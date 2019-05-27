@@ -20,14 +20,11 @@ class LibWallyTests: XCTestCase {
     }
 
     func testGetBIP39WordList() {
-        // Get list
-        let list = BIP39WordList.all
-        
         // Check length
-        XCTAssertEqual(list.count, 2048)
+        XCTAssertEqual(BIP39WordList.count, 2048)
         
         // Check first word
-        XCTAssertEqual(list.first, "abandon")
+        XCTAssertEqual(BIP39WordList.first, "abandon")
     }
 
 }

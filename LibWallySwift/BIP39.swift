@@ -12,17 +12,25 @@ typealias BIP39Word = String
 
 struct BIP39Mnemonic {
     let words: [BIP39Word]
-    
+
     init(words: [BIP39Word]) {
         self.words = words
     }
-    
+
 }
 
-struct BIP39WordList {
-    static var all: [BIP39Word] {
-        let filler = Array(repeating: "", count: 2046)
-        let words = ["abandon", "ability"]
-        return words + filler
+var BIP39WordList: [BIP39Word] = {
+    // Implementation based on Blockstream Green Development Kit
+    var words: [BIP39Word] = []
+    var WL: OpaquePointer?
+    precondition(bip39_get_wordlist(nil, &WL) == WALLY_OK)
+    for i in 0..<BIP39_WORDLIST_LEN {
+        var word: UnsafeMutablePointer<Int8>?
+        defer {
+            wally_free_string(word)
+        }
+        precondition(bip39_get_word(WL, Int(i), &word) == WALLY_OK)
+        words.append(BIP39Word(cString: word!))
     }
-}
+    return words
+}()
