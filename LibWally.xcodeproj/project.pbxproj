@@ -11,6 +11,17 @@
 		FE9CD3BB229C397900345DFA /* LibWally.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9CD3B1229C397900345DFA /* LibWally.framework */; };
 		FE9CD3C0229C397900345DFA /* LibWallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* LibWallyTests.swift */; };
 		FE9CD3C2229C397900345DFA /* LibWally.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9CD3B4229C397900345DFA /* LibWally.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B699229C6BBC00459518 /* wally_script.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46B229C6BBB00459518 /* wally_script.h */; };
+		FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46C229C6BBB00459518 /* wally_elements.h */; };
+		FEB0B69B229C6BBC00459518 /* wally_crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46D229C6BBB00459518 /* wally_crypto.h */; };
+		FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46E229C6BBB00459518 /* wally_address.h */; };
+		FEB0B69D229C6BBC00459518 /* wally_bip39.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46F229C6BBB00459518 /* wally_bip39.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B69E229C6BBC00459518 /* wally_core.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B470229C6BBB00459518 /* wally_core.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B69F229C6BBC00459518 /* wally.hpp in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B471229C6BBB00459518 /* wally.hpp */; };
+		FEB0B6A0229C6BBC00459518 /* wally_bip32.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B472229C6BBB00459518 /* wally_bip32.h */; };
+		FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B473229C6BBB00459518 /* wally_bip38.h */; };
+		FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B474229C6BBB00459518 /* wally_transaction.h */; };
+		FEB0B877229C76F400459518 /* libwallycore-simulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEB0B875229C76F400459518 /* libwallycore-simulator.a */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +42,21 @@
 		FE9CD3BA229C397900345DFA /* LibWallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibWallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE9CD3BF229C397900345DFA /* LibWallyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibWallyTests.swift; sourceTree = "<group>"; };
 		FE9CD3C1229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FEB0B467229C6B6C00459518 /* libwallycore.la */ = {isa = PBXFileReference; lastKnownFileType = text; name = libwallycore.la; path = "libwally-core/src/libwallycore.la"; sourceTree = "<group>"; };
+		FEB0B46B229C6BBB00459518 /* wally_script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_script.h; sourceTree = "<group>"; };
+		FEB0B46C229C6BBB00459518 /* wally_elements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_elements.h; sourceTree = "<group>"; };
+		FEB0B46D229C6BBB00459518 /* wally_crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_crypto.h; sourceTree = "<group>"; };
+		FEB0B46E229C6BBB00459518 /* wally_address.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_address.h; sourceTree = "<group>"; };
+		FEB0B46F229C6BBB00459518 /* wally_bip39.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_bip39.h; sourceTree = "<group>"; };
+		FEB0B470229C6BBB00459518 /* wally_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_core.h; sourceTree = "<group>"; };
+		FEB0B471229C6BBB00459518 /* wally.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = wally.hpp; sourceTree = "<group>"; };
+		FEB0B472229C6BBB00459518 /* wally_bip32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_bip32.h; sourceTree = "<group>"; };
+		FEB0B473229C6BBB00459518 /* wally_bip38.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_bip38.h; sourceTree = "<group>"; };
+		FEB0B474229C6BBB00459518 /* wally_transaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_transaction.h; sourceTree = "<group>"; };
+		FEB0B870229C6EE400459518 /* libwallycore_la-bip39.lo */ = {isa = PBXFileReference; lastKnownFileType = text; name = "libwallycore_la-bip39.lo"; path = "libwally-core/src/libwallycore_la-bip39.lo"; sourceTree = "<group>"; };
+		FEB0B872229C72A700459518 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
+		FEB0B874229C76F400459518 /* libwallycore-device.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwallycore-device.a"; path = "libwally-core/dist/libwallycore-device.a"; sourceTree = "<group>"; };
+		FEB0B875229C76F400459518 /* libwallycore-simulator.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwallycore-simulator.a"; path = "libwally-core/dist/libwallycore-simulator.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEB0B877229C76F400459518 /* libwallycore-simulator.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,9 +82,11 @@
 		FE9CD3A7229C397900345DFA = {
 			isa = PBXGroup;
 			children = (
+				FEB0B469229C6BA400459518 /* libwally-core */,
 				FE9CD3B3229C397900345DFA /* LibWallySwift */,
 				FE9CD3BE229C397900345DFA /* LibWallyTests */,
 				FE9CD3B2229C397900345DFA /* Products */,
+				FEB0B466229C6B6C00459518 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -89,6 +118,44 @@
 			path = LibWallyTests;
 			sourceTree = "<group>";
 		};
+		FEB0B466229C6B6C00459518 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FEB0B874229C76F400459518 /* libwallycore-device.a */,
+				FEB0B875229C76F400459518 /* libwallycore-simulator.a */,
+				FEB0B872229C72A700459518 /* libwallycore.a */,
+				FEB0B870229C6EE400459518 /* libwallycore_la-bip39.lo */,
+				FEB0B467229C6B6C00459518 /* libwallycore.la */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FEB0B469229C6BA400459518 /* libwally-core */ = {
+			isa = PBXGroup;
+			children = (
+				FEB0B46A229C6BBB00459518 /* include */,
+			);
+			name = "libwally-core";
+			sourceTree = "<group>";
+		};
+		FEB0B46A229C6BBB00459518 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				FEB0B46B229C6BBB00459518 /* wally_script.h */,
+				FEB0B46C229C6BBB00459518 /* wally_elements.h */,
+				FEB0B46D229C6BBB00459518 /* wally_crypto.h */,
+				FEB0B46E229C6BBB00459518 /* wally_address.h */,
+				FEB0B46F229C6BBB00459518 /* wally_bip39.h */,
+				FEB0B470229C6BBB00459518 /* wally_core.h */,
+				FEB0B471229C6BBB00459518 /* wally.hpp */,
+				FEB0B472229C6BBB00459518 /* wally_bip32.h */,
+				FEB0B473229C6BBB00459518 /* wally_bip38.h */,
+				FEB0B474229C6BBB00459518 /* wally_transaction.h */,
+			);
+			name = include;
+			path = "libwally-core/include";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -97,6 +164,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE9CD3C2229C397900345DFA /* LibWally.h in Headers */,
+				FEB0B69F229C6BBC00459518 /* wally.hpp in Headers */,
+				FEB0B69E229C6BBC00459518 /* wally_core.h in Headers */,
+				FEB0B69D229C6BBC00459518 /* wally_bip39.h in Headers */,
+				FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */,
+				FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */,
+				FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */,
+				FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */,
+				FEB0B69B229C6BBC00459518 /* wally_crypto.h in Headers */,
+				FEB0B699229C6BBC00459518 /* wally_script.h in Headers */,
+				FEB0B6A0229C6BBC00459518 /* wally_bip32.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +438,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
+					"$(PROJECT_DIR)/libwally-core/src/.libs",
+					"$(PROJECT_DIR)/libwally-core/dist",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -387,6 +470,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
+					"$(PROJECT_DIR)/libwally-core/src/.libs",
+					"$(PROJECT_DIR)/libwally-core/dist",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
