@@ -8,20 +8,18 @@
 
 import Foundation
 
-typealias BIP39Word = String
-
 struct BIP39Mnemonic {
-    let words: [BIP39Word]
+    let words: [String]
 
-    init(words: [BIP39Word]) {
+    init(_ words: [String]) {
         self.words = words
     }
 
 }
 
-var BIP39WordList: [BIP39Word] = {
+var BIP39WordList: [String] = {
     // Implementation based on Blockstream Green Development Kit
-    var words: [BIP39Word] = []
+    var words: [String] = []
     var WL: OpaquePointer?
     precondition(bip39_get_wordlist(nil, &WL) == WALLY_OK)
     for i in 0..<BIP39_WORDLIST_LEN {
@@ -30,7 +28,7 @@ var BIP39WordList: [BIP39Word] = {
             wally_free_string(word)
         }
         precondition(bip39_get_word(WL, Int(i), &word) == WALLY_OK)
-        words.append(BIP39Word(cString: word!))
+        words.append(String(cString: word!))
     }
     return words
 }()
