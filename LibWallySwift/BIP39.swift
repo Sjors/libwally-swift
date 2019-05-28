@@ -9,6 +9,8 @@
 
 import Foundation
 
+let MAX_WORDS = 24 // Arbitrary, used only to determine array size in bip39_mnemonic_to_bytes
+
 public var BIP39Words: [String] = {
     // Implementation based on Blockstream Green Development Kit
     var words: [String] = []
@@ -24,6 +26,24 @@ public var BIP39Words: [String] = {
     }
     return words
 }()
+
+public struct BIP39Entropy : LosslessStringConvertible, Equatable {
+    var data: Data
+    
+    public init?(_ description: String) {
+        if let data = Data(description) {
+            self.data = data
+        } else {
+            return nil
+        }
+    }
+    
+    init(_ data: Data) {
+        self.data = data
+    }
+    
+    public var description: String { return data.hexString }
+}
 
 public struct BIP39Seed : LosslessStringConvertible, Equatable {
     var data: Data
@@ -43,7 +63,7 @@ public struct BIP39Seed : LosslessStringConvertible, Equatable {
     public var description: String { return data.hexString }
 }
 
-public struct BIP39Mnemonic : LosslessStringConvertible {
+public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
     public let words: [String]
     public var description: String { return words.joined(separator: " ") }
 
@@ -54,6 +74,43 @@ public struct BIP39Mnemonic : LosslessStringConvertible {
     
     public init?(_ words: String) {
         self.init(words.components(separatedBy: " "))
+    }
+    
+    public init?(_ entropy: BIP39Entropy) {
+        precondition(entropy.data.count <= MAX_WORDS)
+        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: MAX_WORDS)
+        let bytes_len = entropy.data.count
+        
+        var output: UnsafeMutablePointer<Int8>?
+        defer {
+            wally_free_string(output)
+        }
+        entropy.data.copyBytes(to: bytes, count: entropy.data.count)
+
+        precondition(bip39_mnemonic_from_bytes(nil, bytes, bytes_len, &output) == WALLY_OK)
+        
+        if let words_c_string = output {
+            let words = String(cString: words_c_string)
+            self.init(words)
+        } else {
+            return nil
+        }
+        
+    }
+    
+    public var entropy: BIP39Entropy {
+        get {
+            let mnemonic = words.joined(separator: " ")
+            
+            var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+            var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+            defer {
+                bytes_out.deallocate()
+                written.deallocate()
+            }
+            precondition(bip39_mnemonic_to_bytes(nil, mnemonic, bytes_out, MAX_WORDS, written) == WALLY_OK)
+            return BIP39Entropy(Data(bytes: bytes_out, count: written.pointee))
+        }
     }
     
     public func seedHex(_ passphrase: String? = nil) -> BIP39Seed {
@@ -70,6 +127,9 @@ public struct BIP39Mnemonic : LosslessStringConvertible {
     }
 
     static func isValid(_ words: [String]) -> Bool {
+        // Enforce maximum length
+        if (words.count > MAX_WORDS) { return false }
+
         // Check that each word appears in the BIP39 dictionary:
         if (!Set(words).subtracting(Set(BIP39Words)).isEmpty) {
             return false

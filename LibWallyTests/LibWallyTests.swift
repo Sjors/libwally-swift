@@ -54,6 +54,26 @@ class LibWallyTests: XCTestCase {
         XCTAssertEqual(mnemonic!.description, validMnemonic)
     }
     
+    func testMnemonicToEntropy() {
+        let mnemonic = BIP39Mnemonic(validMnemonic)
+        XCTAssertEqual(mnemonic!.entropy.description, "00000000000000000000000000000000")
+        let mnemonic2 = BIP39Mnemonic("legal winner thank year wave sausage worth useful legal winner thank yellow")
+        XCTAssertEqual(mnemonic2!.entropy.description, "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f")
+    }
+    
+    func testEntropyToMnemonic() {
+        let expectedMnemonic = BIP39Mnemonic("legal winner thank year wave sausage worth useful legal winner thank yellow")
+        let entropy = BIP39Entropy("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f")
+        let mnemonic = BIP39Mnemonic(entropy!)
+        XCTAssertEqual(mnemonic, expectedMnemonic)
+    }
+    
+    
+    func testEntropyLosslessStringConvertible() {
+        let entropy = BIP39Entropy("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f")
+        XCTAssertEqual(entropy!.description, "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f")
+    }
+    
     func testMnemonicToSeedHexString() {
         let mnemonic = BIP39Mnemonic(validMnemonic)
         XCTAssertEqual(mnemonic!.seedHex("TREZOR").description, "c55257c360c07c72029aebc1b53c05ed0362ada38ead3e3e9efa3708e53495531f09a6987599d18264c1e1c92f2cf141630c7a3c4ab7c81b2f001698e7463b04")
