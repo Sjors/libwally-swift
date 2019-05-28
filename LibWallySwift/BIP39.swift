@@ -9,6 +9,22 @@
 
 import Foundation
 
+public var BIP39Words: [String] = {
+    // Implementation based on Blockstream Green Development Kit
+    var words: [String] = []
+    var WL: OpaquePointer?
+    precondition(bip39_get_wordlist(nil, &WL) == WALLY_OK)
+    for i in 0..<BIP39_WORDLIST_LEN {
+        var word: UnsafeMutablePointer<Int8>?
+        defer {
+            wally_free_string(word)
+        }
+        precondition(bip39_get_word(WL, Int(i), &word) == WALLY_OK)
+        words.append(String(cString: word!))
+    }
+    return words
+}()
+
 public struct BIP39Seed : LosslessStringConvertible, Equatable {
     var data: Data
     
@@ -67,19 +83,3 @@ public struct BIP39Mnemonic : LosslessStringConvertible {
     }
 
 }
-
-public var BIP39Words: [String] = {
-    // Implementation based on Blockstream Green Development Kit
-    var words: [String] = []
-    var WL: OpaquePointer?
-    precondition(bip39_get_wordlist(nil, &WL) == WALLY_OK)
-    for i in 0..<BIP39_WORDLIST_LEN {
-        var word: UnsafeMutablePointer<Int8>?
-        defer {
-            wally_free_string(word)
-        }
-        precondition(bip39_get_word(WL, Int(i), &word) == WALLY_OK)
-        words.append(String(cString: word!))
-    }
-    return words
-}()
