@@ -3,7 +3,8 @@
 //  LibWally
 //
 //  Created by Sjors on 27/05/2019.
-//  Copyright © 2019 Blockchain. All rights reserved.
+//  Copyright © 2019 Blockchain. Distributed under the MIT software
+//  license, see the accompanying file LICENSE.md.
 //
 
 #import <UIKit/UIKit.h>
