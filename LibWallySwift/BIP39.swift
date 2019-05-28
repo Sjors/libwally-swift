@@ -9,6 +9,24 @@
 
 import Foundation
 
+public struct BIP39Seed : LosslessStringConvertible, Equatable {
+    var data: Data
+    
+    public init?(_ description: String) {
+        if let data = Data(description) {
+            self.data = data
+        } else {
+            return nil
+        }
+    }
+    
+    init(_ data: Data) {
+        self.data = data
+    }
+    
+    public var description: String { return data.hexString }
+}
+
 public struct BIP39Mnemonic : LosslessStringConvertible {
     public let words: [String]
     public var description: String { return words.joined(separator: " ") }
@@ -20,6 +38,19 @@ public struct BIP39Mnemonic : LosslessStringConvertible {
     
     public init?(_ words: String) {
         self.init(words.components(separatedBy: " "))
+    }
+    
+    public func seedHex(_ passphrase: String? = nil) -> BIP39Seed {
+        let mnemonic = words.joined(separator: " ")
+        
+        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            bytes_out.deallocate()
+            written.deallocate()
+        }
+        precondition(bip39_mnemonic_to_seed(mnemonic, passphrase, bytes_out, Int(BIP39_SEED_LEN_512), written) == WALLY_OK)
+        return BIP39Seed(Data(bytes: bytes_out, count: written.pointee))
     }
 
     static func isValid(_ words: [String]) -> Bool {

@@ -53,5 +53,20 @@ class LibWallyTests: XCTestCase {
         let mnemonic = BIP39Mnemonic(validMnemonic)
         XCTAssertEqual(mnemonic!.description, validMnemonic)
     }
+    
+    func testMnemonicToSeedHexString() {
+        let mnemonic = BIP39Mnemonic(validMnemonic)
+        XCTAssertEqual(mnemonic!.seedHex("TREZOR").description, "c55257c360c07c72029aebc1b53c05ed0362ada38ead3e3e9efa3708e53495531f09a6987599d18264c1e1c92f2cf141630c7a3c4ab7c81b2f001698e7463b04")
+        XCTAssertEqual(mnemonic!.seedHex().description, "5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4")
+        XCTAssertEqual(mnemonic!.seedHex("").description, "5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4")
+    }
+    
+    func testBIP39SeedLosslessStringConvertible() {
+        let mnemonic = BIP39Mnemonic(validMnemonic)
+        let expectedBIP39Seed = mnemonic!.seedHex("TREZOR")
+        let parsedBIP39Seed = BIP39Seed("c55257c360c07c72029aebc1b53c05ed0362ada38ead3e3e9efa3708e53495531f09a6987599d18264c1e1c92f2cf141630c7a3c4ab7c81b2f001698e7463b04")
+        XCTAssertEqual(parsedBIP39Seed, expectedBIP39Seed)
+    }
+
 
 }

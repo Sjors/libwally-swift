@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FE120F55229C3B6900E7720C /* BIP39.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE120F54229C3B6900E7720C /* BIP39.swift */; };
+		FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE39CDF9229DAAF400DD135E /* DataExtension.swift */; };
 		FE9CD3BB229C397900345DFA /* LibWally.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9CD3B1229C397900345DFA /* LibWally.framework */; };
 		FE9CD3C0229C397900345DFA /* LibWallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* LibWallyTests.swift */; };
 		FE9CD3C2229C397900345DFA /* LibWally.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9CD3B4229C397900345DFA /* LibWally.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -37,6 +38,7 @@
 /* Begin PBXFileReference section */
 		FE120F54229C3B6900E7720C /* BIP39.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39.swift; sourceTree = "<group>"; };
 		FE39CDF5229D534100DD135E /* DemoPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = DemoPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		FE39CDF9229DAAF400DD135E /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
 		FE9CD3B1229C397900345DFA /* LibWally.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibWally.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE9CD3B4229C397900345DFA /* LibWally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibWally.h; sourceTree = "<group>"; };
 		FE9CD3B5229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			children = (
 				FE9CD3B4229C397900345DFA /* LibWally.h */,
 				FE9CD3B5229C397900345DFA /* Info.plist */,
+				FE39CDF9229DAAF400DD135E /* DataExtension.swift */,
 				FE120F54229C3B6900E7720C /* BIP39.swift */,
 			);
 			path = LibWallySwift;
@@ -278,6 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE120F55229C3B6900E7720C /* BIP39.swift in Sources */,
+				FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
