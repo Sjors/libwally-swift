@@ -11,8 +11,17 @@ import Foundation
 struct BIP39Mnemonic {
     let words: [String]
 
-    init(_ words: [String]) {
+    init?(_ words: [String]) {
+        if (!BIP39Mnemonic.isValid(words)) { return nil }
         self.words = words
+    }
+
+    static func isValid(_ words: [String]) -> Bool {
+        // Check that each word appears in the BIP39 dictionary:
+        if (!Set(words).subtracting(Set(BIP39WordList)).isEmpty) {
+            return false
+        }
+        return true
     }
 
 }

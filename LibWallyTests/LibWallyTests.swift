@@ -10,6 +10,7 @@ import XCTest
 @testable import LibWally
 
 class LibWallyTests: XCTestCase {
+    let validMnemonic = ["abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "about"]
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -25,6 +26,24 @@ class LibWallyTests: XCTestCase {
         
         // Check first word
         XCTAssertEqual(BIP39WordList.first, "abandon")
+    }
+    
+    func testMnemonicIsValid() {
+        XCTAssertTrue(BIP39Mnemonic.isValid(validMnemonic))
+        XCTAssertFalse(BIP39Mnemonic.isValid(["notavalidword"]))
+    }
+    
+    func testInitializeMnemonic() {
+        let mnemonic = BIP39Mnemonic(validMnemonic)
+        XCTAssertNotNil(mnemonic)
+        if (mnemonic != nil) {
+            XCTAssertEqual(mnemonic!.words, validMnemonic)
+        }
+    }
+    
+    func testInitializeInvalidMnemonic() {
+        let mnemonic = BIP39Mnemonic(["notavalidword"])
+        XCTAssertNil(mnemonic)
     }
 
 }
