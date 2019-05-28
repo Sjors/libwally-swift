@@ -9,10 +9,10 @@
 
 import Foundation
 
-struct BIP39Mnemonic {
-    let words: [String]
+public struct BIP39Mnemonic {
+    public let words: [String]
 
-    init?(_ words: [String]) {
+    public init?(_ words: [String]) {
         if (!BIP39Mnemonic.isValid(words)) { return nil }
         self.words = words
     }
@@ -28,7 +28,7 @@ struct BIP39Mnemonic {
 
 }
 
-var BIP39Words: [String] = {
+public var BIP39Words: [String] = {
     // Implementation based on Blockstream Green Development Kit
     var words: [String] = []
     var WL: OpaquePointer?
