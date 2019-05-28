@@ -22,10 +22,10 @@ class LibWallyTests: XCTestCase {
 
     func testGetBIP39WordList() {
         // Check length
-        XCTAssertEqual(BIP39WordList.count, 2048)
+        XCTAssertEqual(BIP39Words.count, 2048)
         
         // Check first word
-        XCTAssertEqual(BIP39WordList.first, "abandon")
+        XCTAssertEqual(BIP39Words.first, "abandon")
     }
     
     func testMnemonicIsValid() {

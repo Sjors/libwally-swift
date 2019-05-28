@@ -18,7 +18,7 @@ struct BIP39Mnemonic {
 
     static func isValid(_ words: [String]) -> Bool {
         // Check that each word appears in the BIP39 dictionary:
-        if (!Set(words).subtracting(Set(BIP39WordList)).isEmpty) {
+        if (!Set(words).subtracting(Set(BIP39Words)).isEmpty) {
             return false
         }
         return true
@@ -26,7 +26,7 @@ struct BIP39Mnemonic {
 
 }
 
-var BIP39WordList: [String] = {
+var BIP39Words: [String] = {
     // Implementation based on Blockstream Green Development Kit
     var words: [String] = []
     var WL: OpaquePointer?
