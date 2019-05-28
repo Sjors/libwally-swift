@@ -11,7 +11,7 @@ import XCTest
 @testable import LibWally
 
 class LibWallyTests: XCTestCase {
-    let validMnemonic = ["abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "about"]
+    let validMnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -31,21 +31,27 @@ class LibWallyTests: XCTestCase {
     
     func testMnemonicIsValid() {
         XCTAssertTrue(BIP39Mnemonic.isValid(validMnemonic))
-        XCTAssertFalse(BIP39Mnemonic.isValid(["notavalidword"]))
-        XCTAssertFalse(BIP39Mnemonic.isValid(["abandon"]))
+        XCTAssertFalse(BIP39Mnemonic.isValid("notavalidword"))
+        XCTAssertFalse(BIP39Mnemonic.isValid("abandon"))
+        XCTAssertFalse(BIP39Mnemonic.isValid(["abandon", "abandon"]))
     }
     
     func testInitializeMnemonic() {
         let mnemonic = BIP39Mnemonic(validMnemonic)
         XCTAssertNotNil(mnemonic)
         if (mnemonic != nil) {
-            XCTAssertEqual(mnemonic!.words, validMnemonic)
+            XCTAssertEqual(mnemonic!.words, validMnemonic.components(separatedBy: " "))
         }
     }
     
     func testInitializeInvalidMnemonic() {
         let mnemonic = BIP39Mnemonic(["notavalidword"])
         XCTAssertNil(mnemonic)
+    }
+    
+    func testMnemonicLosslessStringConvertible() {
+        let mnemonic = BIP39Mnemonic(validMnemonic)
+        XCTAssertEqual(mnemonic!.description, validMnemonic)
     }
 
 }

@@ -9,12 +9,17 @@
 
 import Foundation
 
-public struct BIP39Mnemonic {
+public struct BIP39Mnemonic : LosslessStringConvertible {
     public let words: [String]
+    public var description: String { return words.joined(separator: " ") }
 
     public init?(_ words: [String]) {
         if (!BIP39Mnemonic.isValid(words)) { return nil }
         self.words = words
+    }
+    
+    public init?(_ words: String) {
+        self.init(words.components(separatedBy: " "))
     }
 
     static func isValid(_ words: [String]) -> Bool {
@@ -24,6 +29,10 @@ public struct BIP39Mnemonic {
         }
         let mnemonic = words.joined(separator: " ")
         return bip39_mnemonic_validate(nil, mnemonic) == WALLY_OK
+    }
+    
+    static func isValid(_ words: String) -> Bool {
+        return self.isValid(words.components(separatedBy: " "))
     }
 
 }
