@@ -32,6 +32,7 @@ class LibWallyTests: XCTestCase {
     func testMnemonicIsValid() {
         XCTAssertTrue(BIP39Mnemonic.isValid(validMnemonic))
         XCTAssertFalse(BIP39Mnemonic.isValid(["notavalidword"]))
+        XCTAssertFalse(BIP39Mnemonic.isValid(["abandon"]))
     }
     
     func testInitializeMnemonic() {

@@ -22,7 +22,8 @@ struct BIP39Mnemonic {
         if (!Set(words).subtracting(Set(BIP39Words)).isEmpty) {
             return false
         }
-        return true
+        let mnemonic = words.joined(separator: " ")
+        return bip39_mnemonic_validate(nil, mnemonic) == WALLY_OK
     }
 
 }
