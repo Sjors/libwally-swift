@@ -20,7 +20,7 @@ Currently only works on the simulator.
 
 ```swift
 let mnemonic = BIP39Mnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
-mnemonic.seedHex
+let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))
 ```
 
 See also the included [Playground](/DemoPlayground.playground/Contents.swift) and [tests](/LibWallyTests).
