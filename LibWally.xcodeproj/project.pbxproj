@@ -12,16 +12,16 @@
 		FE9CD3BB229C397900345DFA /* LibWally.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9CD3B1229C397900345DFA /* LibWally.framework */; };
 		FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* BIP39Tests.swift */; };
 		FE9CD3C2229C397900345DFA /* LibWally.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9CD3B4229C397900345DFA /* LibWally.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FEB0B699229C6BBC00459518 /* wally_script.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46B229C6BBB00459518 /* wally_script.h */; };
+		FEB0B699229C6BBC00459518 /* wally_script.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46B229C6BBB00459518 /* wally_script.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46C229C6BBB00459518 /* wally_elements.h */; };
-		FEB0B69B229C6BBC00459518 /* wally_crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46D229C6BBB00459518 /* wally_crypto.h */; };
-		FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46E229C6BBB00459518 /* wally_address.h */; };
+		FEB0B69B229C6BBC00459518 /* wally_crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46D229C6BBB00459518 /* wally_crypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46E229C6BBB00459518 /* wally_address.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B69D229C6BBC00459518 /* wally_bip39.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46F229C6BBB00459518 /* wally_bip39.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B69E229C6BBC00459518 /* wally_core.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B470229C6BBB00459518 /* wally_core.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B69F229C6BBC00459518 /* wally.hpp in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B471229C6BBB00459518 /* wally.hpp */; };
-		FEB0B6A0229C6BBC00459518 /* wally_bip32.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B472229C6BBB00459518 /* wally_bip32.h */; };
-		FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B473229C6BBB00459518 /* wally_bip38.h */; };
-		FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B474229C6BBB00459518 /* wally_transaction.h */; };
+		FEB0B6A0229C6BBC00459518 /* wally_bip32.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B472229C6BBB00459518 /* wally_bip32.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B473229C6BBB00459518 /* wally_bip38.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B474229C6BBB00459518 /* wally_transaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B877229C76F400459518 /* libwallycore-simulator.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEB0B875229C76F400459518 /* libwallycore-simulator.a */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
@@ -169,16 +169,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE9CD3C2229C397900345DFA /* LibWally.h in Headers */,
-				FEB0B69F229C6BBC00459518 /* wally.hpp in Headers */,
 				FEB0B69E229C6BBC00459518 /* wally_core.h in Headers */,
-				FEB0B69D229C6BBC00459518 /* wally_bip39.h in Headers */,
-				FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */,
-				FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */,
-				FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */,
-				FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */,
 				FEB0B69B229C6BBC00459518 /* wally_crypto.h in Headers */,
-				FEB0B699229C6BBC00459518 /* wally_script.h in Headers */,
+				FEB0B69C229C6BBC00459518 /* wally_address.h in Headers */,
+				FEB0B69F229C6BBC00459518 /* wally.hpp in Headers */,
+				FEB0B6A1229C6BBC00459518 /* wally_bip38.h in Headers */,
 				FEB0B6A0229C6BBC00459518 /* wally_bip32.h in Headers */,
+				FEB0B69D229C6BBC00459518 /* wally_bip39.h in Headers */,
+				FEB0B699229C6BBC00459518 /* wally_script.h in Headers */,
+				FEB0B6A2229C6BBC00459518 /* wally_transaction.h in Headers */,
+				FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
