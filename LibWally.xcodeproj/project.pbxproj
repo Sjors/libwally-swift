@@ -10,7 +10,7 @@
 		FE120F55229C3B6900E7720C /* BIP39.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE120F54229C3B6900E7720C /* BIP39.swift */; };
 		FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE39CDF9229DAAF400DD135E /* DataExtension.swift */; };
 		FE9CD3BB229C397900345DFA /* LibWally.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9CD3B1229C397900345DFA /* LibWally.framework */; };
-		FE9CD3C0229C397900345DFA /* LibWallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* LibWallyTests.swift */; };
+		FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* BIP39Tests.swift */; };
 		FE9CD3C2229C397900345DFA /* LibWally.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9CD3B4229C397900345DFA /* LibWally.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FEB0B699229C6BBC00459518 /* wally_script.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46B229C6BBB00459518 /* wally_script.h */; };
 		FEB0B69A229C6BBC00459518 /* wally_elements.h in Headers */ = {isa = PBXBuildFile; fileRef = FEB0B46C229C6BBB00459518 /* wally_elements.h */; };
@@ -43,7 +43,7 @@
 		FE9CD3B4229C397900345DFA /* LibWally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibWally.h; sourceTree = "<group>"; };
 		FE9CD3B5229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FE9CD3BA229C397900345DFA /* LibWallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibWallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		FE9CD3BF229C397900345DFA /* LibWallyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibWallyTests.swift; sourceTree = "<group>"; };
+		FE9CD3BF229C397900345DFA /* BIP39Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39Tests.swift; sourceTree = "<group>"; };
 		FE9CD3C1229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FEB0B467229C6B6C00459518 /* libwallycore.la */ = {isa = PBXFileReference; lastKnownFileType = text; name = libwallycore.la; path = "libwally-core/src/libwallycore.la"; sourceTree = "<group>"; };
 		FEB0B46B229C6BBB00459518 /* wally_script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_script.h; sourceTree = "<group>"; };
@@ -117,7 +117,7 @@
 		FE9CD3BE229C397900345DFA /* LibWallyTests */ = {
 			isa = PBXGroup;
 			children = (
-				FE9CD3BF229C397900345DFA /* LibWallyTests.swift */,
+				FE9CD3BF229C397900345DFA /* BIP39Tests.swift */,
 				FE9CD3C1229C397900345DFA /* Info.plist */,
 			);
 			path = LibWallyTests;
@@ -289,7 +289,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FE9CD3C0229C397900345DFA /* LibWallyTests.swift in Sources */,
+				FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
