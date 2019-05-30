@@ -14,7 +14,7 @@ Supports a minimal set of features based on v0.7.0. See also [original docs](htt
 - [ ] Script Functions
 - [ ] Transaction Functions
 
-Currently only works on the simulator.
+Works with iOs 11+ on 64-bit devices and the simulator.
 
 ## Usage
 
@@ -36,12 +36,11 @@ brew install gnu-sed
 Clone the repository, including submodules:
 
 ```sh
-git clone ... --recurse-submodules
+git clone https://github.com/blockchain/libwally-swift.git --recurse-submodules
 ```
 
-```sh
-cd libwally-core
-./tools/autogen.sh
-./configure --disable-shared --host=x86_64-apple-darwin --with-sysroot=$(xcrun --sdk iphoneos --show-sdk-path) --enable-static
-make
+Build libwally-core:
+
+```
+./build-libwally.sh
 ```
