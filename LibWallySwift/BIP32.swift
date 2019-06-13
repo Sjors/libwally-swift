@@ -10,6 +10,7 @@ import Foundation
 
 public enum BIP32Error: Error {
     case invalidIndex
+    case hardenedDerivationWithoutPrivateKey
 }
 
 public enum BIP32Derivation : Equatable {
@@ -193,5 +194,27 @@ public struct HDKey : LosslessStringConvertible {
         precondition(bip32_key_to_base58(hdkey, UInt32(BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
         precondition(output != nil)
         return String(cString: output!)
+    }
+    
+    
+    public func derive (_ path: BIP32Path) throws -> HDKey {
+        if self.isNeutered && path.components.first(where: { $0.isHardened }) != nil {
+            throw BIP32Error.hardenedDerivationWithoutPrivateKey
+        }
+        
+        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        hdkey.initialize(to: self.wally_ext_key)
+        
+        var output: UnsafeMutablePointer<ext_key>?
+        defer {
+            hdkey.deallocate()
+            if let wally_ext_key = output {
+                wally_ext_key.deallocate()
+            }
+        }
+        
+        precondition(bip32_key_from_parent_path_alloc(hdkey, path.rawPath, path.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
+        precondition(output != nil)
+        return HDKey(output!.pointee)
     }
 }
