@@ -8,7 +8,7 @@ Supports a minimal set of features based on v0.7.0. See also [original docs](htt
 - [ ] Core Functions
 - [ ] Crypto Functions
 - [ ] Address Functions
-- [ ] BIP32 Functions
+- [x] BIP32 Functions
 - [ ] BIP38 Functions
 - [x] BIP39 Functions
 - [ ] Script Functions
@@ -20,7 +20,10 @@ Works with iOs 11+ on 64-bit devices and the simulator.
 
 ```swift
 let mnemonic = BIP39Mnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
-let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))
+let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))!
+let path = BIP32Path("m/44'/0'/0'")!
+let account = try! masterKey.derive(path)
+account.xpub
 ```
 
 See also the included [Playground](/DemoPlayground.playground/Contents.swift) and [tests](/LibWallyTests).

@@ -14,5 +14,8 @@ BIP39Mnemonic(BIP39Entropy("00000000000000000000000000000000")!)
 // The seed hex is the starting point for BIP32 deriviation. It can take an optional BIP39 passphrase.
 // https://github.com/trezor/python-mnemonic/blob/master/vectors.json#L6
 let seedHex: BIP39Seed = mnemonic!.seedHex("TREZOR")
-let masterKey = HDKey(seedHex)
-masterKey?.description
+let masterKey = HDKey(seedHex)!
+masterKey.description
+let path = BIP32Path("m/44'/0'/0'")!
+let account = try! masterKey.derive(path)
+account.xpub
