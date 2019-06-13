@@ -32,4 +32,29 @@ class BIP32Tests: XCTestCase {
         
         XCTAssertNil(HDKey("invalid"))
     }
+    
+    func testXpriv() {
+        let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
+        let hdKey = HDKey(xpriv)!
+        
+        XCTAssertEqual(hdKey.xpriv, xpriv)
+    }
+    
+    func testXpub() {
+        let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
+        let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
+        let hdKey = HDKey(xpriv)!
+        
+        XCTAssertEqual(hdKey.xpub, xpub)
+    }
+    
+    func testParseXpub() {
+        let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
+        let hdKey = HDKey(xpub)
+        XCTAssertNotNil(hdKey)
+        XCTAssertEqual(hdKey!.description, xpub)
+        XCTAssertEqual(hdKey!.xpub, xpub)
+        XCTAssertNil(hdKey!.xpriv)
+
+    }
 }
