@@ -57,4 +57,22 @@ class BIP32Tests: XCTestCase {
         XCTAssertNil(hdKey!.xpriv)
 
     }
+    
+    func testBIP32PathFromString() {
+        let path = BIP32Path("m/0'/0") // 0' and 0h are treated the same
+        XCTAssertNotNil(path)
+        XCTAssertEqual(path!.components, [.hardened(0), .normal(0)])
+        XCTAssertEqual(path!.description, "m/0h/0") // description always uses h instead of '
+    }
+    
+    func testBIP32PathFromInt() {
+        var path: BIP32Path
+        XCTAssertNoThrow(try BIP32Path(0))
+        path = try! BIP32Path(0)
+        XCTAssertEqual(path.components, [.normal(0)])
+        
+        XCTAssertThrowsError(try BIP32Path(Int(UINT32_MAX))) { error in
+            XCTAssertEqual(error as! BIP32Error, BIP32Error.invalidIndex)
+        }
+    }
 }

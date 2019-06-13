@@ -8,6 +8,109 @@
 
 import Foundation
 
+public enum BIP32Error: Error {
+    case invalidIndex
+}
+
+public enum BIP32Derivation : Equatable {
+    // max 2^^31 - 1: enforced by the BIP32Path initializer
+    case normal(UInt32)
+    case hardened(UInt32)
+    
+    public var isHardened: Bool {
+        switch self {
+            case .normal(_):
+                return false
+            case .hardened(_):
+                return true
+        }
+    }
+}
+
+public struct BIP32Path : LosslessStringConvertible {
+    public let components: [BIP32Derivation]
+    let rawPath: [UInt32]
+    
+    public init(_ components: [BIP32Derivation]) throws {
+        var rawPath: [UInt32] = []
+
+        for component in components {
+            switch component {
+            case .normal(let index):
+                if index >= UINT32_MAX / 2 {
+                    throw BIP32Error.invalidIndex
+                }
+                rawPath.append(index)
+            case .hardened(let index):
+                if index >= UINT32_MAX / 2 {
+                    throw BIP32Error.invalidIndex
+                }
+                rawPath.append(BIP32_INITIAL_HARDENED_CHILD + index)
+            }
+        }
+        self.components = components
+        self.rawPath = rawPath
+    }
+    
+    public init(_ component: BIP32Derivation) throws {
+        try self.init([component])
+    }
+    
+    public init(_ index: Int) throws {
+        try self.init([.normal(UInt32(index))])
+    }
+    
+    // LosslessStringConvertible does not permit this initializer to throw
+    public init?(_ description: String) {
+        guard description.count > 0 else {
+            return nil
+        }
+        guard description.prefix(2) == "m/" else {
+            return nil
+        }
+        var tmpComponents: [BIP32Derivation] = []
+
+        for component in description.dropFirst(2).split(separator: "/") {
+            let index: UInt32? = UInt32(component)
+            if let i = index {
+                tmpComponents.append(.normal(i))
+            } else if component.suffix(1) == "h" || component.suffix(1) == "'" {
+                let indexHardened: UInt32? = UInt32(component.dropLast(1))
+                if let i = indexHardened {
+                    tmpComponents.append(.hardened(i))
+                } else {
+                    return nil
+                }
+            } else {
+                return nil
+            }
+        }
+        
+        guard tmpComponents.count > 0 else {
+            return nil
+        }
+        do {
+            try self.init(tmpComponents)
+        } catch {
+            return nil
+        }
+    }
+    
+    public var description: String {
+        var pathString = "m"
+        for item in components {
+            switch item {
+            case .normal(let index):
+                pathString += "/" + String(index)
+            case .hardened(let index):
+                pathString += "/" + String(index) + "h"
+            }
+        }
+        return pathString
+    }
+    
+}
+
 public struct HDKey : LosslessStringConvertible {
     var wally_ext_key: ext_key
     
