@@ -8,8 +8,25 @@
 
 import Foundation
 
-public struct HDKey {
+public struct HDKey : LosslessStringConvertible {
     var wally_ext_key: ext_key
+
+    public init?(_ description: String) {
+        var output: UnsafeMutablePointer<ext_key>?
+        defer {
+            if let wally_ext_key = output {
+                wally_ext_key.deallocate()
+            }
+        }
+        let result = bip32_key_from_base58_alloc(description, &output)
+        if (result == WALLY_OK) {
+            precondition(output != nil)
+            self.wally_ext_key = output!.pointee
+        } else {
+            return nil
+        }
+    }
+
     public init?(_ seed: BIP39Seed) {
         var bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
         var output: UnsafeMutablePointer<ext_key>?

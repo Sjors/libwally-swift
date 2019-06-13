@@ -24,4 +24,12 @@ class BIP32Tests: XCTestCase {
         let hdKey = HDKey(seed)
         XCTAssertEqual(hdKey!.description, "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF")
     }
+    
+    func testBase58ToHDKey() {
+        let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
+        let hdKey = HDKey(xpriv)
+        XCTAssertEqual(hdKey!.description, xpriv)
+        
+        XCTAssertNil(HDKey("invalid"))
+    }
 }
