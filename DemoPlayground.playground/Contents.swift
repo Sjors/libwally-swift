@@ -20,3 +20,7 @@ let path = BIP32Path("m/44'/0'/0'")!
 let account = try! masterKey.derive(path)
 account.xpub
 account.address(.payToWitnessPubKeyHash)
+
+var address = Address("bc1q6zwjfmhdl4pvhvfpv8pchvtanlar8hrhqdyv0t")
+address?.scriptPubKey
+address?.scriptPubKey.type
