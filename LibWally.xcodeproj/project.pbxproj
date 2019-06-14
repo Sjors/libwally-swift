@@ -10,6 +10,8 @@
 		A2330EF5229FF6A300A5F120 /* libwallycore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEB0B872229C72A700459518 /* libwallycore.a */; };
 		FE120F55229C3B6900E7720C /* BIP39.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE120F54229C3B6900E7720C /* BIP39.swift */; };
 		FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE39CDF9229DAAF400DD135E /* DataExtension.swift */; };
+		FE8B80A422B3E5630041CC94 /* Script.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8B80A322B3E5630041CC94 /* Script.swift */; };
+		FE8B80A622B3E5760041CC94 /* ScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8B80A522B3E5760041CC94 /* ScriptTests.swift */; };
 		FE9CD3BB229C397900345DFA /* LibWally.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9CD3B1229C397900345DFA /* LibWally.framework */; };
 		FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* BIP39Tests.swift */; };
 		FE9CD3C2229C397900345DFA /* LibWally.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9CD3B4229C397900345DFA /* LibWally.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -41,6 +43,8 @@
 		FE120F54229C3B6900E7720C /* BIP39.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39.swift; sourceTree = "<group>"; };
 		FE39CDF5229D534100DD135E /* DemoPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = DemoPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FE39CDF9229DAAF400DD135E /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
+		FE8B80A322B3E5630041CC94 /* Script.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Script.swift; sourceTree = "<group>"; };
+		FE8B80A522B3E5760041CC94 /* ScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptTests.swift; sourceTree = "<group>"; };
 		FE9CD3B1229C397900345DFA /* LibWally.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibWally.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE9CD3B4229C397900345DFA /* LibWally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibWally.h; sourceTree = "<group>"; };
 		FE9CD3B5229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -113,6 +117,7 @@
 				FE39CDF9229DAAF400DD135E /* DataExtension.swift */,
 				FEC79CE3229E7F3800D86E2E /* BIP32.swift */,
 				FE120F54229C3B6900E7720C /* BIP39.swift */,
+				FE8B80A322B3E5630041CC94 /* Script.swift */,
 			);
 			path = LibWallySwift;
 			sourceTree = "<group>";
@@ -123,6 +128,7 @@
 				FE9CD3C1229C397900345DFA /* Info.plist */,
 				FEC79CE5229E807500D86E2E /* BIP32Tests.swift */,
 				FE9CD3BF229C397900345DFA /* BIP39Tests.swift */,
+				FE8B80A522B3E5760041CC94 /* ScriptTests.swift */,
 			);
 			path = LibWallyTests;
 			sourceTree = "<group>";
@@ -282,6 +288,7 @@
 			files = (
 				FE120F55229C3B6900E7720C /* BIP39.swift in Sources */,
 				FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */,
+				FE8B80A422B3E5630041CC94 /* Script.swift in Sources */,
 				FEC79CE4229E7F3800D86E2E /* BIP32.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -290,6 +297,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE8B80A622B3E5760041CC94 /* ScriptTests.swift in Sources */,
 				FEC79CE6229E807500D86E2E /* BIP32Tests.swift in Sources */,
 				FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */,
 			);
