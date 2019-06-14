@@ -24,6 +24,7 @@ let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))!
 let path = BIP32Path("m/44'/0'/0'")!
 let account = try! masterKey.derive(path)
 account.xpub
+account.address(.payToWitnessPubKeyHash)
 ```
 
 See also the included [Playground](/DemoPlayground.playground/Contents.swift) and [tests](/LibWallyTests).
