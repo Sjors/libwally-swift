@@ -34,5 +34,23 @@ class AddressTests: XCTestCase {
         let address = hdKey.address(.payToWitnessPubKeyHash)
         XCTAssertEqual(address.description, "bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt")
     }
+    
+    func testParseLegacyAddress() {
+        let address = Address("1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj")
+        XCTAssertNotNil(address)
+        XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac"))
+    }
+    
+    func testParseWrappedSegWitAddress() {
+        let address = Address("3DymAvEWH38HuzHZ3VwLus673bNZnYwNXu")
+        XCTAssertNotNil(address)
+        XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("a91486cc442a97817c245ce90ed0d31d6dbcde3841f987"))
+    }
+    
+    func testParseNativeSegWitAddress() {
+        let address = Address("bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt")
+        XCTAssertNotNil(address)
+        XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe"))
+    }
 
 }
