@@ -30,6 +30,7 @@ public enum ScriptSigPurpose {
     case signThisInput
     case signOtherInput
     case signed
+    case feeWorstCase
 }
 
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
@@ -110,6 +111,9 @@ public struct ScriptSig : Equatable {
             return self.scriptPubKey.bytes
         case .signOtherInput:
             return Data("")!
+        case .feeWorstCase:
+            let longestSignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
+            return Data([UInt8(longestSignature.count)]) + longestSignature + self.scriptPubKey.bytes
         case .signed:
             if let signature = self.signature {
                 return Data([UInt8(signature.count)]) + signature + self.scriptPubKey.bytes
