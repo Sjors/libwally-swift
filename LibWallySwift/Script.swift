@@ -19,6 +19,19 @@ public enum ScriptType {
     case multiSig
 }
 
+public typealias PubKey = Data
+public typealias Signature = Data
+
+public enum ScriptSigType {
+    case payToPubKeyHash(PubKey) // P2PKH (legacy)
+}
+
+public enum ScriptSigPurpose {
+    case signThisInput
+    case signOtherInput
+    case signed
+}
+
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
     var bytes: Data
     
@@ -68,4 +81,41 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
     }
     
 
+}
+
+public struct ScriptSig {
+    // When signing an input, its scriptSig is replaced by scriptPubKey of the output being spent
+    let scriptPubKey: ScriptPubKey
+    
+    // In order to produce a (P2PKH) scriptSig a public key is needed:
+    let pubKey: PubKey
+
+    // When used in a finalized transaction, scriptSig usually includes a signature:
+    var signature: Signature?
+    
+    init (_ type: ScriptSigType, _ scriptPubKey: ScriptPubKey) {
+        var mutableScriptPubKey = scriptPubKey
+        switch (type) {
+        case .payToPubKeyHash(let pubKey):
+            precondition(mutableScriptPubKey.type == .payToPubKeyHash)
+            self.pubKey = pubKey
+        }
+        
+        self.scriptPubKey = scriptPubKey
+    }
+    
+    public func render(_ purpose: ScriptSigPurpose) -> Data? {
+        switch purpose {
+        case .signThisInput:
+            return self.scriptPubKey.bytes
+        case .signOtherInput:
+            return Data("")!
+        case .signed:
+            if let signature = self.signature {
+                return Data([UInt8(signature.count)]) + signature + self.scriptPubKey.bytes
+            } else {
+                return nil
+            }
+        }
+    }
 }
