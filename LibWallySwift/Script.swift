@@ -83,7 +83,7 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
 
 }
 
-public struct ScriptSig {
+public struct ScriptSig : Equatable {
     // When signing an input, its scriptSig is replaced by scriptPubKey of the output being spent
     let scriptPubKey: ScriptPubKey
     

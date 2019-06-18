@@ -35,4 +35,22 @@ class TransctionTests: XCTestCase {
         XCTAssertEqual(output.amount, 1000)
         XCTAssertEqual(output.scriptPubKey, scriptPubKey)
     }
+
+    func testInput() {
+        let tx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
+        let vout = UInt32(0)
+        let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+        let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
+
+        let input = TxInput(tx, vout, scriptSig)
+        XCTAssertNotNil(input)
+        XCTAssertEqual(input.transaction.hash, tx.hash)
+        XCTAssertEqual(input.vout, 0)
+        XCTAssertEqual(input.sequence, 0)
+        XCTAssertEqual(input.scriptSig, scriptSig)
+        XCTAssertEqual(input.witness, nil)
+        XCTAssertEqual(input.signed, false)
+    }
+
 }

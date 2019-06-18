@@ -37,6 +37,52 @@ struct TxOutput {
     }
 }
 
+struct TxInput {
+    let wally_tx_input: wally_tx_input
+    let transaction: Transaction
+    public var vout: UInt32 {
+        return self.wally_tx_input.index
+    }
+    public var sequence: UInt32 {
+        return self.wally_tx_input.sequence
+    }
+    public var scriptSig: ScriptSig
+
+    public var witness: Data? {
+        // TODO: obtain from wally_tx_input.witness
+        return nil
+    }
+
+    init (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
+        // We initialize self.wally_tx_input with an empty scriptSig, which is what's used when signing
+        // for other inputs. We update it from self.scriptSig as needed during the signing process.
+        self.scriptSig = scriptSig
+
+        let sequence: UInt32 = 0
+
+        var tx_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: tx.hash.count)
+        let tx_hash_bytes_len = tx.hash.count
+
+        tx.hash.copyBytes(to: tx_hash_bytes, count: tx_hash_bytes_len)
+
+        var output: UnsafeMutablePointer<wally_tx_input>?
+        defer {
+            if let wally_tx_input = output {
+                wally_tx_input.deallocate()
+            }
+        }
+        precondition(wally_tx_input_init_alloc(tx_hash_bytes, tx_hash_bytes_len, vout, sequence, nil, 0, nil, &output) == WALLY_OK)
+        precondition(output != nil)
+        self.wally_tx_input = output!.pointee
+
+        self.transaction = tx
+    }
+
+    public var signed: Bool {
+        return self.scriptSig.signature != nil
+    }
+}
+
 struct Transaction {
     let hash: Data
 
