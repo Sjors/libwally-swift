@@ -31,9 +31,11 @@ public enum BIP32Derivation : Equatable {
 public struct BIP32Path : LosslessStringConvertible {
     public let components: [BIP32Derivation]
     let rawPath: [UInt32]
+    let relative: Bool
     
-    public init(_ components: [BIP32Derivation]) throws {
+    public init(_ components: [BIP32Derivation], relative: Bool) throws {
         var rawPath: [UInt32] = []
+        self.relative = relative
 
         for component in components {
             switch component {
@@ -53,12 +55,12 @@ public struct BIP32Path : LosslessStringConvertible {
         self.rawPath = rawPath
     }
     
-    public init(_ component: BIP32Derivation) throws {
-        try self.init([component])
+    public init(_ component: BIP32Derivation, relative: Bool = true) throws {
+        try self.init([component], relative: relative)
     }
     
-    public init(_ index: Int) throws {
-        try self.init([.normal(UInt32(index))])
+    public init(_ index: Int, relative: Bool = true) throws {
+        try self.init([.normal(UInt32(index))], relative: relative)
     }
     
     // LosslessStringConvertible does not permit this initializer to throw
@@ -66,12 +68,11 @@ public struct BIP32Path : LosslessStringConvertible {
         guard description.count > 0 else {
             return nil
         }
-        guard description.prefix(2) == "m/" else {
-            return nil
-        }
+        let relative = description.prefix(2) != "m/"
         var tmpComponents: [BIP32Derivation] = []
 
-        for component in description.dropFirst(2).split(separator: "/") {
+        for component in description.split(separator: "/") {
+            if component == "m" { continue }
             let index: UInt32? = UInt32(component)
             if let i = index {
                 tmpComponents.append(.normal(i))
@@ -91,20 +92,23 @@ public struct BIP32Path : LosslessStringConvertible {
             return nil
         }
         do {
-            try self.init(tmpComponents)
+            try self.init(tmpComponents, relative: relative)
         } catch {
             return nil
         }
     }
     
     public var description: String {
-        var pathString = "m"
-        for item in components {
+        var pathString = self.relative ? "" : "m/"
+        for (index, item) in components.enumerated() {
             switch item {
             case .normal(let index):
-                pathString += "/" + String(index)
+                pathString += String(index)
             case .hardened(let index):
-                pathString += "/" + String(index) + "h"
+                pathString += String(index) + "h"
+            }
+            if index < components.endIndex - 1 {
+                pathString += "/"
             }
         }
         return pathString
