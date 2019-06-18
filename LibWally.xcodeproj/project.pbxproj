@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A232260122B94A6B00C3B79C /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260022B94A6B00C3B79C /* Transaction.swift */; };
+		A232260322B94A8400C3B79C /* TransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260222B94A8400C3B79C /* TransactionTests.swift */; };
 		A2330EF5229FF6A300A5F120 /* libwallycore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEB0B872229C72A700459518 /* libwallycore.a */; };
 		FE120F55229C3B6900E7720C /* BIP39.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE120F54229C3B6900E7720C /* BIP39.swift */; };
 		FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE39CDF9229DAAF400DD135E /* DataExtension.swift */; };
@@ -40,6 +42,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A232260022B94A6B00C3B79C /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		A232260222B94A8400C3B79C /* TransactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
 		FE120F54229C3B6900E7720C /* BIP39.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39.swift; sourceTree = "<group>"; };
 		FE39CDF5229D534100DD135E /* DemoPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = DemoPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FE39CDF9229DAAF400DD135E /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
@@ -51,7 +55,6 @@
 		FE9CD3BA229C397900345DFA /* LibWallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibWallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE9CD3BF229C397900345DFA /* BIP39Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39Tests.swift; sourceTree = "<group>"; };
 		FE9CD3C1229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FEB0B467229C6B6C00459518 /* libwallycore.la */ = {isa = PBXFileReference; lastKnownFileType = text; name = libwallycore.la; path = "libwally-core/src/libwallycore.la"; sourceTree = "<group>"; };
 		FEB0B46B229C6BBB00459518 /* wally_script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_script.h; sourceTree = "<group>"; };
 		FEB0B46C229C6BBB00459518 /* wally_elements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_elements.h; sourceTree = "<group>"; };
 		FEB0B46D229C6BBB00459518 /* wally_crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_crypto.h; sourceTree = "<group>"; };
@@ -62,7 +65,6 @@
 		FEB0B472229C6BBB00459518 /* wally_bip32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_bip32.h; sourceTree = "<group>"; };
 		FEB0B473229C6BBB00459518 /* wally_bip38.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_bip38.h; sourceTree = "<group>"; };
 		FEB0B474229C6BBB00459518 /* wally_transaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wally_transaction.h; sourceTree = "<group>"; };
-		FEB0B870229C6EE400459518 /* libwallycore_la-bip39.lo */ = {isa = PBXFileReference; lastKnownFileType = text; name = "libwallycore_la-bip39.lo"; path = "libwally-core/src/libwallycore_la-bip39.lo"; sourceTree = "<group>"; };
 		FEB0B872229C72A700459518 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
 		FEC79CE3229E7F3800D86E2E /* BIP32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32.swift; sourceTree = "<group>"; };
 		FEC79CE5229E807500D86E2E /* BIP32Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32Tests.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				FEC79CE3229E7F3800D86E2E /* BIP32.swift */,
 				FE120F54229C3B6900E7720C /* BIP39.swift */,
 				FE8B80A322B3E5630041CC94 /* Script.swift */,
+				A232260022B94A6B00C3B79C /* Transaction.swift */,
 			);
 			path = LibWallySwift;
 			sourceTree = "<group>";
@@ -129,6 +132,7 @@
 				FEC79CE5229E807500D86E2E /* BIP32Tests.swift */,
 				FE9CD3BF229C397900345DFA /* BIP39Tests.swift */,
 				FE8B80A522B3E5760041CC94 /* ScriptTests.swift */,
+				A232260222B94A8400C3B79C /* TransactionTests.swift */,
 			);
 			path = LibWallyTests;
 			sourceTree = "<group>";
@@ -290,6 +294,7 @@
 				FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */,
 				FE8B80A422B3E5630041CC94 /* Script.swift in Sources */,
 				FEC79CE4229E7F3800D86E2E /* BIP32.swift in Sources */,
+				A232260122B94A6B00C3B79C /* Transaction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,6 +304,7 @@
 			files = (
 				FE8B80A622B3E5760041CC94 /* ScriptTests.swift in Sources */,
 				FEC79CE6229E807500D86E2E /* BIP32Tests.swift in Sources */,
+				A232260322B94A8400C3B79C /* TransactionTests.swift in Sources */,
 				FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
