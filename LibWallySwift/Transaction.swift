@@ -53,17 +53,21 @@ struct TxInput {
         return nil
     }
 
-    init (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
+    init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
+        if tx.hash == nil {
+            return nil
+        }
+
         // We initialize self.wally_tx_input with an empty scriptSig, which is what's used when signing
         // for other inputs. We update it from self.scriptSig as needed during the signing process.
         self.scriptSig = scriptSig
 
         let sequence: UInt32 = 0
 
-        var tx_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: tx.hash.count)
-        let tx_hash_bytes_len = tx.hash.count
+        var tx_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: tx.hash!.count)
+        let tx_hash_bytes_len = tx.hash!.count
 
-        tx.hash.copyBytes(to: tx_hash_bytes, count: tx_hash_bytes_len)
+        tx.hash!.copyBytes(to: tx_hash_bytes, count: tx_hash_bytes_len)
 
         var output: UnsafeMutablePointer<wally_tx_input>?
         defer {
@@ -84,7 +88,7 @@ struct TxInput {
 }
 
 struct Transaction {
-    let hash: Data
+    var hash: Data? = nil
 
     init? (_ description: String) {
         if description.count == 64 { // Transaction hash
