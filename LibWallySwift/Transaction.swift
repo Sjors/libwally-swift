@@ -38,13 +38,13 @@ struct TxOutput {
 }
 
 struct TxInput {
-    let wally_tx_input: wally_tx_input
+    var wally_tx_input: UnsafeMutablePointer<wally_tx_input>?
     let transaction: Transaction
     public var vout: UInt32 {
-        return self.wally_tx_input.index
+        return self.wally_tx_input!.pointee.index
     }
     public var sequence: UInt32 {
-        return self.wally_tx_input.sequence
+        return self.wally_tx_input!.pointee.sequence
     }
     public var scriptSig: ScriptSig
 
@@ -63,23 +63,17 @@ struct TxInput {
         self.scriptSig = scriptSig
 
         let sequence: UInt32 = 0
+        
+        self.transaction = tx
 
-        var tx_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: tx.hash!.count)
+        let tx_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: tx.hash!.count)
         let tx_hash_bytes_len = tx.hash!.count
 
         tx.hash!.copyBytes(to: tx_hash_bytes, count: tx_hash_bytes_len)
 
-        var output: UnsafeMutablePointer<wally_tx_input>?
-        defer {
-            if let wally_tx_input = output {
-                wally_tx_input.deallocate()
-            }
-        }
-        precondition(wally_tx_input_init_alloc(tx_hash_bytes, tx_hash_bytes_len, vout, sequence, nil, 0, nil, &output) == WALLY_OK)
-        precondition(output != nil)
-        self.wally_tx_input = output!.pointee
+        precondition(wally_tx_input_init_alloc(tx_hash_bytes, tx_hash_bytes_len, vout, sequence, nil, 0, nil, &self.wally_tx_input) == WALLY_OK)
+        precondition(self.wally_tx_input != nil)
 
-        self.transaction = tx
     }
 
     public var signed: Bool {
@@ -128,13 +122,7 @@ struct Transaction {
     }
     
     mutating func addInput (_ input: TxInput) {
-        let tx_input = UnsafeMutablePointer<wally_tx_input>.allocate(capacity: 1)
-        defer {
-            tx_input.deallocate()
-        }
-        tx_input.pointee = input.wally_tx_input
-
-        precondition(wally_tx_add_input(self.wally_tx, tx_input) == WALLY_OK)
+        precondition(wally_tx_add_input(self.wally_tx, input.wally_tx_input) == WALLY_OK)
     }
     
     mutating func addOutput (_ output: TxOutput) {
