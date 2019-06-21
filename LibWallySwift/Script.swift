@@ -94,7 +94,7 @@ public struct ScriptSig : Equatable {
     // When used in a finalized transaction, scriptSig usually includes a signature:
     var signature: Signature?
     
-    init (_ type: ScriptSigType, _ scriptPubKey: ScriptPubKey) {
+    public init (_ type: ScriptSigType, _ scriptPubKey: ScriptPubKey) {
         var mutableScriptPubKey = scriptPubKey
         switch (type) {
         case .payToPubKeyHash(let pubKey):

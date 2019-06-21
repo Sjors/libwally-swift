@@ -8,16 +8,16 @@
 
 import Foundation
 
-typealias Satoshi = UInt64
+public typealias Satoshi = UInt64
 
-struct TxOutput {
+public struct TxOutput {
     let wally_tx_output: wally_tx_output
-    public var amount: Satoshi {
+    var amount: Satoshi {
         return self.wally_tx_output.satoshi
     }
-    public let scriptPubKey: ScriptPubKey
+    let scriptPubKey: ScriptPubKey
 
-    init (_ scriptPubKey: ScriptPubKey, _ amount: Satoshi) {
+    public init (_ scriptPubKey: ScriptPubKey, _ amount: Satoshi) {
         self.scriptPubKey = scriptPubKey
 
         var scriptpubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.bytes.count)
@@ -37,7 +37,7 @@ struct TxOutput {
     }
 }
 
-struct TxInput {
+public struct TxInput {
     var wally_tx_input: UnsafeMutablePointer<wally_tx_input>?
     let transaction: Transaction
     public var vout: UInt32 {
@@ -53,7 +53,7 @@ struct TxInput {
         return nil
     }
 
-    init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
+    public init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
         if tx.hash == nil {
             return nil
         }
@@ -81,15 +81,15 @@ struct TxInput {
     }
 }
 
-struct Transaction {
+public struct Transaction {
     var hash: Data? = nil
     
     var wally_tx: UnsafeMutablePointer<wally_tx>?
     
-    var inputs: [TxInput]? = nil
+    public var inputs: [TxInput]? = nil
     var outputs: [TxOutput]? = nil
 
-    init? (_ description: String) {
+    public init? (_ description: String) {
         if description.count == 64 { // Transaction hash
             if let hash = Data(description) {
                 self.hash = hash
@@ -102,7 +102,7 @@ struct Transaction {
 
     }
     
-    init (_ inputs: [TxInput], _ outputs: [TxOutput]) {
+    public init (_ inputs: [TxInput], _ outputs: [TxOutput]) {
         self.inputs = inputs
         self.outputs = outputs
         
