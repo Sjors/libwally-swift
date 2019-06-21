@@ -121,6 +121,26 @@ public struct Transaction {
         }
     }
     
+    public var description: String? {
+        if (self.wally_tx == nil) {
+            return nil
+        }
+        precondition(self.inputs != nil)
+        for input in self.inputs! {
+            if !input.signed {
+                return nil
+            }
+        }
+        var output: UnsafeMutablePointer<Int8>?
+        defer {
+            wally_free_string(output)
+        }
+        
+        precondition(wally_tx_to_hex(self.wally_tx, UInt32(WALLY_TX_FLAG_USE_WITNESS), &output) == WALLY_OK)
+        precondition(output != nil)
+        return String(cString: output!)
+    }
+    
     mutating func addInput (_ input: TxInput) {
         precondition(wally_tx_add_input(self.wally_tx, input.wally_tx_input) == WALLY_OK)
     }
