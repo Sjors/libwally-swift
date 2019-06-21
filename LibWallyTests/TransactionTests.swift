@@ -69,6 +69,38 @@ class TransactionTests: XCTestCase {
         XCTAssertEqual(tx.wally_tx?.pointee.num_inputs, 1)
         XCTAssertEqual(tx.wally_tx?.pointee.num_outputs, 1)
     }
+    
+}
+
+class TransactionInstanceTests: XCTestCase {
+    let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
+    let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+    var tx: Transaction? = nil
+    
+    override func setUp() {
+        // Input
+        let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
+        let vout = UInt32(0)
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
+        let txInput = TxInput(prevTx, vout, scriptSig)!
+        
+        // Output:
+        let txOutput = TxOutput(scriptPubKey, 1000)
+        
+        // Transaction
+        tx = Transaction([txInput], [txOutput])
+    }
+    
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+    
+    func testTotalOut() {
+        XCTAssertEqual(tx?.totalOut, 1000)
+        
+        let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
+        XCTAssertNil(tx2?.totalOut)
+
     }
 
 }

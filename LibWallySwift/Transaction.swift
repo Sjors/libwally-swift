@@ -146,6 +146,19 @@ struct Transaction {
         
         precondition(wally_tx_add_output(self.wally_tx, tx_output) == WALLY_OK)
     }
+    
+    var totalOut: Satoshi? {
+        if (self.wally_tx == nil) {
+            return nil
+        }
+        var value_out = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
+        defer {
+            value_out.deallocate()
+        }
+        
+        precondition(wally_tx_get_total_output_satoshi(self.wally_tx, value_out) == WALLY_OK)
+        
+        return value_out.pointee;
     }
 
 }
