@@ -73,12 +73,13 @@ class TransactionTests: XCTestCase {
 }
 
 class TransactionInstanceTests: XCTestCase {
+    // Pay to legacy P2PKH address
     let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
     let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
     var tx: Transaction? = nil
     
     override func setUp() {
-        // Input
+        // Input (legacy P2PKH)
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
         let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
@@ -101,6 +102,14 @@ class TransactionInstanceTests: XCTestCase {
         let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
         XCTAssertNil(tx2?.totalOut)
 
+    }
+    
+    func testSize() {
+        XCTAssertEqual(tx?.vbytes, 182)
+        
+        let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
+        XCTAssertNil(tx2?.vbytes)
+        
     }
 
 }

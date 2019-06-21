@@ -148,5 +148,34 @@ struct Transaction {
         
         return value_out.pointee;
     }
+    
+    var vbytes: Int? {
+        if (self.wally_tx == nil) {
+            return nil
+        }
+        
+        precondition(self.inputs != nil)
+
+        // Set scriptSig for all unsigned inputs to .feeWorstCase
+        for (index, input) in self.inputs!.enumerated() {
+            if (!input.signed) {
+                let scriptSig = input.scriptSig.render(.feeWorstCase)!
+                let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSig.count)
+                let bytes_len = scriptSig.count
+                scriptSig.copyBytes(to: bytes, count: bytes_len)
+                
+                precondition(wally_tx_set_input_script(self.wally_tx, index, bytes, bytes_len) == WALLY_OK)
+            }
+        }
+        
+        var value_out = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            value_out.deallocate()
+        }
+        
+        precondition(wally_tx_get_vsize(self.wally_tx, value_out) == WALLY_OK)
+        
+        return value_out.pointee;
+    }
 
 }
