@@ -92,7 +92,7 @@ public struct Transaction {
     public init? (_ description: String) {
         if description.count == 64 { // Transaction hash
             if let hash = Data(description) {
-                self.hash = hash
+                self.hash = Data(hash.reversed())
             } else {
                 return nil
             }
