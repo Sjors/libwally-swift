@@ -105,7 +105,7 @@ class TransactionInstanceTests: XCTestCase {
     }
     
     func testSize() {
-        XCTAssertEqual(tx?.vbytes, 182)
+        XCTAssertEqual(tx?.vbytes, 183)
         
         let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
         XCTAssertNil(tx2?.vbytes)

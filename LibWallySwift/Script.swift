@@ -112,11 +112,13 @@ public struct ScriptSig : Equatable {
         case .signOtherInput:
             return Data("")!
         case .feeWorstCase:
-            let longestSignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
+            let longestSignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN + 1)))
             return Data([UInt8(longestSignature.count)]) + longestSignature + self.scriptPubKey.bytes
         case .signed:
             if let signature = self.signature {
-                return Data([UInt8(signature.count)]) + signature + self.scriptPubKey.bytes
+                let lengthPush = Data([UInt8(signature.count + 1)]) // DER encoded signature + sighash byte
+                let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
+                return lengthPush + signature + sigHashByte + Data([UInt8(self.pubKey.count)]) + self.pubKey
             } else {
                 return nil
             }
