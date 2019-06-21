@@ -73,10 +73,12 @@ class TransactionTests: XCTestCase {
 }
 
 class TransactionInstanceTests: XCTestCase {
-    // Pay to legacy P2PKH address
+    // From: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
+    // To: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
     let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
     let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
     var tx: Transaction? = nil
+    var hdKey: HDKey? = nil // private key for signing
     
     override func setUp() {
         // Input (legacy P2PKH)
@@ -90,6 +92,9 @@ class TransactionInstanceTests: XCTestCase {
         
         // Transaction
         tx = Transaction([txInput], [txOutput])
+        
+        // Corresponding private key
+       hdKey = HDKey("xprv9wTYmMFdV23N2TdNG573QoEsfRrWKQgWeibmLntzniatZvR9BmLnvSxqu53Kw1UmYPxLgboyZQaXwTCg8MSY3H2EU4pWcQDnRnrVA1xe8fs")!
     }
     
     override func tearDown() {
@@ -110,6 +115,13 @@ class TransactionInstanceTests: XCTestCase {
         let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
         XCTAssertNil(tx2?.vbytes)
         
+    }
+    
+    func testSign() {
+        XCTAssertTrue(tx!.sign([hdKey!]))
+        XCTAssertEqual(tx!.inputs?[0].signed, true)
+        XCTAssertEqual(tx!.inputs?[0].scriptSig.signature?.hexString, "304402203d274300310c06582d0186fc197106120c4838fa5d686fe3aa0478033c35b97802205379758b11b869ede2f5ab13a738493a93571268d66b2a875ae148625bd20578")
+        XCTAssertEqual(tx!.description, "01000000010000000000000000000000000000000000000000000000000000000000000000000000006a47304402203d274300310c06582d0186fc197106120c4838fa5d686fe3aa0478033c35b97802205379758b11b869ede2f5ab13a738493a93571268d66b2a875ae148625bd20578012103501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711cffffffff01e8030000000000001976a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac00000000")
     }
 
 }

@@ -197,5 +197,74 @@ public struct Transaction {
         
         return value_out.pointee;
     }
+    
+    public mutating func sign (_ privKeys: [HDKey]) -> Bool {
+        if self.wally_tx == nil {
+            return false
+        }
+        precondition(self.inputs != nil)
+        if privKeys.count != self.inputs!.count {
+            return false
+        }
+        
+        // Loop through inputs to sign:
+        for (i, _) in self.inputs!.enumerated() {
+            // Prep input for signing:
+            let scriptSig = self.inputs![i].scriptSig.render(.signThisInput)!
+            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSig.count)
+            let bytes_len = scriptSig.count
+            scriptSig.copyBytes(to: bytes, count: bytes_len)
+            
+            var message_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
+            defer {
+                message_bytes.deallocate()
+            }
+
+            // Create hash for signing
+            precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, bytes, bytes_len, 0, UInt32(WALLY_SIGHASH_ALL), 0, message_bytes, Int(SHA256_LEN)) == WALLY_OK)
+            
+            var compact_sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
+            defer {
+                compact_sig_bytes.deallocate()
+            }
+            
+            // Sign hash using private key (without 0 prefix)
+            precondition(EC_MESSAGE_HASH_LEN == SHA256_LEN)
+            
+            var tmp = privKeys[i].wally_ext_key.priv_key
+            let privKey = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
+
+            precondition(wally_ec_sig_from_bytes(privKey, Int(EC_PRIVATE_KEY_LEN), message_bytes, Int(EC_MESSAGE_HASH_LEN), UInt32(EC_FLAG_ECDSA | EC_FLAG_GRIND_R), compact_sig_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
+            
+            // Convert to low s form:
+            let sig_norm_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
+            defer {
+                sig_norm_bytes.deallocate()
+            }
+            precondition(wally_ec_sig_normalize(compact_sig_bytes, Int(EC_SIGNATURE_LEN), sig_norm_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
+            
+            // Convert normalized signature to DER
+            let sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_DER_MAX_LEN))
+            var sig_bytes_written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+            defer {
+                sig_bytes.deallocate()
+                sig_bytes_written.deallocate()
+            }
+            precondition(wally_ec_sig_to_der(sig_norm_bytes, Int(EC_SIGNATURE_LEN), sig_bytes, Int(EC_SIGNATURE_DER_MAX_LEN), sig_bytes_written) == WALLY_OK)
+            
+            // Store signature in TxInput
+            self.inputs![i].scriptSig.signature = Data(bytes: sig_bytes, count: sig_bytes_written.pointee)
+            
+            // Update scriptSig:
+            let signedScriptSig = self.inputs![i].scriptSig.render(.signed)!
+            let bytes_signed_scriptsig = UnsafeMutablePointer<UInt8>.allocate(capacity: signedScriptSig.count)
+            let bytes_signed_scriptsig_len = signedScriptSig.count
+            signedScriptSig.copyBytes(to: bytes_signed_scriptsig, count: bytes_signed_scriptsig_len)
+            
+            precondition(wally_tx_set_input_script(self.wally_tx, i, bytes_signed_scriptsig, bytes_signed_scriptsig_len) == WALLY_OK)
+        }
+
+        return true
+    }
 
 }
