@@ -9,7 +9,7 @@
 import XCTest
 @testable import LibWally
 
-class TransctionTests: XCTestCase {
+class TransactionTests: XCTestCase {
     let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
     let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
 
@@ -50,6 +50,25 @@ class TransctionTests: XCTestCase {
         XCTAssertEqual(input?.scriptSig, scriptSig)
         XCTAssertEqual(input?.witness, nil)
         XCTAssertEqual(input?.signed, false)
+    }
+
+    func testComposeTransaction() {
+        // Input
+        let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
+        let vout = UInt32(0)
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
+        let txInput = TxInput(prevTx, vout, scriptSig)!
+
+        // Output:
+        let txOutput = TxOutput(scriptPubKey, 1000)
+
+        // Transaction
+        let tx = Transaction([txInput], [txOutput])
+        XCTAssertNil(tx.hash)
+        XCTAssertEqual(tx.wally_tx?.pointee.version, 1)
+        XCTAssertEqual(tx.wally_tx?.pointee.num_inputs, 1)
+        XCTAssertEqual(tx.wally_tx?.pointee.num_outputs, 1)
+    }
     }
 
 }
