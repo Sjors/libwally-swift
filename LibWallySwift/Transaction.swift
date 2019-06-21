@@ -62,7 +62,7 @@ public struct TxInput {
         // for other inputs. We update it from self.scriptSig as needed during the signing process.
         self.scriptSig = scriptSig
 
-        let sequence: UInt32 = 0
+        let sequence: UInt32 = 0xFFFFFFFF
         
         self.transaction = tx
 

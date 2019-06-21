@@ -46,7 +46,7 @@ class TransactionTests: XCTestCase {
         XCTAssertNotNil(input)
         XCTAssertEqual(input?.transaction.hash, tx.hash)
         XCTAssertEqual(input?.vout, 0)
-        XCTAssertEqual(input?.sequence, 0)
+        XCTAssertEqual(input?.sequence, 0xFFFFFFFF)
         XCTAssertEqual(input?.scriptSig, scriptSig)
         XCTAssertEqual(input?.witness, nil)
         XCTAssertEqual(input?.signed, false)
