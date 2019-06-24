@@ -92,7 +92,7 @@ class TransactionInstanceTests: XCTestCase {
         // Input (legacy P2PKH)
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
-        let amount: Satoshi = 1000
+        let amount: Satoshi = 1192
         let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
         let txInput = TxInput(prevTx, vout, amount, scriptSig, scriptPubKey)!
         
@@ -111,7 +111,7 @@ class TransactionInstanceTests: XCTestCase {
     }
     
     func testTotalIn() {
-        XCTAssertEqual(tx?.totalIn, 1000)
+        XCTAssertEqual(tx?.totalIn, 1192)
         
         let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
         XCTAssertNil(tx2?.totalIn)
@@ -136,6 +136,14 @@ class TransactionInstanceTests: XCTestCase {
         let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
         XCTAssertNil(tx2?.vbytes)
         
+    }
+    
+    func testFee() {
+        XCTAssertEqual(tx?.fee, 192)
+    }
+    
+    func testFeeRate() {
+        XCTAssertEqual(tx?.feeRate, 1.0)
     }
     
     func testSign() {

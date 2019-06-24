@@ -235,6 +235,27 @@ public struct Transaction {
         return value_out.pointee;
     }
     
+    public var fee: Satoshi? {
+        if let totalOut = self.totalOut {
+            if let totalIn = self.totalIn {
+                if totalIn >= totalOut {
+                    return self.totalIn! - self.totalOut!
+                }
+            }
+        }
+        return nil
+    }
+    
+    public var feeRate: Float64? {
+        if let fee = self.fee {
+            if let vbytes = self.vbytes {
+                precondition(vbytes > 0)
+                return Float64(fee) / Float64(vbytes)
+            }
+        }
+        return nil
+    }
+    
     public mutating func sign (_ privKeys: [HDKey]) -> Bool {
         if self.wally_tx == nil {
             return false
