@@ -169,7 +169,7 @@ public struct Transaction {
         return value_out.pointee;
     }
     
-    var vbytes: Int? {
+    public var vbytes: Int? {
         if (self.wally_tx == nil) {
             return nil
         }

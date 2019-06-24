@@ -45,13 +45,12 @@ class ScriptTests: XCTestCase {
         var scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
         XCTAssertEqual(scriptSig.pubKey, pubKey)
         XCTAssertEqual(scriptSig.scriptPubKey, scriptPubKey)
-        XCTAssertEqual(scriptSig.render(.signOtherInput), Data(""))
         XCTAssertEqual(scriptSig.render(.signThisInput), scriptPubKey.bytes)
         XCTAssertEqual(scriptSig.render(.signed), nil)
 
         XCTAssertEqual(scriptSig.signature, nil)
         
-        XCTAssertEqual(scriptSig.render(.feeWorstCase)?.count, 2 + Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN) + scriptPubKey.bytes.count)
+        XCTAssertEqual(scriptSig.render(.feeWorstCase)?.count, 2 + Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN) + 1 + pubKey.count)
         
         scriptSig.signature = Signature("01")!
         let sigHashByte = Data("01")! // SIGHASH_ALL
