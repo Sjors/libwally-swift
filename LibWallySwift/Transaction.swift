@@ -237,6 +237,11 @@ public struct Transaction {
             precondition(wally_ec_private_key_verify(privKey, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
         
             precondition(wally_ec_sig_from_bytes(privKey, Int(EC_PRIVATE_KEY_LEN), message_bytes, Int(EC_MESSAGE_HASH_LEN), UInt32(EC_FLAG_ECDSA | EC_FLAG_GRIND_R), compact_sig_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
+        
+            // Check that signature is valid and for the correct public key:
+            var tmpPub = privKeys[i].wally_ext_key.pub_key
+            let pubKey = [UInt8](UnsafeBufferPointer(start: &tmpPub.0, count: Int(EC_PUBLIC_KEY_LEN)))
+            precondition(wally_ec_sig_verify(pubKey, Int(EC_PUBLIC_KEY_LEN), message_bytes, Int(EC_MESSAGE_HASH_LEN), UInt32(EC_FLAG_ECDSA), compact_sig_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
             
             // Convert to low s form:
             let sig_norm_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
