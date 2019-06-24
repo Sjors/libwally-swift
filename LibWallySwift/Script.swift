@@ -27,7 +27,6 @@ public enum ScriptSigType {
 }
 
 public enum ScriptSigPurpose {
-    case signThisInput
     case signed
     case feeWorstCase
 }
@@ -84,30 +83,21 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
 }
 
 public struct ScriptSig : Equatable {
-    // When signing an input, its scriptSig is replaced by scriptPubKey of the output being spent
-    let scriptPubKey: ScriptPubKey
-    
     // In order to produce a (P2PKH) scriptSig a public key is needed:
     let pubKey: PubKey
 
     // When used in a finalized transaction, scriptSig usually includes a signature:
     var signature: Signature?
     
-    public init (_ type: ScriptSigType, _ scriptPubKey: ScriptPubKey) {
-        var mutableScriptPubKey = scriptPubKey
+    public init (_ type: ScriptSigType) {
         switch (type) {
         case .payToPubKeyHash(let pubKey):
-            precondition(mutableScriptPubKey.type == .payToPubKeyHash)
             self.pubKey = pubKey
         }
-        
-        self.scriptPubKey = scriptPubKey
     }
     
     public func render(_ purpose: ScriptSigPurpose) -> Data? {
         switch purpose {
-        case .signThisInput:
-            return self.scriptPubKey.bytes
         case .feeWorstCase:
              // DER encoded signature
             let dummySignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))

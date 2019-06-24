@@ -46,6 +46,7 @@ public struct TxInput {
     public var sequence: UInt32 {
         return self.wally_tx_input!.pointee.sequence
     }
+    public var scriptPubKey: ScriptPubKey
     public var scriptSig: ScriptSig
 
     public var witness: Data? {
@@ -53,14 +54,13 @@ public struct TxInput {
         return nil
     }
 
-    public init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig) {
+    public init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig, _ scriptPubKey: ScriptPubKey) {
         if tx.hash == nil {
             return nil
         }
 
-        // We initialize self.wally_tx_input with an empty scriptSig, which is what's used when signing
-        // for other inputs. We update it from self.scriptSig as needed during the signing process.
         self.scriptSig = scriptSig
+        self.scriptPubKey = scriptPubKey
 
         let sequence: UInt32 = 0xFFFFFFFF
         
@@ -210,10 +210,10 @@ public struct Transaction {
         // Loop through inputs to sign:
         for (i, _) in self.inputs!.enumerated() {
             // Prep input for signing:
-            let scriptSig = self.inputs![i].scriptSig.render(.signThisInput)!
-            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSig.count)
-            let bytes_len = scriptSig.count
-            scriptSig.copyBytes(to: bytes, count: bytes_len)
+            let scriptPubKey = self.inputs![i].scriptPubKey.bytes
+            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.count)
+            let bytes_len = scriptPubKey.count
+            scriptPubKey.copyBytes(to: bytes, count: bytes_len)
             
             var message_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
             defer {

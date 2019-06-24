@@ -40,9 +40,9 @@ class TransactionTests: XCTestCase {
     func testInput() {
         let tx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
-        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
 
-        let input = TxInput(tx, vout, scriptSig)
+        let input = TxInput(tx, vout, scriptSig, scriptPubKey)
         XCTAssertNotNil(input)
         XCTAssertEqual(input?.transaction.hash, tx.hash)
         XCTAssertEqual(input?.vout, 0)
@@ -56,8 +56,8 @@ class TransactionTests: XCTestCase {
         // Input
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
-        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
-        let txInput = TxInput(prevTx, vout, scriptSig)!
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
+        let txInput = TxInput(prevTx, vout, scriptSig, scriptPubKey)!
 
         // Output:
         let txOutput = TxOutput(scriptPubKey, 1000)
@@ -84,8 +84,8 @@ class TransactionInstanceTests: XCTestCase {
         // Input (legacy P2PKH)
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
-        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey), scriptPubKey)
-        let txInput = TxInput(prevTx, vout, scriptSig)!
+        let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
+        let txInput = TxInput(prevTx, vout, scriptSig, scriptPubKey)!
         
         // Output:
         let txOutput = TxOutput(scriptPubKey, 1000)
