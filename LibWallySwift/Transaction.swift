@@ -197,6 +197,15 @@ public struct Transaction {
         return value_out.pointee;
     }
     
+    var funded: Bool? {
+        if let totalOut = self.totalOut {
+            if let totalIn = self.totalIn {
+                return totalOut >= totalIn
+            }
+        }
+        return nil
+    }
+    
     public var vbytes: Int? {
         if (self.wally_tx == nil) {
             return nil

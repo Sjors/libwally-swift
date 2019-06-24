@@ -126,6 +126,10 @@ class TransactionInstanceTests: XCTestCase {
 
     }
     
+    func testFunded() {
+        XCTAssertEqual(tx?.funded, true)
+    }
+    
     func testSize() {
         XCTAssertEqual(tx?.vbytes, 192)
         
