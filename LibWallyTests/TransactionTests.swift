@@ -70,6 +70,12 @@ class TransactionTests: XCTestCase {
         XCTAssertEqual(tx.wally_tx?.pointee.num_outputs, 1)
     }
     
+    func testDeserialize() {
+        let hex = "01000000010000000000000000000000000000000000000000000000000000000000000000000000006a47304402203d274300310c06582d0186fc197106120c4838fa5d686fe3aa0478033c35b97802205379758b11b869ede2f5ab13a738493a93571268d66b2a875ae148625bd20578012103501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711cffffffff01e8030000000000001976a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac00000000"
+        let tx = Transaction(hex)
+        XCTAssertEqual(tx?.description, hex)
+    }
+    
 }
 
 class TransactionInstanceTests: XCTestCase {

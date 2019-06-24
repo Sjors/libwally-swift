@@ -90,16 +90,24 @@ public struct Transaction {
     var outputs: [TxOutput]? = nil
 
     public init? (_ description: String) {
-        if description.count == 64 { // Transaction hash
-            if let hash = Data(description) {
-                self.hash = Data(hash.reversed())
-            } else {
-                return nil
+        if let hex = Data(description) {
+            if hex.count != SHA256_LEN { // Not a transaction hash
+                var tx_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: hex.count)
+                hex.copyBytes(to: tx_bytes, count: hex.count)
+                defer {
+                    tx_bytes.deallocate()
+                }
+                if (wally_tx_from_bytes(tx_bytes, hex.count, UInt32(WALLY_TX_FLAG_USE_WITNESS), &self.wally_tx) == WALLY_OK) {
+                    precondition(self.wally_tx != nil)
+                    return
+                }
             }
-        } else { // Transaction hex
-            return nil
+            if hex.count == SHA256_LEN { // 32 bytes, but not a valid transaction, so treat as a hash
+                self.hash = Data(hex.reversed())
+                return
+            }
         }
-
+        return nil
     }
     
     public init (_ inputs: [TxInput], _ outputs: [TxOutput]) {
@@ -125,12 +133,16 @@ public struct Transaction {
         if (self.wally_tx == nil) {
             return nil
         }
-        precondition(self.inputs != nil)
-        for input in self.inputs! {
-            if !input.signed {
-                return nil
+        // If we have TxInput objects, make sure they're all signed. Otherwise we've been initialized
+        // from a hex string, so we'll just try to reserialize what we have.
+        if (self.inputs != nil) {
+            for input in self.inputs! {
+                if !input.signed {
+                    return nil
+                }
             }
         }
+        
         var output: UnsafeMutablePointer<Int8>?
         defer {
             wally_free_string(output)
