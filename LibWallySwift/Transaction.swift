@@ -48,19 +48,22 @@ public struct TxInput {
     }
     public var scriptPubKey: ScriptPubKey
     public var scriptSig: ScriptSig
+    public var amount: Satoshi
 
     public var witness: Data? {
         // TODO: obtain from wally_tx_input.witness
         return nil
     }
 
-    public init? (_ tx: Transaction, _ vout: UInt32, _ scriptSig: ScriptSig, _ scriptPubKey: ScriptPubKey) {
+    public init? (_ tx: Transaction, _ vout: UInt32, _ amount: Satoshi, _ scriptSig: ScriptSig, _ scriptPubKey: ScriptPubKey) {
         if tx.hash == nil {
             return nil
         }
 
         self.scriptSig = scriptSig
         self.scriptPubKey = scriptPubKey
+        
+        self.amount = amount
 
         let sequence: UInt32 = 0xFFFFFFFF
         
@@ -165,6 +168,19 @@ public struct Transaction {
         tx_output.pointee = output.wally_tx_output
         
         precondition(wally_tx_add_output(self.wally_tx, tx_output) == WALLY_OK)
+    }
+    
+    var totalIn: Satoshi? {
+        var tally: Satoshi = 0
+        if let inputs = self.inputs {
+            for input in inputs {
+                tally += input.amount
+            }
+        } else {
+            return nil
+        }
+        
+        return tally
     }
     
     var totalOut: Satoshi? {

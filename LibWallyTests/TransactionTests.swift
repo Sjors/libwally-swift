@@ -40,9 +40,10 @@ class TransactionTests: XCTestCase {
     func testInput() {
         let tx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
+        let amount: Satoshi = 1000
         let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
 
-        let input = TxInput(tx, vout, scriptSig, scriptPubKey)
+        let input = TxInput(tx, vout, amount, scriptSig, scriptPubKey)
         XCTAssertNotNil(input)
         XCTAssertEqual(input?.transaction.hash, tx.hash)
         XCTAssertEqual(input?.vout, 0)
@@ -56,8 +57,9 @@ class TransactionTests: XCTestCase {
         // Input
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
+        let amount: Satoshi = 1000
         let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
-        let txInput = TxInput(prevTx, vout, scriptSig, scriptPubKey)!
+        let txInput = TxInput(prevTx, vout, amount, scriptSig, scriptPubKey)!
 
         // Output:
         let txOutput = TxOutput(scriptPubKey, 1000)
@@ -90,8 +92,9 @@ class TransactionInstanceTests: XCTestCase {
         // Input (legacy P2PKH)
         let prevTx = Transaction("0000000000000000000000000000000000000000000000000000000000000000")!
         let vout = UInt32(0)
+        let amount: Satoshi = 1000
         let scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
-        let txInput = TxInput(prevTx, vout, scriptSig, scriptPubKey)!
+        let txInput = TxInput(prevTx, vout, amount, scriptSig, scriptPubKey)!
         
         // Output:
         let txOutput = TxOutput(scriptPubKey, 1000)
@@ -105,6 +108,14 @@ class TransactionInstanceTests: XCTestCase {
     
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+    
+    func testTotalIn() {
+        XCTAssertEqual(tx?.totalIn, 1000)
+        
+        let tx2 = Transaction("0000000000000000000000000000000000000000000000000000000000000000")
+        XCTAssertNil(tx2?.totalIn)
+        
     }
     
     func testTotalOut() {
