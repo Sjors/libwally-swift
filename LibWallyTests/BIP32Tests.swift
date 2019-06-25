@@ -48,6 +48,20 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(hdKey.xpub, xpub)
     }
     
+    func testTpub() {
+        let tpriv = "tprv8gzC1wn3dmCrBiqDFrqhw9XXgy5t4mzeL5SdWayHBHz1GmWbRKoqDBSwDLfunPAWxMqZ9bdGsdpTiYUfYiWypv4Wfj9g7AYX5K3H9gRYNCA"
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let hdKey = HDKey(tpriv)!
+        
+        XCTAssertEqual(hdKey.xpub, tpub)
+    }
+    
+    func testPubKey() {
+        let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
+        let hdKey = HDKey(xpub)!
+        XCTAssertEqual(hdKey.pubKey.hexString, Data("02f632717d78bf73e74aa8461e2e782532abae4eed5110241025afb59ebfd3d2fd")?.hexString)
+    }
+    
     func testParseXpub() {
         let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
         let hdKey = HDKey(xpub)
@@ -56,6 +70,16 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(hdKey!.xpub, xpub)
         XCTAssertNil(hdKey!.xpriv)
 
+    }
+
+    func testParseTpub() {
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let hdKey = HDKey(tpub)
+        XCTAssertNotNil(hdKey)
+        XCTAssertEqual(hdKey!.description, tpub)
+        XCTAssertEqual(hdKey!.xpub, tpub)
+        XCTAssertNil(hdKey!.xpriv)
+        
     }
     
     func testRelativePathFromString() {

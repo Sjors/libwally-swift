@@ -8,9 +8,15 @@
 
 import Foundation
 
+public enum Network {
+    case mainnet
+    case testnet
+}
+
 public enum BIP32Error: Error {
     case invalidIndex
     case hardenedDerivationWithoutPrivateKey
+    case incompatibleNetwork
 }
 
 public enum BIP32Derivation : Equatable {
@@ -139,7 +145,7 @@ public struct HDKey : LosslessStringConvertible {
         }
     }
 
-    public init?(_ seed: BIP39Seed) {
+    public init?(_ seed: BIP39Seed, _ network: Network = .mainnet) {
         var bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
         var output: UnsafeMutablePointer<ext_key>?
         defer {
@@ -149,7 +155,14 @@ public struct HDKey : LosslessStringConvertible {
             }
         }
         seed.data.copyBytes(to: bytes_in, count: Int(BIP39_SEED_LEN_512))
-        let result = bip32_key_from_seed_alloc(bytes_in, Int(BIP32_ENTROPY_LEN_512), UInt32(BIP32_VER_MAIN_PRIVATE), 0, &output)
+        var flags: UInt32 = 0
+        switch network {
+        case .mainnet:
+            flags = UInt32(BIP32_VER_MAIN_PRIVATE)
+        case .testnet:
+            flags = UInt32(BIP32_VER_TEST_PRIVATE)
+        }
+        let result = bip32_key_from_seed_alloc(bytes_in, Int(BIP32_ENTROPY_LEN_512), flags, 0, &output)
         if (result == WALLY_OK) {
             precondition(output != nil)
             self.init(output!.pointee)
@@ -158,6 +171,17 @@ public struct HDKey : LosslessStringConvertible {
             // The entropy passed in may produce an invalid key. If this happens, WALLY_ERROR will be returned
             // and the caller should retry with new entropy.
             return nil
+        }
+    }
+    
+    public var network: Network {
+        switch self.wally_ext_key.version {
+        case UInt32(BIP32_VER_MAIN_PRIVATE), UInt32(BIP32_VER_MAIN_PUBLIC):
+            return .mainnet
+        case UInt32(BIP32_VER_TEST_PRIVATE), UInt32(BIP32_VER_TEST_PUBLIC):
+            return .testnet
+        default:
+            precondition(false)
         }
     }
     
@@ -181,6 +205,12 @@ public struct HDKey : LosslessStringConvertible {
         precondition(bip32_key_to_base58(hdkey, UInt32(BIP32_FLAG_KEY_PUBLIC), &output) == WALLY_OK)
         precondition(output != nil)
         return String(cString: output!)
+    }
+    
+    public var pubKey: Data {
+        var tmp = self.wally_ext_key.pub_key
+        let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
+        return Data(pub_key)
     }
     
     public var xpriv: String? {
