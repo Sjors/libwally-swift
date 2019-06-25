@@ -11,6 +11,8 @@ import XCTest
 
 class AddressTests: XCTestCase {
     let hdKey = HDKey("xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ")!
+    let hdKeyTestnet = HDKey("tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ")!
+
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -24,15 +26,32 @@ class AddressTests: XCTestCase {
         let address = hdKey.address(.payToPubKeyHash)
         XCTAssertEqual(address.description, "1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj")
     }
+
+    func testDeriveLegacyAddressTestnet() {
+        let address = hdKeyTestnet.address(.payToPubKeyHash)
+        XCTAssertEqual(address.description, "mnicNaAVzyGdFvDa9VkMrjgNdnr2wHBWxk")
+    }
+
     
     func testDeriveWrappedSegWitAddress() {
         let address = hdKey.address(.payToScriptHashPayToWitnessPubKeyHash)
         XCTAssertEqual(address.description, "3DymAvEWH38HuzHZ3VwLus673bNZnYwNXu")
     }
     
+    func testDeriveWrappedSegWitAddressTestnet() {
+        let address = hdKeyTestnet.address(.payToScriptHashPayToWitnessPubKeyHash)
+        XCTAssertEqual(address.description, "2N6M3ah9EoggimNz5pnAmQwnpE1Z3ya3V7A")
+    }
+    
+    
     func testDeriveNativeSegWitAddress() {
         let address = hdKey.address(.payToWitnessPubKeyHash)
         XCTAssertEqual(address.description, "bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt")
+    }
+    
+    func testDeriveNativeSegWitAddressTestnet() {
+        let address = hdKeyTestnet.address(.payToWitnessPubKeyHash)
+        XCTAssertEqual(address.description, "tb1qfm7nmm28m9n7gy3fsfpze8vymds9qwtjwn4w7y")
     }
     
     func testParseLegacyAddress() {

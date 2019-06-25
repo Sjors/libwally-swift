@@ -19,6 +19,7 @@ public protocol AddressProtocol : LosslessStringConvertible {
 }
 
 public struct Address : AddressProtocol {
+    public var network: Network
     public var scriptPubKey: ScriptPubKey
     var address: String
     
@@ -33,17 +34,32 @@ public struct Address : AddressProtocol {
             written.deallocate()
         }
         
-        // Try if this is a bech32 Bitcoin address:
-        let family: String = "bc"
+        // Try if this is a bech32 Bitcoin mainnet address:
+        var family: String = "bc"
         var result = wally_addr_segwit_to_bytes(description, family, 0, bytes_out, description.count, written)
+        self.network = .mainnet
+
+        if (result != WALLY_OK) {
+            // Try if this is a bech32 Bitcoin testnet address:
+            family = "tb"
+            result = wally_addr_segwit_to_bytes(description, family, 0, bytes_out, description.count, written)
+            self.network = .testnet
+        }
         
         if (result != WALLY_OK) {
             // Try if this is a base58 addresses (P2PKH or P2SH)
             result = wally_address_to_scriptpubkey(description, UInt32(WALLY_NETWORK_BITCOIN_MAINNET), bytes_out, description.count, written)
-
-            if (result != WALLY_OK) {
-                return nil
-            }
+            self.network = .mainnet
+        }
+        
+        if (result != WALLY_OK) {
+            // Try if this is a testnet base58 addresses (P2PKH or P2SH)
+            result = wally_address_to_scriptpubkey(description, UInt32(WALLY_NETWORK_BITCOIN_TESTNET), bytes_out, description.count, written)
+            self.network = .testnet
+        }
+        
+        if (result != WALLY_OK) {
+            return nil
         }
         
         self.scriptPubKey = ScriptPubKey(Data(bytes: bytes_out, count: written.pointee))
@@ -70,12 +86,24 @@ public struct Address : AddressProtocol {
         }
         
         if (wally_type == WALLY_ADDRESS_TYPE_P2PKH || wally_type == WALLY_ADDRESS_TYPE_P2SH_P2WPKH) {
-            let version: UInt32 = wally_type == WALLY_ADDRESS_TYPE_P2PKH ? 0x00 : 0x05
+            var version: UInt32
+            switch hdKey.network {
+            case .mainnet:
+                version = wally_type == WALLY_ADDRESS_TYPE_P2PKH ? 0x00 : 0x05
+            case .testnet:
+                version = wally_type == WALLY_ADDRESS_TYPE_P2PKH ? 0x6F : 0xC4
+            }
             precondition(wally_bip32_key_to_address(key, UInt32(wally_type), version, &output) == WALLY_OK)
             precondition(output != nil)
         } else {
             precondition(wally_type == WALLY_ADDRESS_TYPE_P2WPKH)
-            let family: String = "bc"
+            var family: String
+            switch hdKey.network {
+            case .mainnet:
+                family = "bc"
+            case .testnet:
+                family = "tb"
+            }
             precondition(wally_bip32_key_to_addr_segwit(key, family, 0, &output) == WALLY_OK)
             precondition(output != nil)
         }
