@@ -200,7 +200,7 @@ public struct Transaction {
     var funded: Bool? {
         if let totalOut = self.totalOut {
             if let totalIn = self.totalIn {
-                return totalOut >= totalIn
+                return totalOut <= totalIn
             }
         }
         return nil
