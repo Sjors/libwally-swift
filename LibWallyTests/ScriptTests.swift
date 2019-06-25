@@ -56,4 +56,14 @@ class ScriptTests: XCTestCase {
         XCTAssertEqual(scriptSig.render(.signed)?.hexString, (signaturePush + pubKeyPush).hexString)
     }
 
+    func testWitnessP2WPKH() {
+        let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+        let witness = Witness(.payToWitnessPubKeyHash(pubKey))
+        XCTAssertEqual(witness.dummy, true)
+        XCTAssertEqual(witness.stack?.pointee.num_items, 2)
+        XCTAssertEqual(witness.scriptCode.hexString, "76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")
+        let signedWitness = Witness(.payToWitnessPubKeyHash(pubKey), Signature("01")!)
+        XCTAssertEqual(signedWitness.stack?.pointee.num_items, 2)
+        
+    }
 }

@@ -31,6 +31,10 @@ public enum ScriptSigPurpose {
     case feeWorstCase
 }
 
+public enum WitnessType {
+    case payToWitnessPubKeyHash(PubKey) // P2WPKH (native SegWit)
+}
+
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
     var bytes: Data
     
@@ -116,4 +120,53 @@ public struct ScriptSig : Equatable {
             }
         }
     }
+}
+
+public struct Witness {
+    var stack: UnsafeMutablePointer<wally_tx_witness_stack>?
+    var dummy: Bool = false
+    
+    let type: WitnessType
+    
+    public init (_ type: WitnessType, _ signature: Data) {
+        switch (type) {
+        case .payToWitnessPubKeyHash(let pubKey):
+            self.type = type
+            precondition(wally_tx_witness_stack_init_alloc(2, &self.stack) == WALLY_OK)
+            let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
+            let signature_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: signature.count + 1)
+            (signature + sigHashByte).copyBytes(to: signature_bytes, count: signature.count + 1)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
+            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            
+            precondition(wally_tx_witness_stack_set(self.stack!, 0, signature_bytes, signature.count + 1) == WALLY_OK)
+            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.count) == WALLY_OK)
+        }
+    }
+    
+    // Initialize without signature argument to get a dummy signature for fee calculation
+    public init (_ type: WitnessType) {
+        let dummySignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
+        self.init(type, dummySignature)
+        self.dummy = true
+    }
+    
+    func signed (_ signature: Data) -> Witness {
+        return Witness(self.type, signature)
+    }
+    
+    var scriptCode: Data {
+        switch self.type {
+        case .payToWitnessPubKeyHash(let pubKey):
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
+            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
+            defer {
+                pubkey_hash_bytes.deallocate()
+            }
+            precondition(wally_hash160(pubkey_bytes, pubKey.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
+            return Data("76a914")! + Data(bytes: pubkey_hash_bytes, count: Int(HASH160_LEN)) + Data("88ac")!
+        }
+    }
+
 }
