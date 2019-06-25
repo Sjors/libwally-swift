@@ -47,20 +47,17 @@ public struct TxInput {
         return self.wally_tx_input!.pointee.sequence
     }
     public var scriptPubKey: ScriptPubKey
-    public var scriptSig: ScriptSig
+    public var scriptSig: ScriptSig?
+    public var witness: Witness?
     public var amount: Satoshi
 
-    public var witness: Data? {
-        // TODO: obtain from wally_tx_input.witness
-        return nil
-    }
-
-    public init? (_ tx: Transaction, _ vout: UInt32, _ amount: Satoshi, _ scriptSig: ScriptSig, _ scriptPubKey: ScriptPubKey) {
+    public init? (_ tx: Transaction, _ vout: UInt32, _ amount: Satoshi, _ scriptSig: ScriptSig?, _ witness: Witness?, _ scriptPubKey: ScriptPubKey) {
         if tx.hash == nil {
             return nil
         }
 
         self.scriptSig = scriptSig
+        self.witness = witness
         self.scriptPubKey = scriptPubKey
         
         self.amount = amount
@@ -74,13 +71,13 @@ public struct TxInput {
 
         tx.hash!.copyBytes(to: tx_hash_bytes, count: tx_hash_bytes_len)
 
-        precondition(wally_tx_input_init_alloc(tx_hash_bytes, tx_hash_bytes_len, vout, sequence, nil, 0, nil, &self.wally_tx_input) == WALLY_OK)
+        precondition(wally_tx_input_init_alloc(tx_hash_bytes, tx_hash_bytes_len, vout, sequence, nil, 0, self.witness == nil ? nil : self.witness!.stack!, &self.wally_tx_input) == WALLY_OK)
         precondition(self.wally_tx_input != nil)
 
     }
 
     public var signed: Bool {
-        return self.scriptSig.signature != nil
+        return (self.scriptSig != nil && self.scriptSig!.signature != nil) || (self.witness != nil && !self.witness!.dummy)
     }
 }
 
@@ -216,12 +213,13 @@ public struct Transaction {
         // Set scriptSig for all unsigned inputs to .feeWorstCase
         for (index, input) in self.inputs!.enumerated() {
             if (!input.signed) {
-                let scriptSig = input.scriptSig.render(.feeWorstCase)!
-                let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSig.count)
-                let bytes_len = scriptSig.count
-                scriptSig.copyBytes(to: bytes, count: bytes_len)
-                
-                precondition(wally_tx_set_input_script(self.wally_tx, index, bytes, bytes_len) == WALLY_OK)
+                if let scriptSig = input.scriptSig {
+                    let scriptSigWorstCase = scriptSig.render(.feeWorstCase)!
+                    let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSigWorstCase.count)
+                    let bytes_len = scriptSigWorstCase.count
+                    scriptSigWorstCase.copyBytes(to: bytes, count: bytes_len)
+                    precondition(wally_tx_set_input_script(self.wally_tx, index, bytes, bytes_len) == WALLY_OK)
+                }
             }
         }
         
@@ -267,19 +265,37 @@ public struct Transaction {
         
         // Loop through inputs to sign:
         for (i, _) in self.inputs!.enumerated() {
-            // Prep input for signing:
-            let scriptPubKey = self.inputs![i].scriptPubKey.bytes
-            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.count)
-            let bytes_len = scriptPubKey.count
-            scriptPubKey.copyBytes(to: bytes, count: bytes_len)
+            let hasWitness = self.inputs![i].witness != nil
             
             var message_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
             defer {
                 message_bytes.deallocate()
             }
+            
+            if (hasWitness) {
+                switch (self.inputs![i].witness!.type) {
+                    case .payToWitnessPubKeyHash(let pubKey):
+                    // Check that we're using the right public key:
+                    var tmp = privKeys[i].wally_ext_key.pub_key
+                    let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
+                    let pubKeyData = Data(pub_key)
+                    precondition(pubKey == pubKeyData)
+                    
+                    let scriptCode = self.inputs![i].witness!.scriptCode
+                    let scriptcode_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptCode.count)
+                    scriptCode.copyBytes(to: scriptcode_bytes, count: scriptCode.count)
 
-            // Create hash for signing
-            precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, bytes, bytes_len, 0, UInt32(WALLY_SIGHASH_ALL), 0, message_bytes, Int(SHA256_LEN)) == WALLY_OK)
+                    precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, scriptcode_bytes, scriptCode.count, self.inputs![i].amount, UInt32(WALLY_SIGHASH_ALL), UInt32(WALLY_TX_FLAG_USE_WITNESS), message_bytes, Int(SHA256_LEN)) == WALLY_OK)
+                }
+            } else {
+                // Prep input for signing:
+                let scriptPubKey = self.inputs![i].scriptPubKey.bytes
+                let scriptpubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.count)
+                scriptPubKey.copyBytes(to: scriptpubkey_bytes, count: scriptPubKey.count)
+
+                // Create hash for signing
+                precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, scriptpubkey_bytes, scriptPubKey.count, 0, UInt32(WALLY_SIGHASH_ALL), 0, message_bytes, Int(SHA256_LEN)) == WALLY_OK)
+            }
             
             var compact_sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
             defer {
@@ -318,15 +334,22 @@ public struct Transaction {
             precondition(wally_ec_sig_to_der(sig_norm_bytes, Int(EC_SIGNATURE_LEN), sig_bytes, Int(EC_SIGNATURE_DER_MAX_LEN), sig_bytes_written) == WALLY_OK)
             
             // Store signature in TxInput
-            self.inputs![i].scriptSig.signature = Data(bytes: sig_bytes, count: sig_bytes_written.pointee)
-            
-            // Update scriptSig:
-            let signedScriptSig = self.inputs![i].scriptSig.render(.signed)!
-            let bytes_signed_scriptsig = UnsafeMutablePointer<UInt8>.allocate(capacity: signedScriptSig.count)
-            let bytes_signed_scriptsig_len = signedScriptSig.count
-            signedScriptSig.copyBytes(to: bytes_signed_scriptsig, count: bytes_signed_scriptsig_len)
-            
-            precondition(wally_tx_set_input_script(self.wally_tx, i, bytes_signed_scriptsig, bytes_signed_scriptsig_len) == WALLY_OK)
+            let signature =  Data(bytes: sig_bytes, count: sig_bytes_written.pointee)
+            if (hasWitness) {
+                let witness = self.inputs![i].witness!.signed(signature)
+                self.inputs![i].witness = witness
+                precondition(wally_tx_set_input_witness(self.wally_tx!, i, witness.stack!) == WALLY_OK)
+            } else {
+                self.inputs![i].scriptSig!.signature = signature
+                
+                // Update scriptSig:
+                let signedScriptSig = self.inputs![i].scriptSig!.render(.signed)!
+                let bytes_signed_scriptsig = UnsafeMutablePointer<UInt8>.allocate(capacity: signedScriptSig.count)
+                let bytes_signed_scriptsig_len = signedScriptSig.count
+                signedScriptSig.copyBytes(to: bytes_signed_scriptsig, count: bytes_signed_scriptsig_len)
+                
+                precondition(wally_tx_set_input_script(self.wally_tx, i, bytes_signed_scriptsig, bytes_signed_scriptsig_len) == WALLY_OK)
+            }
         }
 
         return true
