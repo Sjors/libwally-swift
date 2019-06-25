@@ -22,8 +22,9 @@ public enum ScriptType {
 public typealias PubKey = Data
 public typealias Signature = Data
 
-public enum ScriptSigType {
+public enum ScriptSigType : Equatable {
     case payToPubKeyHash(PubKey) // P2PKH (legacy)
+    case payToScriptHashPayToWitnessPubKeyHash(PubKey) // P2SH-P2WPKH (wrapped SegWit)
 }
 
 public enum ScriptSigPurpose {
@@ -33,6 +34,7 @@ public enum ScriptSigPurpose {
 
 public enum WitnessType {
     case payToWitnessPubKeyHash(PubKey) // P2WPKH (native SegWit)
+    case payToScriptHashPayToWitnessPubKeyHash(PubKey) // P2SH-P2WPKH (wrapped SegWit)
 }
 
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
@@ -87,37 +89,50 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
 }
 
 public struct ScriptSig : Equatable {
-    // In order to produce a (P2PKH) scriptSig a public key is needed:
-    let pubKey: PubKey
+    public static func == (lhs: ScriptSig, rhs: ScriptSig) -> Bool {
+        return lhs.type == rhs.type
+    }
+    
+    let type: ScriptSigType
 
     // When used in a finalized transaction, scriptSig usually includes a signature:
     var signature: Signature?
     
     public init (_ type: ScriptSigType) {
-        switch (type) {
-        case .payToPubKeyHash(let pubKey):
-            self.pubKey = pubKey
-        }
+        self.type = type
     }
     
     public func render(_ purpose: ScriptSigPurpose) -> Data? {
-        switch purpose {
-        case .feeWorstCase:
-             // DER encoded signature
-            let dummySignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
-            let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
-            let lengthPushSignature = Data([UInt8(dummySignature.count + 1)]) // DER encoded signature + sighash byte
-            let lengthPushPubKey = Data([UInt8(self.pubKey.count)])
-            return lengthPushSignature + dummySignature + sigHashByte + lengthPushPubKey + self.pubKey
-        case .signed:
-            if let signature = self.signature {
-                let lengthPushSignature = Data([UInt8(signature.count + 1)]) // DER encoded signature + sighash byte
+        switch self.type {
+        case .payToPubKeyHash(let pubKey):
+            switch purpose {
+            case .feeWorstCase:
+                // DER encoded signature
+                let dummySignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
                 let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
-                let lengthPushPubKey = Data([UInt8(self.pubKey.count)])
-                return lengthPushSignature + signature + sigHashByte + lengthPushPubKey + self.pubKey
-            } else {
-                return nil
+                let lengthPushSignature = Data([UInt8(dummySignature.count + 1)]) // DER encoded signature + sighash byte
+                let lengthPushPubKey = Data([UInt8(pubKey.count)])
+                return lengthPushSignature + dummySignature + sigHashByte + lengthPushPubKey + pubKey
+            case .signed:
+                if let signature = self.signature {
+                    let lengthPushSignature = Data([UInt8(signature.count + 1)]) // DER encoded signature + sighash byte
+                    let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
+                    let lengthPushPubKey = Data([UInt8(pubKey.count)])
+                    return lengthPushSignature + signature + sigHashByte + lengthPushPubKey + pubKey
+                } else {
+                    return nil
+                }
             }
+        case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
+            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
+            defer {
+                pubkey_hash_bytes.deallocate()
+            }
+            precondition(wally_hash160(pubkey_bytes, pubKey.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
+            let redeemScript = Data("0014")! + Data(bytes: pubkey_hash_bytes, count: Int(HASH160_LEN))
+            return Data([UInt8(redeemScript.count)]) + redeemScript
         }
     }
 }
@@ -129,9 +144,9 @@ public struct Witness {
     let type: WitnessType
     
     public init (_ type: WitnessType, _ signature: Data) {
+        self.type = type
         switch (type) {
         case .payToWitnessPubKeyHash(let pubKey):
-            self.type = type
             precondition(wally_tx_witness_stack_init_alloc(2, &self.stack) == WALLY_OK)
             let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
             let signature_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: signature.count + 1)
@@ -139,6 +154,16 @@ public struct Witness {
             let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
             pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
             
+            precondition(wally_tx_witness_stack_set(self.stack!, 0, signature_bytes, signature.count + 1) == WALLY_OK)
+            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.count) == WALLY_OK)
+        case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
+            precondition(wally_tx_witness_stack_init_alloc(2, &self.stack) == WALLY_OK)
+            let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
+            let signature_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: signature.count + 1)
+            (signature + sigHashByte).copyBytes(to: signature_bytes, count: signature.count + 1)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
+            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+        
             precondition(wally_tx_witness_stack_set(self.stack!, 0, signature_bytes, signature.count + 1) == WALLY_OK)
             precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.count) == WALLY_OK)
         }
@@ -157,7 +182,7 @@ public struct Witness {
     
     var scriptCode: Data {
         switch self.type {
-        case .payToWitnessPubKeyHash(let pubKey):
+        case .payToWitnessPubKeyHash(let pubKey), .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
             let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
             pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
             var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))

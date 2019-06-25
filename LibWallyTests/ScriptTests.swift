@@ -42,7 +42,7 @@ class ScriptTests: XCTestCase {
     func testScriptSigP2PKH() {
         let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
         var scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
-        XCTAssertEqual(scriptSig.pubKey, pubKey)
+        XCTAssertEqual(scriptSig.type, ScriptSigType.payToPubKeyHash(pubKey))
         XCTAssertEqual(scriptSig.render(.signed), nil)
 
         XCTAssertEqual(scriptSig.signature, nil)

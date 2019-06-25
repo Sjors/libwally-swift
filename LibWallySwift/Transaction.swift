@@ -51,14 +51,27 @@ public struct TxInput {
     public var witness: Witness?
     public var amount: Satoshi
 
+    // For P2SH wrapped SegWit, we set scriptSig automatically
     public init? (_ tx: Transaction, _ vout: UInt32, _ amount: Satoshi, _ scriptSig: ScriptSig?, _ witness: Witness?, _ scriptPubKey: ScriptPubKey) {
         if tx.hash == nil {
             return nil
         }
 
-        self.scriptSig = scriptSig
         self.witness = witness
+        
+        if (witness == nil) {
+            self.scriptSig = scriptSig
+        } else {
+            switch witness!.type {
+            case .payToWitnessPubKeyHash(_):
+                break
+            case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
+                self.scriptSig = ScriptSig(.payToScriptHashPayToWitnessPubKeyHash(pubKey))
+            }
+        }
+        
         self.scriptPubKey = scriptPubKey
+        
         
         self.amount = amount
 
@@ -274,7 +287,16 @@ public struct Transaction {
             
             if (hasWitness) {
                 switch (self.inputs![i].witness!.type) {
-                    case .payToWitnessPubKeyHash(let pubKey):
+                case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
+                    let scriptSig = self.inputs![i].scriptSig!.render(.signed)!
+                    let bytes_scriptsig = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptSig.count)
+                    let bytes_scriptsig_len = scriptSig.count
+                    scriptSig.copyBytes(to: bytes_scriptsig, count: bytes_scriptsig_len)
+                    
+                    precondition(wally_tx_set_input_script(self.wally_tx, i, bytes_scriptsig, bytes_scriptsig_len) == WALLY_OK)
+
+                    fallthrough
+                case .payToWitnessPubKeyHash(let pubKey):
                     // Check that we're using the right public key:
                     var tmp = privKeys[i].wally_ext_key.pub_key
                     let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
@@ -285,6 +307,7 @@ public struct Transaction {
                     let scriptcode_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptCode.count)
                     scriptCode.copyBytes(to: scriptcode_bytes, count: scriptCode.count)
 
+                    
                     precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, scriptcode_bytes, scriptCode.count, self.inputs![i].amount, UInt32(WALLY_SIGHASH_ALL), UInt32(WALLY_TX_FLAG_USE_WITNESS), message_bytes, Int(SHA256_LEN)) == WALLY_OK)
                 }
             } else {
