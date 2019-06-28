@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import LibWally
+import CLibWally
 
 class ScriptTests: XCTestCase {
 

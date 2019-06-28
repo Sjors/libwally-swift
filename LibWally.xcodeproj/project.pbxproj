@@ -32,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A20557A522C6CDBE007221AA /* LibWally.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LibWally.modulemap; sourceTree = "<group>"; };
 		A20C942422C6BC3900B0D206 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "CLibWally/libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
 		A20C942622C6BDB000B0D206 /* CLibWally */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CLibWally; sourceTree = "<group>"; };
 		A232260022B94A6B00C3B79C /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
@@ -96,6 +97,7 @@
 		FE9CD3B3229C397900345DFA /* LibWally */ = {
 			isa = PBXGroup;
 			children = (
+				A20557A522C6CDBE007221AA /* LibWally.modulemap */,
 				FE9CD3B4229C397900345DFA /* LibWally.h */,
 				FE9CD3B5229C397900345DFA /* Info.plist */,
 				FE39CDF9229DAAF400DD135E /* DataExtension.swift */,
@@ -303,6 +305,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -367,6 +370,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -412,10 +416,13 @@
 					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
 					"$(PROJECT_DIR)/libwally-core/src/.libs",
 					"$(PROJECT_DIR)/libwally-core/dist",
+					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
+				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}/CLibWally";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -445,10 +452,13 @@
 					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
 					"$(PROJECT_DIR)/libwally-core/src/.libs",
 					"$(PROJECT_DIR)/libwally-core/dist",
+					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
+				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}/CLibWally";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
