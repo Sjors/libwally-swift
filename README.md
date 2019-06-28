@@ -45,5 +45,5 @@ git clone https://github.com/blockchain/libwally-swift.git --recurse-submodules
 Build libwally-core:
 
 ```
-./build-libwally.sh
+./build-libwally.sh -ds
 ```
