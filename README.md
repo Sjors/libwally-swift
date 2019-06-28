@@ -28,6 +28,18 @@ account.xpub
 
 See also the included [Playground](/DemoPlayground.playground/Contents.swift) and [tests](/LibWallyTests).
 
+## Install
+
+Via CocoaPods:
+
+```
+pod 'LibWally', :git => 'https://github.com/blockchain/LibWallySwift.git', :branch => 'master'
+```
+
+```
+pod install --verbose
+```
+
 ## Build
 
 Install dependencies:
@@ -45,5 +57,5 @@ git clone https://github.com/blockchain/libwally-swift.git --recurse-submodules
 Build libwally-core:
 
 ```
-./build-libwally.sh -ds
+./build-libwally.sh -dsc
 ```
