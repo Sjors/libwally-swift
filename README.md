@@ -1,4 +1,4 @@
-# LibWally Swift
+# LibWally Swift [![Build Status](https://travis-ci.org/blockchain/libwally-swift.svg?branch=master)](https://travis-ci.org/blockchain/libwally-swift)
 
 Opinionated Swift wrapper around [LibWally](https://github.com/ElementsProject/libwally-core),
 a collection of useful primitives for cryptocurrency wallets.
