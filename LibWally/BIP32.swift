@@ -7,6 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
+import CLibWally
 
 public enum Network {
     case mainnet
@@ -182,6 +183,7 @@ public struct HDKey : LosslessStringConvertible {
             return .testnet
         default:
             precondition(false)
+            return .mainnet
         }
     }
     

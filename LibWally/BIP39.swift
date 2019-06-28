@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import CLibWally
 
 let MAX_WORDS = 24 // Arbitrary, used only to determine array size in bip39_mnemonic_to_bytes
 

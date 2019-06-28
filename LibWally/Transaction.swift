@@ -7,6 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
+import CLibWally
 
 public typealias Satoshi = UInt64
 

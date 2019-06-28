@@ -7,6 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
+import CLibWally
 
 let a = WALLY_SCRIPT_TYPE_OP_RETURN
 
