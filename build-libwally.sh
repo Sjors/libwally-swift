@@ -36,7 +36,7 @@ fi
 cd CLibWally/libwally-core
 
 if [ $clean == 1 ]; then
-  rm -r build
+  rm -rf build
 fi
 
 if [ ! -d "build" ]; then
@@ -44,11 +44,6 @@ if [ ! -d "build" ]; then
 fi
 export CC=`xcrun -find clang`
 export CXX=`xcrun -find clang++`
-set +v
-if [ $clean == 1 ]; then
-  set -v # display commands
-  make clean
-fi
 
 set +v
 if [ $simulator == 1 ]; then
@@ -59,6 +54,10 @@ if [ $simulator == 1 ]; then
     export CXXFLAGS="-O3 -arch x86_64 -fembed-bitcode-marker -mios-simulator-version-min=11.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
     mkdir -p build
     ./configure --disable-shared --host=x86_64-apple-darwin --enable-static
+    if [ $clean == 1 ]; then
+      set -v # display commands
+      make clean
+    fi
   fi
   make
   if [ $device == 1 ]; then
@@ -70,14 +69,14 @@ if [ $device == 1 ]; then
   set +v
   if [ ! -d "build" ] || [ $clean == 1 ]; then
     echo "Configure and cross-compile for the device..."
-    if [ $clean == 1 ]; then
-      make clean
-    fi
     set -v
     export CFLAGS="-O3 -arch arm64 -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
     export CXXFLAGS="-O3 -arch arm64 -isysroot -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
     mkdir -p build
     ./configure --disable-shared --host=aarch64-apple-darwin14 --enable-static
+    if [ $clean == 1 ]; then
+      make clean
+    fi
   fi
   make
   set +v
