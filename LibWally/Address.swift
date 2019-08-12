@@ -7,6 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
+import CLibWally
 
 public enum AddressType {
     case payToPubKeyHash // P2PKH (legacy)
