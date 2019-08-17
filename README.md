@@ -84,7 +84,7 @@ See also the included [Playground](/DemoPlayground.playground/Contents.swift) an
 Via CocoaPods:
 
 ```
-pod 'LibWally', :git => 'https://github.com/blockchain/LibWallySwift.git', :branch => 'master'
+pod 'LibWally', :git => 'https://github.com/blockchain/LibWally-Swift.git', :branch => 'master', :submodules => true
 ```
 
 ```
