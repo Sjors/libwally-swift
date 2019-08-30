@@ -7,7 +7,7 @@
 //  license, see the accompanying file LICENSE.md.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for LibWally.
 FOUNDATION_EXPORT double LibWallyVersionNumber;
