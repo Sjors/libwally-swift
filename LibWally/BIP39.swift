@@ -39,7 +39,7 @@ public struct BIP39Entropy : LosslessStringConvertible, Equatable {
         }
     }
     
-    init(_ data: Data) {
+    public init(_ data: Data) {
         self.data = data
     }
     
