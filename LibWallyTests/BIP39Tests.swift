@@ -12,6 +12,7 @@ import XCTest
 
 class BIP39Tests: XCTestCase {
     let validMnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+    let validMnemonic24 = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -41,6 +42,16 @@ class BIP39Tests: XCTestCase {
         XCTAssertNotNil(mnemonic)
         if (mnemonic != nil) {
             XCTAssertEqual(mnemonic!.words, validMnemonic.components(separatedBy: " "))
+        }
+    }
+    
+    func testInitializeMnemonicFromBytes() {
+        let bytes = [Int8](repeating: 0, count: 32)
+        let entropy = BIP39Entropy(Data(bytes: bytes, count: 32))
+        let mnemonic = BIP39Mnemonic(entropy)
+        XCTAssertNotNil(mnemonic)
+        if (mnemonic != nil) {
+            XCTAssertEqual(mnemonic!.words, validMnemonic24.components(separatedBy: " "))
         }
     }
     
