@@ -82,6 +82,11 @@ class BIP32Tests: XCTestCase {
         
     }
     
+    func testFingerPint() {
+        let hdKey = HDKey(seed)!
+        XCTAssertEqual(hdKey.fingerprint.hexString, "b4e3f5ed")
+    }
+    
     func testRelativePathFromString() {
         let path = BIP32Path("0'/0")
         XCTAssertNotNil(path)

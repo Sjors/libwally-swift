@@ -39,6 +39,7 @@ Derive address from a seed:
 ```swift
 let mnemonic = BIP39Mnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))!
+masterKey.fingerprint.hexString
 let path = BIP32Path("m/44'/0'/0'")!
 let account = try! masterKey.derive(path)
 account.xpub
