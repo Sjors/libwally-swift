@@ -19,6 +19,8 @@ BIP39Mnemonic(BIP39Entropy("00000000000000000000000000000000")!)
 let seedHex: BIP39Seed = mnemonic!.seedHex("TREZOR")
 let masterKey = HDKey(seedHex, .mainnet)!
 masterKey.description
+// Wallets are often identified by their master fingerprint
+masterKey.fingerprint.hexString
 let path = BIP32Path("m/44'/0'/0'")!
 var account = try! masterKey.derive(path)
 account.xpub

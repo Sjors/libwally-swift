@@ -232,6 +232,23 @@ public struct HDKey : LosslessStringConvertible {
         return String(cString: output!)
     }
     
+    public var fingerprint: Data {
+        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        var output: UnsafeMutablePointer<Int8>?
+        defer {
+            hdkey.deallocate()
+        }
+        hdkey.initialize(to: self.wally_ext_key)
+        
+        var fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
+        defer {
+            fingerprint_bytes.deallocate()
+        }
+        
+        precondition(bip32_key_get_fingerprint(hdkey, fingerprint_bytes, Int(FINGERPRINT_LEN)) == WALLY_OK)
+        return Data(bytes: fingerprint_bytes, count: Int(FINGERPRINT_LEN))
+    }
+
     
     public func derive (_ path: BIP32Path) throws -> HDKey {
         if self.isNeutered && path.components.first(where: { $0.isHardened }) != nil {
