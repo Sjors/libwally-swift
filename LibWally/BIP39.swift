@@ -29,7 +29,7 @@ public var BIP39Words: [String] = {
 }()
 
 public struct BIP39Entropy : LosslessStringConvertible, Equatable {
-    var data: Data
+    public var data: Data
     
     public init?(_ description: String) {
         if let data = Data(description) {
