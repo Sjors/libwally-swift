@@ -67,4 +67,11 @@ class ScriptTests: XCTestCase {
         XCTAssertEqual(signedWitness.stack?.pointee.num_items, 2)
 
     }
+    
+    func testMultisig() {
+        let pubKey1 = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)! // [3442193e/0'/1]
+        let pubKey2 = PubKey(Data("022e3d55c64908832291348d1faa74bff4ae1047e9777a28b26b064e410a554737")!, .mainnet)! // [bd16bee5/0'/1]
+        let multisig = ScriptPubKey(multisig: [pubKey1, pubKey2], threshold: 2)
+        XCTAssertEqual(multisig.type, .multiSig)
+    }
 }
