@@ -77,6 +77,27 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
         }
     }
     
+    public init(multisig pubKeys:[PubKey], threshold: UInt, bip67: Bool = true) {
+        let pubkeys_bytes_len = Int(EC_PUBLIC_KEY_LEN) * pubKeys.count
+        let pubkeys_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubkeys_bytes_len)
+        var offset = 0
+        for pubKey in pubKeys {
+            pubKey.copyBytes(to: pubkeys_bytes + offset, count: pubKey.count)
+            offset += Int(EC_PUBLIC_KEY_LEN)
+        }
+        let scriptLen = 3 + pubKeys.count * (Int(EC_PUBLIC_KEY_LEN) + 1)
+        var script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptLen)
+        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            script_bytes.deallocate()
+            written.deallocate()
+        }
+        let flags = UInt32(bip67 ? WALLY_SCRIPT_MULTISIG_SORTED : 0)
+        precondition(wally_scriptpubkey_multisig_from_bytes(pubkeys_bytes, pubkeys_bytes_len, UInt32(threshold), flags, script_bytes, scriptLen, written) == WALLY_OK)
+        
+        self.bytes = Data(bytes: script_bytes, count: written.pointee)
+    }
+    
     public var description: String {
         return self.bytes.hexString
     }
