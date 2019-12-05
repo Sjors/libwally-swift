@@ -23,4 +23,15 @@ class DataExtensionTests: XCTestCase {
         let data = Data(hexString)
         XCTAssertEqual(data?.hexString, hexString)
     }
+
+    func testToBase58() {
+        let data = Data("01234567890abcde")
+        XCTAssertEqual(data?.base58, "2FEDkTt23zPwhDwc")
+    }
+    
+    func testFromBase58() {
+        let base58 = "2FEDkTt23zPwhDwc"
+        let data = Data(base58: base58)
+        XCTAssertEqual(data?.hexString, "01234567890abcde")
+    }
 }
