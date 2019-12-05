@@ -106,6 +106,21 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
         self.bytes = bytes
     }
 
+    public var witnessProgram: Data {
+        let bytes_len = self.bytes.count
+        let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
+        self.bytes.copyBytes(to: bytes, count: bytes_len)
+        let script_bytes_len = 34 // 00 20 HASH256
+        var script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: script_bytes_len)
+        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            script_bytes.deallocate()
+            written.deallocate()
+        }
+        precondition(wally_witness_program_from_bytes(bytes, bytes_len, UInt32(WALLY_SCRIPT_SHA256), script_bytes, script_bytes_len, written) == WALLY_OK)
+        precondition(written.pointee == script_bytes_len)
+        return Data(bytes: script_bytes, count: written.pointee)
+    }
 
 }
 
