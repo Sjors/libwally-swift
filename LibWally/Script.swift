@@ -41,8 +41,8 @@ public enum WitnessType {
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
     var bytes: Data
     
-    public lazy var type: ScriptType? = {
-        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: self.bytes.count)
+    public var type: ScriptType? {
+        let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: self.bytes.count)
         let bytes_len = self.bytes.count
         let output = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         
@@ -67,7 +67,7 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
             precondition(output.pointee == WALLY_SCRIPT_TYPE_UNKNOWN)
             return nil
         }
-    }()
+    }
 
     public init?(_ description: String) {
         if let data = Data(description) {
