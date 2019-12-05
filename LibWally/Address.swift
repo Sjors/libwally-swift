@@ -115,6 +115,37 @@ public struct Address : AddressProtocol {
         self.init(address)! // libwally generated this string, so it's safe to force unwrap
     }
     
+    public init?(_ scriptPubKey: ScriptPubKey, _ network: Network) {
+        self.network = network
+        self.scriptPubKey = scriptPubKey
+        switch self.scriptPubKey.type {
+        case .multiSig:
+            var family: String
+            switch network {
+            case .mainnet:
+                family = "bc"
+            case .testnet:
+                family = "tb"
+            }
+            let witness_program_len = self.scriptPubKey.witnessProgram.count
+            var witness_program = UnsafeMutablePointer<UInt8>.allocate(capacity: witness_program_len)
+            var output: UnsafeMutablePointer<Int8>?
+            defer {
+                wally_free_string(output)
+            }
+            self.scriptPubKey.witnessProgram.copyBytes(to: witness_program, count: witness_program_len)
+            precondition(wally_addr_segwit_from_bytes(witness_program, witness_program_len, family, 0, &output) == WALLY_OK)
+
+            if let words_c_string = output {
+                self.address = String(cString: words_c_string)
+            } else {
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+    
     public var description: String {
         return address
     }
