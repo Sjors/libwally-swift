@@ -6,6 +6,7 @@ a collection of useful primitives for cryptocurrency wallets.
 Supports a minimal set of features based on v0.7.6. See also [original docs](https://wally.readthedocs.io/en/release_0.7.6).
 
 - [ ] Core Functions
+  - [x] base58 encode / decode
 - [ ] Crypto Functions
   - [x] sign ECDSA, convert to DER
 - [ ] Address Functions
