@@ -21,22 +21,22 @@ class ScriptTests: XCTestCase {
     }
 
     func testDetectScriptPubKeyTypeP2PKH() {
-        var scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
+        let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
         XCTAssertEqual(scriptPubKey.type, .payToPubKeyHash)
     }
 
     func testDetectScriptPubKeyTypeP2SH() {
-        var scriptPubKey = ScriptPubKey("a91486cc442a97817c245ce90ed0d31d6dbcde3841f987")!
+        let scriptPubKey = ScriptPubKey("a91486cc442a97817c245ce90ed0d31d6dbcde3841f987")!
         XCTAssertEqual(scriptPubKey.type, .payToScriptHash)
     }
 
     func testDetectScriptPubKeyTypeNativeSegWit() {
-        var scriptPubKey = ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe")!
+        let scriptPubKey = ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe")!
         XCTAssertEqual(scriptPubKey.type, .payToWitnessPubKeyHash)
     }
 
     func testDetectScriptPubKeyTypeOpReturn() {
-        var scriptPubKey = ScriptPubKey("6a13636861726c6579206c6f766573206865696469")!
+        let scriptPubKey = ScriptPubKey("6a13636861726c6579206c6f766573206865696469")!
         XCTAssertEqual(scriptPubKey.type, .opReturn)
     }
 
