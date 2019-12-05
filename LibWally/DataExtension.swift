@@ -9,9 +9,7 @@
 import Foundation
 
 public extension Data {
-    var hexString: String {
-        return self.reduce("", { $0 + String(format: "%02x", $1) })
-    }
+
     init?(_ hexString: String) {
         let len = hexString.count / 2
         var data = Data(capacity: len)
@@ -26,5 +24,9 @@ public extension Data {
             }
         }
         self = data
+    }
+
+    var hexString: String {
+        return self.reduce("", { $0 + String(format: "%02x", $1) })
     }
 }
