@@ -34,4 +34,9 @@ class DataExtensionTests: XCTestCase {
         let data = Data(base58: base58)
         XCTAssertEqual(data?.hexString, "01234567890abcde")
     }
+    
+    func testInvalidCharacter() {
+        let base58 = "💩"
+        XCTAssertNil(Data(base58: base58))
+    }
 }
