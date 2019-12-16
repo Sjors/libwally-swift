@@ -102,6 +102,11 @@ public struct Transaction {
     
     public var inputs: [TxInput]? = nil
     var outputs: [TxOutput]? = nil
+    
+    init (_ wally_tx: wally_tx) {
+        self.wally_tx = UnsafeMutablePointer<wally_tx>.allocate(capacity: 1)
+        self.wally_tx!.initialize(to: wally_tx)
+    }
 
     public init? (_ description: String) {
         if let hex = Data(description) {

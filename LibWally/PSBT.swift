@@ -68,4 +68,26 @@ public struct PSBT {
         return data.base64EncodedString()
     }
     
+    public var complete: Bool {
+        // TODO: add function to libwally-core to check this directly
+        return self.transaction != nil
+    }
+    
+    public var transaction: Transaction? {
+        var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
+        psbt.initialize(to: self.wally_psbt)
+        var output: UnsafeMutablePointer<wally_tx>?
+        defer {
+            psbt.deallocate()
+            if let wally_tx = output {
+                wally_tx.deallocate()
+            }
+        }
+        guard wally_extract_psbt(psbt, &output) == WALLY_OK else {
+            return nil
+        }
+        precondition(output != nil)
+        return Transaction(output!.pointee)
+    }
+    
 }
