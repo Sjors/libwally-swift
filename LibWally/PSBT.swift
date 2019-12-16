@@ -90,4 +90,16 @@ public struct PSBT {
         return Transaction(output!.pointee)
     }
     
+    mutating func sign(_ privKey: Key) {
+        var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
+        psbt.initialize(to: self.wally_psbt)
+        var key_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity:Int(EC_PRIVATE_KEY_LEN))
+        privKey.data.copyBytes(to: key_bytes, count: Int(EC_PRIVATE_KEY_LEN))
+        defer {
+           psbt.deallocate()
+        }
+        // TODO: sanity key for network
+        precondition(wally_sign_psbt(psbt, key_bytes, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
+    }
+    
 }
