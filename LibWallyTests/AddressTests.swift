@@ -71,5 +71,24 @@ class AddressTests: XCTestCase {
         XCTAssertNotNil(address)
         XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe"))
     }
+    
+    func testParseWIF() {
+        // https://en.bitcoin.it/wiki/Wallet_import_format
+        let wif = "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ"
+        if let key = Key(wif, .mainnet, compressed: false) {
+            XCTAssertEqual(key.data.hexString, "0c28fca386c7a227600b2fe50b7cae11ec86d3bf1fbe471be89827e19d72aa1d")
+            XCTAssertEqual(key.network, .mainnet)
+            XCTAssertEqual(key.compressed, false)
+        } else { XCTFail() }
+
+    }
+
+    func testToWIF() {
+        // https://en.bitcoin.it/wiki/Wallet_import_format
+        let data = Data("0c28fca386c7a227600b2fe50b7cae11ec86d3bf1fbe471be89827e19d72aa1d")
+        let key = Key(data!, .mainnet, compressed: false)
+        XCTAssertNotNil(key)
+        XCTAssertEqual(key!.wif, "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ")
+    }
 
 }

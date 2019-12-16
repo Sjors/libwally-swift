@@ -13,7 +13,7 @@ Supports a minimal set of features based on v0.7.6. See also [original docs](htt
   - [x] Parse to scriptPubKey
   - [ ] Generate from scriptPubKey #7 (wishlist)
   - [x] Derive
-  - [ ] WIF
+  - [x] WIF
   - [ ] Detect bech32 typos #4 (wishlist)
 - [x] BIP32 Functions
   - [ ] Derive scriptPubKey #6 (wishlist)
