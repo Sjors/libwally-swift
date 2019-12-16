@@ -35,7 +35,9 @@ public extension Data {
             bytes_out.deallocate()
             written.deallocate()
         }
-        precondition(wally_base58_to_bytes(strBase58, UInt32(BASE58_FLAG_CHECKSUM), bytes_out, len, written) == WALLY_OK)
+        guard wally_base58_to_bytes(strBase58, UInt32(BASE58_FLAG_CHECKSUM), bytes_out, len, written) == WALLY_OK else {
+            return nil
+        }
         self = Data(bytes: bytes_out, count: written.pointee)
     }
 
