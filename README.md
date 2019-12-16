@@ -23,7 +23,8 @@ Supports a minimal set of features based on v0.7.6. See also [original docs](htt
   - [x] Serialize scriptPubKey
   - [x] Determine scriptPubkey type
 - [ ] PSBT functions
-  - [x] Parse and serialize (base64 / binary) 
+  - [x] Parse and serialize (base64 / binary)
+  - [x] Check completeness and extract transaction
 - [ ] Transaction Functions
   - [x] Compose and sign (SegWit) transaction
   - [x] Calculate fee
