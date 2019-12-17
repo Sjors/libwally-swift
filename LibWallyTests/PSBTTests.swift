@@ -12,6 +12,7 @@ import CLibWally
 
 class PSBTTests: XCTestCase {
     // Test vectors from https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
+    let fingerprint = Data("d90c6a4f")!
     
     let validPSBT = "cHNidP8BAHUCAAAAASaBcTce3/KF6Tet7qSze3gADAVmy7OtZGQXE8pCFxv2AAAAAAD+////AtPf9QUAAAAAGXapFNDFmQPFusKGh2DpD9UhpGZap2UgiKwA4fUFAAAAABepFDVF5uM7gyxHBQ8k0+65PJwDlIvHh7MuEwAAAQD9pQEBAAAAAAECiaPHHqtNIOA3G7ukzGmPopXJRjr6Ljl/hTPMti+VZ+UBAAAAFxYAFL4Y0VKpsBIDna89p95PUzSe7LmF/////4b4qkOnHf8USIk6UwpyN+9rRgi7st0tAXHmOuxqSJC0AQAAABcWABT+Pp7xp0XpdNkCxDVZQ6vLNL1TU/////8CAMLrCwAAAAAZdqkUhc/xCX/Z4Ai7NK9wnGIZeziXikiIrHL++E4sAAAAF6kUM5cluiHv1irHU6m80GfWx6ajnQWHAkcwRAIgJxK+IuAnDzlPVoMR3HyppolwuAJf3TskAinwf4pfOiQCIAGLONfc0xTnNMkna9b7QPZzMlvEuqFEyADS8vAtsnZcASED0uFWdJQbrUqZY3LLh+GFbTZSYG2YVi/jnF6efkE/IQUCSDBFAiEA0SuFLYXc2WHS9fSrZgZU327tzHlMDDPOXMMJ/7X85Y0CIGczio4OFyXBl/saiK9Z9R5E5CVbIBZ8hoQDHAXR8lkqASECI7cr7vCWXRC+B3jv7NYfysb3mk6haTkzgHNEZPhPKrMAAAAAAAAA"
     
@@ -20,11 +21,27 @@ class PSBTTests: XCTestCase {
     // Test vector at "An updater which adds SIGHASH_ALL to the above PSBT must create this PSBT"
     let unsignedPSBT = "cHNidP8BAJoCAAAAAljoeiG1ba8MI76OcHBFbDNvfLqlyHV5JPVFiHuyq911AAAAAAD/////g40EJ9DsZQpoqka7CwmK6kQiwHGyyng1Kgd5WdB86h0BAAAAAP////8CcKrwCAAAAAAWABTYXCtx0AYLCcmIauuBXlCZHdoSTQDh9QUAAAAAFgAUAK6pouXw+HaliN9VRuh0LR2HAI8AAAAAAAEAuwIAAAABqtc5MQGL0l+ErkALaISL4J23BurCrBgpi6vucatlb4sAAAAASEcwRAIgWPb8fGoz4bMVSNSByCbAFb0wE1qtQs1neQ2rZtKtJDsCIEoc7SYExnNbY5PltBaR3XiwDwxZQvufdRhW+qk4FX26Af7///8CgPD6AgAAAAAXqRQPuUY0IWlrgsgzryQceMF9295JNIfQ8gonAQAAABepFCnKdPigj4GZlCgYXJe12FLkBj9hh2UAAAABAwQBAAAAAQRHUiEClYO/Oa4KYJdHrRma3dY0+mEIVZ1sXNObTCGD8auW4H8hAtq2H/SaFNtqfQKwzR+7ePxLGDErW05U2uTbovv+9TbXUq4iBgKVg785rgpgl0etGZrd1jT6YQhVnWxc05tMIYPxq5bgfxDZDGpPAAAAgAAAAIAAAACAIgYC2rYf9JoU22p9ArDNH7t4/EsYMStbTlTa5Nui+/71NtcQ2QxqTwAAAIAAAACAAQAAgAABASAAwusLAAAAABepFLf1+vQOPUClpFmx2zU18rcvqSHohwEDBAEAAAABBCIAIIwjUxc3Q7WV37Sge3K6jkLjeX2nTof+fZ10l+OyAokDAQVHUiEDCJ3BDHrG21T5EymvYXMz2ziM6tDCMfcjN50bmQMLAtwhAjrdkE89bc9Z3bkGsN7iNSm3/7ntUOXoYVGSaGAiHw5zUq4iBgI63ZBPPW3PWd25BrDe4jUpt/+57VDl6GFRkmhgIh8OcxDZDGpPAAAAgAAAAIADAACAIgYDCJ3BDHrG21T5EymvYXMz2ziM6tDCMfcjN50bmQMLAtwQ2QxqTwAAAIAAAACAAgAAgAAiAgOppMN/WZbTqiXbrGtXCvBlA5RJKUJGCzVHU+2e7KWHcRDZDGpPAAAAgAAAAIAEAACAACICAn9jmXV9Lv9VoTatAsaEsYOLZVbl8bazQoKpS2tQBRCWENkMak8AAACAAAAAgAUAAIAA"
     
+    // Paths
+    let path0 = BIP32Path("m/0'/0'/0'")!
+    let path1 = BIP32Path("m/0'/0'/1'")!
+    let path2 = BIP32Path("m/0'/0'/2'")!
+    let path3 = BIP32Path("m/0'/0'/3'")!
+    let path4 = BIP32Path("m/0'/0'/4'")!
+    let path5 = BIP32Path("m/0'/0'/5'")!
+    
     // Private keys (testnet)
     let WIF_0 = "cP53pDbR5WtAD8dYAW9hhTjuvvTVaEiQBdrz9XPrgLBeRFiyCbQr" // m/0'/0'/0'
     let WIF_1 = "cT7J9YpCwY3AVRFSjN6ukeEeWY6mhpbJPxRaDaP5QTdygQRxP9Au" // m/0'/0'/1'
     let WIF_2 = "cR6SXDoyfQrcp4piaiHE97Rsgta9mNhGTen9XeonVgwsh4iSgw6d" // m/0'/0'/2'
     let WIF_3 = "cNBc3SWUip9PPm1GjRoLEJT6T41iNzCYtD7qro84FMnM5zEqeJsE" // m/0'/0'/3'
+    
+    // Public keys
+    let pubKey0 = PubKey(Data("029583bf39ae0a609747ad199addd634fa6108559d6c5cd39b4c2183f1ab96e07f")!, .testnet)!
+    let pubKey1 = PubKey(Data("02dab61ff49a14db6a7d02b0cd1fbb78fc4b18312b5b4e54dae4dba2fbfef536d7")!, .testnet)!
+    let pubKey2 = PubKey(Data("03089dc10c7ac6db54f91329af617333db388cead0c231f723379d1b99030b02dc")!, .testnet)!
+    let pubKey3 = PubKey(Data("023add904f3d6dcf59ddb906b0dee23529b7ffb9ed50e5e86151926860221f0e73")!, .testnet)!
+    let pubKey4 = PubKey(Data("03a9a4c37f5996d3aa25dbac6b570af0650394492942460b354753ed9eeca58771")!, .testnet)!
+    let pubKey5 = PubKey(Data("027f6399757d2eff55a136ad02c684b1838b6556e5f1b6b34282a94b6b50051096")!, .testnet)!
     
     // Singed with keys m/0'/0'/0' and m/0'/0'/2'
     let signedPSBT_0_2 = "cHNidP8BAJoCAAAAAljoeiG1ba8MI76OcHBFbDNvfLqlyHV5JPVFiHuyq911AAAAAAD/////g40EJ9DsZQpoqka7CwmK6kQiwHGyyng1Kgd5WdB86h0BAAAAAP////8CcKrwCAAAAAAWABTYXCtx0AYLCcmIauuBXlCZHdoSTQDh9QUAAAAAFgAUAK6pouXw+HaliN9VRuh0LR2HAI8AAAAAAAEAuwIAAAABqtc5MQGL0l+ErkALaISL4J23BurCrBgpi6vucatlb4sAAAAASEcwRAIgWPb8fGoz4bMVSNSByCbAFb0wE1qtQs1neQ2rZtKtJDsCIEoc7SYExnNbY5PltBaR3XiwDwxZQvufdRhW+qk4FX26Af7///8CgPD6AgAAAAAXqRQPuUY0IWlrgsgzryQceMF9295JNIfQ8gonAQAAABepFCnKdPigj4GZlCgYXJe12FLkBj9hh2UAAAAiAgKVg785rgpgl0etGZrd1jT6YQhVnWxc05tMIYPxq5bgf0cwRAIgdAGK1BgAl7hzMjwAFXILNoTMgSOJEEjn282bVa1nnJkCIHPTabdA4+tT3O+jOCPIBwUUylWn3ZVE8VfBZ5EyYRGMAQEDBAEAAAABBEdSIQKVg785rgpgl0etGZrd1jT6YQhVnWxc05tMIYPxq5bgfyEC2rYf9JoU22p9ArDNH7t4/EsYMStbTlTa5Nui+/71NtdSriIGApWDvzmuCmCXR60Zmt3WNPphCFWdbFzTm0whg/GrluB/ENkMak8AAACAAAAAgAAAAIAiBgLath/0mhTban0CsM0fu3j8SxgxK1tOVNrk26L7/vU21xDZDGpPAAAAgAAAAIABAACAAAEBIADC6wsAAAAAF6kUt/X69A49QKWkWbHbNTXyty+pIeiHIgIDCJ3BDHrG21T5EymvYXMz2ziM6tDCMfcjN50bmQMLAtxHMEQCIGLrelVhB6fHP0WsSrWh3d9vcHX7EnWWmn84Pv/3hLyyAiAMBdu3Rw2/LwhVfdNWxzJcHtMJE+mWzThAlF2xIijaXwEBAwQBAAAAAQQiACCMI1MXN0O1ld+0oHtyuo5C43l9p06H/n2ddJfjsgKJAwEFR1IhAwidwQx6xttU+RMpr2FzM9s4jOrQwjH3IzedG5kDCwLcIQI63ZBPPW3PWd25BrDe4jUpt/+57VDl6GFRkmhgIh8Oc1KuIgYCOt2QTz1tz1nduQaw3uI1Kbf/ue1Q5ehhUZJoYCIfDnMQ2QxqTwAAAIAAAACAAwAAgCIGAwidwQx6xttU+RMpr2FzM9s4jOrQwjH3IzedG5kDCwLcENkMak8AAACAAAAAgAIAAIAAIgIDqaTDf1mW06ol26xrVwrwZQOUSSlCRgs1R1Ptnuylh3EQ2QxqTwAAAIAAAACABAAAgAAiAgJ/Y5l1fS7/VaE2rQLGhLGDi2VW5fG2s0KCqUtrUAUQlhDZDGpPAAAAgAAAAIAFAACAAA=="
@@ -106,6 +123,42 @@ class PSBTTests: XCTestCase {
         psbt2.sign(privKey1!)
         psbt2.sign(privKey3!)
         XCTAssertEqual(psbt2.description, expectedPSBT_1_3.description)
+    }
+    
+    func testInputs() {
+        let psbt = try! PSBT(unsignedPSBT, .testnet)
+        XCTAssertEqual(psbt.inputs.count, 2)
+    }
+    
+    func testOutput() {
+        let psbt = try! PSBT(unsignedPSBT, .testnet)
+        XCTAssertEqual(psbt.outputs.count, 2)
+    }
+    
+    func testKeyPaths() {
+        let expectedOrigin0 = KeyOrigin(fingerprint: fingerprint, path: path0)
+        let expectedOrigin1 = KeyOrigin(fingerprint: fingerprint, path: path1)
+        let expectedOrigin2 = KeyOrigin(fingerprint: fingerprint, path: path2)
+        let expectedOrigin3 = KeyOrigin(fingerprint: fingerprint, path: path3)
+        let expectedOrigin4 = KeyOrigin(fingerprint: fingerprint, path: path4)
+        let expectedOrigin5 = KeyOrigin(fingerprint: fingerprint, path: path5)
+        let psbt = try! PSBT(unsignedPSBT, .testnet)
+        // Check inputs
+        XCTAssertEqual(psbt.inputs.count, 2)
+        XCTAssertNotNil(psbt.inputs[0].origins)
+        XCTAssertEqual(psbt.inputs[0].origins!.count, 2)
+        XCTAssertEqual(psbt.inputs[0].origins![pubKey0], expectedOrigin0)
+        XCTAssertEqual(psbt.inputs[0].origins![pubKey1], expectedOrigin1)
+        XCTAssertEqual(psbt.inputs[1].origins!.count, 2)
+        XCTAssertEqual(psbt.inputs[1].origins![pubKey3], expectedOrigin3)
+        XCTAssertEqual(psbt.inputs[1].origins![pubKey2], expectedOrigin2)
+        // Check outputs
+        XCTAssertEqual(psbt.outputs.count, 2)
+        XCTAssertNotNil(psbt.outputs[0].origins)
+        XCTAssertEqual(psbt.outputs[0].origins!.count, 1)
+        XCTAssertEqual(psbt.outputs[0].origins![pubKey4], expectedOrigin4)
+        XCTAssertEqual(psbt.outputs[1].origins!.count, 1)
+        XCTAssertEqual(psbt.outputs[1].origins![pubKey5], expectedOrigin5)
     }
    
 }
