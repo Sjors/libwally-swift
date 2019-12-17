@@ -17,9 +17,11 @@ public struct PSBT {
         case invalid
     }
     
+    let network: Network
     let wally_psbt: wally_psbt
     
-    public init (_ psbt: Data) throws {
+    public init (_ psbt: Data, _ network: Network) throws {
+        self.network = network
         var psbt_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: psbt.count)
         let psbt_bytes_len = psbt.count
         psbt.copyBytes(to: psbt_bytes, count: psbt_bytes_len)
@@ -37,7 +39,7 @@ public struct PSBT {
         self.wally_psbt = output!.pointee
     }
     
-    public init (_ psbt: String) throws {
+    public init (_ psbt: String, _ network: Network) throws {
         guard psbt.count != 0 else {
             throw ParseError.tooShort
         }
@@ -46,7 +48,7 @@ public struct PSBT {
             throw ParseError.invalidBase64
         }
         
-        try self.init(psbtData)
+        try self.init(psbtData, network)
     }
     
     public var data: Data {
