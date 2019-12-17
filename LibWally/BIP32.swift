@@ -35,7 +35,7 @@ public enum BIP32Derivation : Equatable {
     }
 }
 
-public struct BIP32Path : LosslessStringConvertible {
+public struct BIP32Path : LosslessStringConvertible, Equatable {
     public let components: [BIP32Derivation]
     let rawPath: [UInt32]
     let relative: Bool
