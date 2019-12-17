@@ -176,6 +176,21 @@ struct Key {
     }
 }
 
+public struct PubKey : Equatable, Hashable {
+    let compressed: Bool
+    let data: Data
+    let network: Network
+
+    public init?(_ data: Data, _ network: Network, compressed: Bool = true) {
+        guard data.count == Int(compressed ? EC_PUBLIC_KEY_LEN : EC_PUBLIC_KEY_UNCOMPRESSED_LEN) else {
+            return nil
+        }
+        self.data = data
+        self.network = network
+        self.compressed = compressed
+    }
+}
+
 extension HDKey {
     public func address (_ type: AddressType) -> Address {
         return Address(self, type)
