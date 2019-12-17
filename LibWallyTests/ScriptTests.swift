@@ -41,24 +41,24 @@ class ScriptTests: XCTestCase {
     }
     
     func testScriptSigP2PKH() {
-        let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+        let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
         var scriptSig = ScriptSig(.payToPubKeyHash(pubKey))
         XCTAssertEqual(scriptSig.type, ScriptSigType.payToPubKeyHash(pubKey))
         XCTAssertEqual(scriptSig.render(.signed), nil)
 
         XCTAssertEqual(scriptSig.signature, nil)
         
-        XCTAssertEqual(scriptSig.render(.feeWorstCase)?.count, 2 + Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN) + 1 + pubKey.count)
+        XCTAssertEqual(scriptSig.render(.feeWorstCase)?.count, 2 + Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN) + 1 + pubKey.data.count)
         
         scriptSig.signature = Signature("01")!
         let sigHashByte = Data("01")! // SIGHASH_ALL
         let signaturePush = Data("02")! + scriptSig.signature! + sigHashByte
-        let pubKeyPush = Data([UInt8(pubKey.count)]) + pubKey
+        let pubKeyPush = Data([UInt8(pubKey.data.count)]) + pubKey.data
         XCTAssertEqual(scriptSig.render(.signed)?.hexString, (signaturePush + pubKeyPush).hexString)
     }
 
     func testWitnessP2WPKH() {
-        let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+        let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
         let witness = Witness(.payToWitnessPubKeyHash(pubKey))
         XCTAssertEqual(witness.dummy, true)
         XCTAssertEqual(witness.stack?.pointee.num_items, 2)
@@ -69,8 +69,8 @@ class ScriptTests: XCTestCase {
     }
     
     func testMultisig() {
-        let pubKey1 = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")! // [3442193e/0'/1]
-        let pubKey2 = PubKey("022e3d55c64908832291348d1faa74bff4ae1047e9777a28b26b064e410a554737")! // [bd16bee5/0'/1]
+        let pubKey1 = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)! // [3442193e/0'/1]
+        let pubKey2 = PubKey(Data("022e3d55c64908832291348d1faa74bff4ae1047e9777a28b26b064e410a554737")!, .mainnet)! // [bd16bee5/0'/1]
         let multisig = ScriptPubKey(multisig: [pubKey1, pubKey2], threshold: 2)
         XCTAssertEqual(multisig.type, .multiSig)
         XCTAssertEqual(multisig.bytes.hexString, "5221022e3d55c64908832291348d1faa74bff4ae1047e9777a28b26b064e410a5547372103501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c52ae")

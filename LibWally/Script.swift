@@ -20,7 +20,6 @@ public enum ScriptType {
     case multiSig
 }
 
-public typealias PubKey = Data
 public typealias Signature = Data
 
 public enum ScriptSigType : Equatable {
@@ -82,7 +81,7 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
         let pubkeys_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubkeys_bytes_len)
         var offset = 0
         for pubKey in pubKeys {
-            pubKey.copyBytes(to: pubkeys_bytes + offset, count: pubKey.count)
+            pubKey.data.copyBytes(to: pubkeys_bytes + offset, count: pubKey.data.count)
             offset += Int(EC_PUBLIC_KEY_LEN)
         }
         let scriptLen = 3 + pubKeys.count * (Int(EC_PUBLIC_KEY_LEN) + 1)
@@ -148,26 +147,26 @@ public struct ScriptSig : Equatable {
                 let dummySignature = Data([UInt8].init(repeating: 0, count: Int(EC_SIGNATURE_DER_MAX_LOW_R_LEN)))
                 let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
                 let lengthPushSignature = Data([UInt8(dummySignature.count + 1)]) // DER encoded signature + sighash byte
-                let lengthPushPubKey = Data([UInt8(pubKey.count)])
-                return lengthPushSignature + dummySignature + sigHashByte + lengthPushPubKey + pubKey
+                let lengthPushPubKey = Data([UInt8(pubKey.data.count)])
+                return lengthPushSignature + dummySignature + sigHashByte + lengthPushPubKey + pubKey.data
             case .signed:
                 if let signature = self.signature {
                     let lengthPushSignature = Data([UInt8(signature.count + 1)]) // DER encoded signature + sighash byte
                     let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
-                    let lengthPushPubKey = Data([UInt8(pubKey.count)])
-                    return lengthPushSignature + signature + sigHashByte + lengthPushPubKey + pubKey
+                    let lengthPushPubKey = Data([UInt8(pubKey.data.count)])
+                    return lengthPushSignature + signature + sigHashByte + lengthPushPubKey + pubKey.data
                 } else {
                     return nil
                 }
             }
         case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
-            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
-            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
+            pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
             var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
             defer {
                 pubkey_hash_bytes.deallocate()
             }
-            precondition(wally_hash160(pubkey_bytes, pubKey.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
+            precondition(wally_hash160(pubkey_bytes, pubKey.data.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
             let redeemScript = Data("0014")! + Data(bytes: pubkey_hash_bytes, count: Int(HASH160_LEN))
             return Data([UInt8(redeemScript.count)]) + redeemScript
         }
@@ -188,21 +187,21 @@ public struct Witness {
             let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
             let signature_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: signature.count + 1)
             (signature + sigHashByte).copyBytes(to: signature_bytes, count: signature.count + 1)
-            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
-            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
+            pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
             
             precondition(wally_tx_witness_stack_set(self.stack!, 0, signature_bytes, signature.count + 1) == WALLY_OK)
-            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.count) == WALLY_OK)
+            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.data.count) == WALLY_OK)
         case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
             precondition(wally_tx_witness_stack_init_alloc(2, &self.stack) == WALLY_OK)
             let sigHashByte = Data([UInt8(WALLY_SIGHASH_ALL)])
             let signature_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: signature.count + 1)
             (signature + sigHashByte).copyBytes(to: signature_bytes, count: signature.count + 1)
-            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
-            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
+            pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
         
             precondition(wally_tx_witness_stack_set(self.stack!, 0, signature_bytes, signature.count + 1) == WALLY_OK)
-            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.count) == WALLY_OK)
+            precondition(wally_tx_witness_stack_set(self.stack!, 1, pubkey_bytes, pubKey.data.count) == WALLY_OK)
         }
     }
     
@@ -220,13 +219,13 @@ public struct Witness {
     var scriptCode: Data {
         switch self.type {
         case .payToWitnessPubKeyHash(let pubKey), .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
-            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.count)
-            pubKey.copyBytes(to: pubkey_bytes, count: pubKey.count)
+            let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
+            pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
             var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
             defer {
                 pubkey_hash_bytes.deallocate()
             }
-            precondition(wally_hash160(pubkey_bytes, pubKey.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
+            precondition(wally_hash160(pubkey_bytes, pubKey.data.count, pubkey_hash_bytes, Int(HASH160_LEN)) == WALLY_OK)
             return Data("76a914")! + Data(bytes: pubkey_hash_bytes, count: Int(HASH160_LEN)) + Data("88ac")!
         }
     }
