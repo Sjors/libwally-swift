@@ -9,7 +9,7 @@
 import Foundation
 import CLibWally
 
-public enum Network {
+public enum Network : Equatable {
     case mainnet
     case testnet
 }
@@ -39,6 +39,18 @@ public struct BIP32Path : LosslessStringConvertible, Equatable {
     public let components: [BIP32Derivation]
     let rawPath: [UInt32]
     let relative: Bool
+    
+    public init(_ rawPath: [UInt32], relative: Bool) throws {
+        var components: [BIP32Derivation] = []
+        for index in rawPath {
+            if (index < UINT32_MAX / 2 ) {
+                components.append(BIP32Derivation.normal(index))
+            } else {
+                components.append(BIP32Derivation.hardened(index - UINT32_MAX / 2 - 1))
+            }
+        }
+        try self.init(components, relative:relative)
+    }
     
     public init(_ components: [BIP32Derivation], relative: Bool) throws {
         var rawPath: [UInt32] = []
