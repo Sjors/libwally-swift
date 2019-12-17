@@ -121,7 +121,7 @@ public struct Address : AddressProtocol {
 
 }
 
-struct Key {
+public struct Key {
     let compressed: Bool
     let data: Data
     let network: Network
