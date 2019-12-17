@@ -9,6 +9,56 @@
 import Foundation
 import CLibWally
 
+public struct KeyOrigin : Equatable {
+    let fingerprint: Data
+    let path: BIP32Path
+}
+
+func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyOrigin] {
+    var origins: [PubKey: KeyOrigin] = [:]
+    for i in 0..<keypaths.num_items {
+        let item: wally_keypath_item = keypaths.items[i]
+        let pubKey = PubKey(Data(bytes: [item.pubkey], count: Int(EC_PUBLIC_KEY_LEN)), network)!
+        let fingerprint = Data(bytes: [item.origin.fingerprint], count: Int(FINGERPRINT_LEN))
+        var components: [UInt32] = []
+        for j in 0..<item.origin.path_len {
+            let index = item.origin.path[j]
+            components.append(index)
+        }
+        let path = try! BIP32Path(components, relative: false)
+        origins[pubKey] = KeyOrigin(fingerprint: fingerprint, path: path)
+    }
+    return origins
+}
+
+struct PSBTInput {
+    let wally_psbt_input: wally_psbt_input
+    let origins: [PubKey: KeyOrigin]?
+    
+    init(_ wally_psbt_input: wally_psbt_input, network: Network) {
+        self.wally_psbt_input = wally_psbt_input
+        if (wally_psbt_input.keypaths != nil) {
+            self.origins = getOrigins(keypaths: wally_psbt_input.keypaths.pointee, network: network)
+        } else {
+            self.origins = nil
+        }
+    }
+}
+
+struct PSBTOutput {
+    let wally_psbt_output: wally_psbt_output
+    let origins: [PubKey: KeyOrigin]?
+    
+    init(_ wally_psbt_output: wally_psbt_output, network: Network) {
+        self.wally_psbt_output = wally_psbt_output
+        if (wally_psbt_output.keypaths != nil) {
+            self.origins = getOrigins(keypaths: wally_psbt_output.keypaths.pointee, network: network)
+        } else {
+            self.origins = nil
+        }
+    }
+}
+
 public struct PSBT {
 
     enum ParseError: Error {
@@ -18,6 +68,9 @@ public struct PSBT {
     }
     
     let network: Network
+    let inputs: [PSBTInput]
+    let outputs: [PSBTOutput]
+    
     let wally_psbt: wally_psbt
     
     public init (_ psbt: Data, _ network: Network) throws {
@@ -37,6 +90,16 @@ public struct PSBT {
         }
         precondition(output != nil)
         self.wally_psbt = output!.pointee
+        var inputs: [PSBTInput] = []
+        for i in 0..<self.wally_psbt.inputs_allocation_len {
+            inputs.append(PSBTInput(self.wally_psbt.inputs![i], network: network))
+        }
+        self.inputs = inputs
+        var outputs: [PSBTOutput] = []
+        for i in 0..<self.wally_psbt.outputs_allocation_len {
+            outputs.append(PSBTOutput(self.wally_psbt.outputs![i], network: network))
+        }
+        self.outputs = outputs
     }
     
     public init (_ psbt: String, _ network: Network) throws {
