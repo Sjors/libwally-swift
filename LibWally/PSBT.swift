@@ -81,7 +81,11 @@ struct PSBTOutput {
     }
 }
 
-public struct PSBT {
+public struct PSBT : Equatable {
+    public static func == (lhs: PSBT, rhs: PSBT) -> Bool {
+        lhs.network == rhs.network && lhs.data == rhs.data
+    }
+    
 
     enum ParseError: Error {
         case tooShort
