@@ -43,6 +43,28 @@ struct PSBTInput {
             self.origins = nil
         }
     }
+    
+    public func canSign(_ hdKey: HDKey) -> [KeyOrigin]? {
+        var result: [KeyOrigin] = []
+        if let origins = self.origins {
+            for origin in origins {
+                if hdKey.fingerprint == origin.value.fingerprint {
+                    if let childKey = try? hdKey.derive(origin.value.path) {
+                        let childPubKey = PubKey(childKey.pubKey, origin.key.network)!
+                        if childPubKey == origin.key {
+                            result.append(origin.value)
+                        }
+                    }
+                }
+            }
+        }
+        if result.count == 0 { return nil }
+        return result
+    }
+    
+    public func canSign(_ hdKey: HDKey) -> Bool {
+        return canSign(hdKey) != nil
+    }
 }
 
 struct PSBTOutput {
