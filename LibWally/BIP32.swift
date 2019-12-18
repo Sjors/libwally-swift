@@ -43,10 +43,10 @@ public struct BIP32Path : LosslessStringConvertible, Equatable {
     public init(_ rawPath: [UInt32], relative: Bool) throws {
         var components: [BIP32Derivation] = []
         for index in rawPath {
-            if (index < UINT32_MAX / 2 ) {
+            if (index < BIP32_INITIAL_HARDENED_CHILD ) {
                 components.append(BIP32Derivation.normal(index))
             } else {
-                components.append(BIP32Derivation.hardened(index - UINT32_MAX / 2 - 1))
+                components.append(BIP32Derivation.hardened(index - BIP32_INITIAL_HARDENED_CHILD))
             }
         }
         try self.init(components, relative:relative)
@@ -59,12 +59,12 @@ public struct BIP32Path : LosslessStringConvertible, Equatable {
         for component in components {
             switch component {
             case .normal(let index):
-                if index >= UINT32_MAX / 2 {
+                if index >= BIP32_INITIAL_HARDENED_CHILD {
                     throw BIP32Error.invalidIndex
                 }
                 rawPath.append(index)
             case .hardened(let index):
-                if index >= UINT32_MAX / 2 {
+                if index >= BIP32_INITIAL_HARDENED_CHILD {
                     throw BIP32Error.invalidIndex
                 }
                 rawPath.append(BIP32_INITIAL_HARDENED_CHILD + index)
