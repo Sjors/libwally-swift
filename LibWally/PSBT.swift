@@ -177,7 +177,7 @@ public struct PSBT {
         return Transaction(output!.pointee)
     }
     
-    mutating func sign(_ privKey: Key) {
+    public mutating func sign(_ privKey: Key) {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
         var key_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity:Int(EC_PRIVATE_KEY_LEN))
