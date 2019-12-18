@@ -179,4 +179,12 @@ class PSBTTests: XCTestCase {
         XCTAssertTrue(psbt.finalize())
         XCTAssertEqual(psbt, expected)
     }
+    
+    func testSignWithHDKey() {
+        var psbt = try! PSBT(unsignedPSBT, .testnet)
+        let masterKey = HDKey(masterKeyXpriv)!
+        psbt.sign(masterKey)
+        XCTAssertTrue(psbt.finalize())
+        XCTAssertTrue(psbt.complete)
+    }
 }
