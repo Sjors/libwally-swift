@@ -227,6 +227,16 @@ public struct HDKey : LosslessStringConvertible {
         return Data(pub_key)
     }
     
+    var privKey: Key? {
+        if self.isNeutered {
+           return nil
+        }
+        var tmp = self.wally_ext_key.priv_key
+        // skip prefix byte 0
+        let priv_key = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
+        return Key(Data(priv_key), self.network, compressed: true)
+    }
+    
     public var xpriv: String? {
         if self.isNeutered {
             return nil
