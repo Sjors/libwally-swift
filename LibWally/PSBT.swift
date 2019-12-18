@@ -193,4 +193,16 @@ public struct PSBT : Equatable {
         precondition(wally_sign_psbt(psbt, key_bytes, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
     }
     
+    public mutating func finalize() -> Bool {
+        var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
+        psbt.initialize(to: self.wally_psbt)
+        defer {
+            psbt.deallocate()
+        }
+        guard wally_finalize_psbt(psbt) == WALLY_OK else {
+            return false
+        }
+        return true
+    }
+    
 }
