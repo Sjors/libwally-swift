@@ -44,15 +44,15 @@ struct PSBTInput {
         }
     }
     
-    public func canSign(_ hdKey: HDKey) -> [KeyOrigin]? {
-        var result: [KeyOrigin] = []
+    public func canSign(_ hdKey: HDKey) -> [PubKey: KeyOrigin]? {
+        var result: [PubKey: KeyOrigin] = [:]
         if let origins = self.origins {
             for origin in origins {
                 if hdKey.fingerprint == origin.value.fingerprint {
                     if let childKey = try? hdKey.derive(origin.value.path) {
                         let childPubKey = PubKey(childKey.pubKey, origin.key.network)!
                         if childPubKey == origin.key {
-                            result.append(origin.value)
+                            result[origin.key] = origin.value
                         }
                     }
                 }
@@ -195,10 +195,11 @@ public struct PSBT : Equatable {
     
     public mutating func sign(_ hdKey: HDKey) {
         for input in self.inputs {
-            if let origins: [KeyOrigin] = input.canSign(hdKey) {
+            if let origins: [PubKey : KeyOrigin] = input.canSign(hdKey) {
                 for origin in origins {
-                    if let childKey = try? hdKey.derive(origin.path) {
+                    if let childKey = try? hdKey.derive(origin.value.path) {
                         if let privKey = childKey.privKey {
+                            precondition(privKey.pubKey == origin.key)
                             self.sign(privKey)
                         }
                     }
