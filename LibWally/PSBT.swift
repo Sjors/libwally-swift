@@ -68,15 +68,20 @@ struct PSBTInput {
 
 struct PSBTOutput {
     let wally_psbt_output: wally_psbt_output
+    let txOutput: TxOutput
     let origins: [PubKey: KeyOrigin]?
     
-    init(_ wally_psbt_output: wally_psbt_output, network: Network) {
-        self.wally_psbt_output = wally_psbt_output
+    init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
+        precondition(index >= 0 && index < tx.num_outputs)
+        precondition(tx.num_outputs != 0 )
+        self.wally_psbt_output = wally_psbt_outputs[index]
         if (wally_psbt_output.keypaths != nil) {
             self.origins = getOrigins(keypaths: wally_psbt_output.keypaths.pointee, network: network)
         } else {
             self.origins = nil
         }
+        let output = tx.outputs![index]
+        self.txOutput = TxOutput(output, network)
     }
 }
 
@@ -114,6 +119,7 @@ public struct PSBT : Equatable {
             throw ParseError.invalid
         }
         precondition(output != nil)
+        precondition(output!.pointee.tx != nil)
         self.wally_psbt = output!.pointee
         var inputs: [PSBTInput] = []
         for i in 0..<self.wally_psbt.inputs_allocation_len {
@@ -122,7 +128,7 @@ public struct PSBT : Equatable {
         self.inputs = inputs
         var outputs: [PSBTOutput] = []
         for i in 0..<self.wally_psbt.outputs_allocation_len {
-            outputs.append(PSBTOutput(self.wally_psbt.outputs![i], network: network))
+            outputs.append(PSBTOutput(self.wally_psbt.outputs, tx: self.wally_psbt.tx!.pointee, index: i, network: network))
         }
         self.outputs = outputs
     }

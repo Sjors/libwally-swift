@@ -31,7 +31,7 @@ class TransactionTests: XCTestCase {
     }
 
     func testOutput() {
-        let output = TxOutput(scriptPubKey, 1000)
+        let output = TxOutput(scriptPubKey, 1000, .mainnet)
         XCTAssertNotNil(output)
         XCTAssertEqual(output.amount, 1000)
         XCTAssertEqual(output.scriptPubKey, scriptPubKey)
@@ -61,7 +61,7 @@ class TransactionTests: XCTestCase {
         let txInput = TxInput(prevTx, vout, amount, scriptSig, nil, scriptPubKey)!
 
         // Output:
-        let txOutput = TxOutput(scriptPubKey, 1000)
+        let txOutput = TxOutput(scriptPubKey, 1000, .mainnet)
 
         // Transaction
         let tx = Transaction([txInput], [txOutput])
@@ -114,7 +114,7 @@ class TransactionInstanceTests: XCTestCase {
         let txInput3 = TxInput(prevTx, vout, amount3, nil, witness3, scriptPubKey3)!
         
         // Output:
-        let txOutput = TxOutput(scriptPubKey1, 1000)
+        let txOutput = TxOutput(scriptPubKey1, 1000, .mainnet)
         
         // Transaction spending legacy
         tx1 = Transaction([txInput1], [txOutput])

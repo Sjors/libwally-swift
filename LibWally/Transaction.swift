@@ -13,12 +13,20 @@ public typealias Satoshi = UInt64
 
 public struct TxOutput {
     let wally_tx_output: wally_tx_output
+    let network: Network
     var amount: Satoshi {
         return self.wally_tx_output.satoshi
     }
     let scriptPubKey: ScriptPubKey
+    var address: String? {
+        if let address = Address(self.scriptPubKey, self.network) {
+            return address.description
+        }
+        return nil
+    }
 
-    public init (_ scriptPubKey: ScriptPubKey, _ amount: Satoshi) {
+    public init (_ scriptPubKey: ScriptPubKey, _ amount: Satoshi, _ network: Network) {
+        self.network = network
         self.scriptPubKey = scriptPubKey
 
         var scriptpubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.bytes.count)
@@ -35,6 +43,12 @@ public struct TxOutput {
         precondition(wally_tx_output_init_alloc(amount, scriptpubkey_bytes, scriptpubkey_bytes_len, &output) == WALLY_OK)
         precondition(output != nil)
         self.wally_tx_output = output!.pointee
+    }
+    
+    public init (_ tx_output: wally_tx_output, _ network: Network) {
+        self.network = network
+        self.wally_tx_output = tx_output
+        self.scriptPubKey = ScriptPubKey(Data(bytes: tx_output.script, count: tx_output.script_len))
     }
 }
 
