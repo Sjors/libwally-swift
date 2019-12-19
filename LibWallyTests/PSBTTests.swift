@@ -52,6 +52,23 @@ class PSBTTests: XCTestCase {
     
     // Singed with keys m/0'/0'/1' (test vector modified for EC_FLAG_GRIND_R) and m/0'/0'/3'
     let signedPSBT_1_3 = "cHNidP8BAJoCAAAAAljoeiG1ba8MI76OcHBFbDNvfLqlyHV5JPVFiHuyq911AAAAAAD/////g40EJ9DsZQpoqka7CwmK6kQiwHGyyng1Kgd5WdB86h0BAAAAAP////8CcKrwCAAAAAAWABTYXCtx0AYLCcmIauuBXlCZHdoSTQDh9QUAAAAAFgAUAK6pouXw+HaliN9VRuh0LR2HAI8AAAAAAAEAuwIAAAABqtc5MQGL0l+ErkALaISL4J23BurCrBgpi6vucatlb4sAAAAASEcwRAIgWPb8fGoz4bMVSNSByCbAFb0wE1qtQs1neQ2rZtKtJDsCIEoc7SYExnNbY5PltBaR3XiwDwxZQvufdRhW+qk4FX26Af7///8CgPD6AgAAAAAXqRQPuUY0IWlrgsgzryQceMF9295JNIfQ8gonAQAAABepFCnKdPigj4GZlCgYXJe12FLkBj9hh2UAAAAiAgLath/0mhTban0CsM0fu3j8SxgxK1tOVNrk26L7/vU210cwRAIgYxqYn+c4qSrQGYYCMxLBkhT+KAKznly8GsNniAbGksMCIDnbbDh70mdxbf2z1NjaULjoXSEzJrp8faqkwM5B65IjAQEDBAEAAAABBEdSIQKVg785rgpgl0etGZrd1jT6YQhVnWxc05tMIYPxq5bgfyEC2rYf9JoU22p9ArDNH7t4/EsYMStbTlTa5Nui+/71NtdSriIGApWDvzmuCmCXR60Zmt3WNPphCFWdbFzTm0whg/GrluB/ENkMak8AAACAAAAAgAAAAIAiBgLath/0mhTban0CsM0fu3j8SxgxK1tOVNrk26L7/vU21xDZDGpPAAAAgAAAAIABAACAAAEBIADC6wsAAAAAF6kUt/X69A49QKWkWbHbNTXyty+pIeiHIgICOt2QTz1tz1nduQaw3uI1Kbf/ue1Q5ehhUZJoYCIfDnNHMEQCIGX0W6WZi1mif/4ae+0BavHx+Q1Us6qPdFCqX1aiUQO9AiB/ckcDrR7blmgLKEtW1P/LiPf7dZ6rvgiqMPKbhROD0gEBAwQBAAAAAQQiACCMI1MXN0O1ld+0oHtyuo5C43l9p06H/n2ddJfjsgKJAwEFR1IhAwidwQx6xttU+RMpr2FzM9s4jOrQwjH3IzedG5kDCwLcIQI63ZBPPW3PWd25BrDe4jUpt/+57VDl6GFRkmhgIh8Oc1KuIgYCOt2QTz1tz1nduQaw3uI1Kbf/ue1Q5ehhUZJoYCIfDnMQ2QxqTwAAAIAAAACAAwAAgCIGAwidwQx6xttU+RMpr2FzM9s4jOrQwjH3IzedG5kDCwLcENkMak8AAACAAAAAgAIAAIAAIgIDqaTDf1mW06ol26xrVwrwZQOUSSlCRgs1R1Ptnuylh3EQ2QxqTwAAAIAAAACABAAAgAAiAgJ/Y5l1fS7/VaE2rQLGhLGDi2VW5fG2s0KCqUtrUAUQlhDZDGpPAAAAgAAAAIAFAACAAA=="
+
+    // Mainnet multisig wallet based on BIP32 test vectors.
+    // To import into Bitcoin Core (experimental descriptor wallet branch) use:
+    // importdescriptors '[{"range":1000,"timestamp":"now","watchonly":true,"internal":false,"desc":"wsh(sortedmulti(2,[3442193e\/48h\/0h\/0h\/2h]xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi\/0\/*,[bd16bee5\/48h\/0h\/0h\/2h]xpub6DwQ4gBCmJZM3TaKogP41tpjuEwnMH2nWEi3PFev37LfsWPvjZrh1GfAG8xvoDYMPWGKG1oBPMCfKpkVbJtUHRaqRdCb6X6o1e9PQTVK88a\/0\/*))#75z63vc9","active":true},{"range":1000,"timestamp":"now","watchonly":true,"internal":true,"desc":"wsh(sortedmulti(2,[3442193e\/48h\/0h\/0h\/2h]xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi\/1\/*,[bd16bee5\/48h\/0h\/0h\/2h]xpub6DwQ4gBCmJZM3TaKogP41tpjuEwnMH2nWEi3PFev37LfsWPvjZrh1GfAG8xvoDYMPWGKG1oBPMCfKpkVbJtUHRaqRdCb6X6o1e9PQTVK88a\/1\/*))#8837llds","active":true}]'
+    let fingerprint1 = Data("3442193e")!
+    let fingerprint2 = Data("bd16bee5")!
+    let master1 = "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi"
+    let master2 = "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U"
+     let multiUnsignedPSBTWithoutChange = "cHNidP8BAFICAAAAAV/0Rj8kmS/ZB5NjsQvCKM1LTtovmhuQu2GITtz/XUFnAAAAAAD9////Af4SAAAAAAAAFgAUgPiTflaS1yPZmZleFfTq7fUwdIYAAAAAAAEBK4gTAAAAAAAAIgAg+GCObltTf4/IGC6xE89A9WS5nPmdhxcMTxrCWQdO6P0BBUdSIQIRWymltMLmSLuvwQBG3wDoMRcQlj79Fah1NMZw3Q6w+iEDkxPICphGAQSk6avIbx9z0fqYLssxciadkXQV5q7uJnVSriIGAhFbKaW0wuZIu6/BAEbfAOgxFxCWPv0VqHU0xnDdDrD6HL0WvuUwAACAAAAAgAAAAIACAACAAAAAAAAAAAAiBgOTE8gKmEYBBKTpq8hvH3PR+pguyzFyJp2RdBXmru4mdRw0Qhk+MAAAgAAAAIAAAACAAgAAgAAAAAAAAAAAAAA="
+    
+    let multiPSBTWithoutChangeHex = "020000000001015ff4463f24992fd9079363b10bc228cd4b4eda2f9a1b90bb61884edcff5d41670000000000fdffffff01fe1200000000000016001480f8937e5692d723d999995e15f4eaedf5307486040047304402204f54c5c049e74f06f04ded90ad25e487505fd50eca9a48fbd820f7c046c7141002205f7fec16da5bf495a3991d71c90d8131e386f3c259f664eef1dd7e84496265d3014730440220528bfc7f495c853994ff15c46da50c6874dc197c177945af1a42332e73b372d702203a940c4c2dd2946127a41ce15a1c594aaf1a131c654eadcf911c9d72d499c8b10147522102115b29a5b4c2e648bbafc10046df00e8311710963efd15a87534c670dd0eb0fa21039313c80a98460104a4e9abc86f1f73d1fa982ecb3172269d917415e6aeee267552ae00000000"
+    
+    let multiUnsignedPSBTWithChange = "cHNidP8BAH0CAAAAAV/0Rj8kmS/ZB5NjsQvCKM1LTtovmhuQu2GITtz/XUFnAAAAAAD9////AqAPAAAAAAAAIgAg2SAanVpF/Lx6c7mjRV2xL95PrYeO1kq+yERNnuQ5oBYzAwAAAAAAABYAFID4k35Wktcj2ZmZXhX06u31MHSGAAAAAAABASuIEwAAAAAAACIAIPhgjm5bU3+PyBgusRPPQPVkuZz5nYcXDE8awlkHTuj9AQVHUiECEVsppbTC5ki7r8EARt8A6DEXEJY+/RWodTTGcN0OsPohA5MTyAqYRgEEpOmryG8fc9H6mC7LMXImnZF0Feau7iZ1Uq4iBgIRWymltMLmSLuvwQBG3wDoMRcQlj79Fah1NMZw3Q6w+hy9Fr7lMAAAgAAAAIAAAACAAgAAgAAAAAAAAAAAIgYDkxPICphGAQSk6avIbx9z0fqYLssxciadkXQV5q7uJnUcNEIZPjAAAIAAAACAAAAAgAIAAIAAAAAAAAAAAAABAUdSIQMROfTTVvMRvdrTpGn+pMYvCLB/78Bc/PK8qqIYwgg1diEDUb/gzEHWzqIxfhWictWQ+Osk5XiRlQCzWIzI+0xHd11SriICAxE59NNW8xG92tOkaf6kxi8IsH/vwFz88ryqohjCCDV2HL0WvuUwAACAAAAAgAAAAIACAACAAQAAAAIAAAAiAgNRv+DMQdbOojF+FaJy1ZD46yTleJGVALNYjMj7TEd3XRw0Qhk+MAAAgAAAAIAAAACAAgAAgAEAAAACAAAAAAA="
+    
+    let multiSignedPSBTWithChange = "cHNidP8BAH0CAAAAAV/0Rj8kmS/ZB5NjsQvCKM1LTtovmhuQu2GITtz/XUFnAAAAAAD9////AqAPAAAAAAAAIgAg2SAanVpF/Lx6c7mjRV2xL95PrYeO1kq+yERNnuQ5oBYzAwAAAAAAABYAFID4k35Wktcj2ZmZXhX06u31MHSGAAAAAAABASuIEwAAAAAAACIAIPhgjm5bU3+PyBgusRPPQPVkuZz5nYcXDE8awlkHTuj9IgIDkxPICphGAQSk6avIbx9z0fqYLssxciadkXQV5q7uJnVHMEQCIA5I8rmEi/j3Tllb7IJHfR0CpjYXaeEgCEM4Cf8QUGhfAiB46seQHLvXAK8UygrITTSNb55+fwzeamYkuJ2MVmdvhgEiAgIRWymltMLmSLuvwQBG3wDoMRcQlj79Fah1NMZw3Q6w+kcwRAIgfHMQFlEGknsHeUdN7qQCAMmrt3Y7jvvXRLPiSCVOg44CIDlsbA6Aldhz/LX1FnrTBlZ0k38OUTziYa2gkUTQ1PltAQEFR1IhAhFbKaW0wuZIu6/BAEbfAOgxFxCWPv0VqHU0xnDdDrD6IQOTE8gKmEYBBKTpq8hvH3PR+pguyzFyJp2RdBXmru4mdVKuIgYCEVsppbTC5ki7r8EARt8A6DEXEJY+/RWodTTGcN0OsPocvRa+5TAAAIAAAACAAAAAgAIAAIAAAAAAAAAAACIGA5MTyAqYRgEEpOmryG8fc9H6mC7LMXImnZF0Feau7iZ1HDRCGT4wAACAAAAAgAAAAIACAACAAAAAAAAAAAAAAQFHUiEDETn001bzEb3a06Rp/qTGLwiwf+/AXPzyvKqiGMIINXYhA1G/4MxB1s6iMX4VonLVkPjrJOV4kZUAs1iMyPtMR3ddUq4iAgMROfTTVvMRvdrTpGn+pMYvCLB/78Bc/PK8qqIYwgg1dhy9Fr7lMAAAgAAAAIAAAACAAgAAgAEAAAACAAAAIgIDUb/gzEHWzqIxfhWictWQ+Osk5XiRlQCzWIzI+0xHd10cNEIZPjAAAIAAAACAAAAAgAIAAIABAAAAAgAAAAAA"
+    
+    let multiPSBTWithChangeHex = "020000000001015ff4463f24992fd9079363b10bc228cd4b4eda2f9a1b90bb61884edcff5d41670000000000fdffffff02a00f000000000000220020d9201a9d5a45fcbc7a73b9a3455db12fde4fad878ed64abec8444d9ee439a016330300000000000016001480f8937e5692d723d999995e15f4eaedf5307486040047304402207c7310165106927b0779474deea40200c9abb7763b8efbd744b3e248254e838e0220396c6c0e8095d873fcb5f5167ad3065674937f0e513ce261ada09144d0d4f96d0147304402200e48f2b9848bf8f74e595bec82477d1d02a6361769e12008433809ff1050685f022078eac7901cbbd700af14ca0ac84d348d6f9e7e7f0cde6a6624b89d8c56676f860147522102115b29a5b4c2e648bbafc10046df00e8311710963efd15a87534c670dd0eb0fa21039313c80a98460104a4e9abc86f1f73d1fa982ecb3172269d917415e6aeee267552ae00000000"
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -186,5 +203,27 @@ class PSBTTests: XCTestCase {
         psbt.sign(masterKey)
         XCTAssertTrue(psbt.finalize())
         XCTAssertTrue(psbt.complete)
+    }
+    
+    // In the previous example all inputs were part of the same BIP32 master key.
+    // In this example we sign with seperate keys, more representative of a real
+    // setup with multiple wallets.
+    func testSignRealMultisigWithHDKey() {
+        let keySigner1 = HDKey(master1)!
+        let keySigner2 = HDKey(master2)!
+        var psbtWithoutChange = try! PSBT(multiUnsignedPSBTWithoutChange, .mainnet)
+        var psbtWithChange = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        
+        psbtWithoutChange.sign(keySigner1)
+        psbtWithoutChange.sign(keySigner2)
+        XCTAssertTrue(psbtWithoutChange.finalize())
+        XCTAssertTrue(psbtWithoutChange.complete)
+        XCTAssertEqual(psbtWithoutChange.transaction?.description, multiPSBTWithoutChangeHex)
+        
+        psbtWithChange.sign(keySigner1)
+        psbtWithChange.sign(keySigner2)
+        XCTAssertEqual(psbtWithChange.description, multiSignedPSBTWithChange)
+        XCTAssertTrue(psbtWithChange.finalize())
+        XCTAssertEqual(psbtWithChange.transaction?.description, multiPSBTWithChangeHex)
     }
 }
