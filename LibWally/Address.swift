@@ -172,7 +172,27 @@ public struct Key {
         precondition(wally_wif_from_bytes(data, Int(EC_PRIVATE_KEY_LEN), Key.prefix(network), flags, &output) == WALLY_OK)
         assert(output != nil)
         return String(cString: output!)
-
+    }
+    
+    public var pubKey: PubKey {
+        precondition(data.count == Int(EC_PRIVATE_KEY_LEN))
+        var data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_LEN))
+        defer {
+          bytes_out.deallocate()
+        }
+        self.data.copyBytes(to: data, count: Int(EC_PRIVATE_KEY_LEN))
+        precondition(wally_ec_public_key_from_private_key(data, Int(EC_PRIVATE_KEY_LEN), bytes_out, Int(EC_PUBLIC_KEY_LEN)) == WALLY_OK)
+        if (!compressed) {
+            var bytes_out_uncompressed = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN))
+            defer {
+              bytes_out_uncompressed.deallocate()
+            }
+            precondition(wally_ec_public_key_decompress(bytes_out, Int(EC_PUBLIC_KEY_LEN), bytes_out_uncompressed, Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN)) == WALLY_OK)
+            return PubKey(Data(bytes: bytes_out_uncompressed, count: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN)), network, compressed: false)!
+        } else {
+            return PubKey(Data(bytes: bytes_out, count: Int(EC_PUBLIC_KEY_LEN)), network, compressed: true)!
+        }
     }
 }
 
