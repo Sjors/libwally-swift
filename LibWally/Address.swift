@@ -119,6 +119,24 @@ public struct Address : AddressProtocol {
         self.network = network
         self.scriptPubKey = scriptPubKey
         switch self.scriptPubKey.type {
+        case .payToWitnessPubKeyHash, .payToWitnessScriptHash:
+            var family: String
+            switch network {
+            case .mainnet:
+              family = "bc"
+            case .testnet:
+              family = "tb"
+            }
+            let bytes_len = self.scriptPubKey.bytes.count
+            var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
+            var output: UnsafeMutablePointer<Int8>?
+            defer {
+                wally_free_string(output)
+            }
+            self.scriptPubKey.bytes.copyBytes(to: bytes, count: bytes_len)
+            precondition(wally_addr_segwit_from_bytes(bytes, bytes_len, family, 0, &output) == WALLY_OK)
+            precondition(output != nil)
+            self.address = String(cString: output!)
         case .multiSig:
             var family: String
             switch network {
