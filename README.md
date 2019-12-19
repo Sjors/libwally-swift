@@ -11,7 +11,7 @@ Supports a minimal set of features based on v0.7.6. See also [original docs](htt
   - [x] sign ECDSA, convert to DER
 - [ ] Address Functions
   - [x] Parse to scriptPubKey
-  - [ ] Generate from scriptPubKey #7 (wishlist)
+  - [ ] Generate from scriptPubKey #7 (wishlist, done for SegWit)
   - [x] Derive
   - [x] WIF
   - [ ] Detect bech32 typos #4 (wishlist)

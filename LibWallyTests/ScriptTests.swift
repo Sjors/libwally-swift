@@ -79,4 +79,24 @@ class ScriptTests: XCTestCase {
         let address = Address(multisig, .mainnet)
         XCTAssertEqual(address?.address, "bc1qe6x9y6m6dj2frmfnsc05fy3fnjr0l2zk0f6jsef47vtamm0rqc4qnfnxm0")
     }
+    
+    func testScriptPubKeyAddress() {
+//        let scriptPubKeyPKH = ScriptPubKey(Data("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!)
+//        XCTAssertEqual(scriptPubKeyPKH.type, .payToPubKeyHash)
+//        XCTAssertEqual(Address(scriptPubKeyPKH, .mainnet)?.description, "1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj")
+//        XCTAssertEqual(Address(scriptPubKeyPKH, .testnet)?.description, "mxvewdhKCenLkYgNa8irv1UM2omEWPMdEE")
+    
+//        let scriptPubKeyP2SH = ScriptPubKey(Data("a91486cc442a97817c245ce90ed0d31d6dbcde3841f987")!)
+//        XCTAssertEqual(scriptPubKeyP2SH.type, .payToScriptHash)
+//        XCTAssertEqual(Address(scriptPubKeyP2SH, .mainnet)?.description, "3DymAvEWH38HuzHZ3VwLus673bNZnYwNXu")
+//        XCTAssertEqual(Address(scriptPubKeyP2SH, .testnet)?.description, "2N5XyEfAXtVde7mv6idZDXp5NFwajYEj9TD")
+
+        let scriptP2WPKH = ScriptPubKey(Data("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe")!)
+        XCTAssertEqual(scriptP2WPKH.type, .payToWitnessPubKeyHash)
+        XCTAssertEqual(Address(scriptP2WPKH, .mainnet)?.description, "bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt")
+        
+        let scriptP2WSH = ScriptPubKey(Data("0020f8608e6e5b537f8fc8182eb113cf40f564b99cf99d87170c4f1ac259074ee8fd")!)
+        XCTAssertEqual(scriptP2WSH.type, .payToWitnessScriptHash)
+        XCTAssertEqual(Address(scriptP2WSH, .mainnet)?.description, "bc1qlpsgumjm2dlcljqc96c38n6q74jtn88enkr3wrz0rtp9jp6war7s2h4lrs")
+    }
 }
