@@ -225,5 +225,12 @@ class PSBTTests: XCTestCase {
         XCTAssertEqual(psbtWithChange.description, multiSignedPSBTWithChange)
         XCTAssertTrue(psbtWithChange.finalize())
         XCTAssertEqual(psbtWithChange.transaction?.description, multiPSBTWithChangeHex)
+        
+        XCTAssertEqual(psbtWithChange.outputs[0].txOutput.amount, 4000)
+        XCTAssertEqual(psbtWithChange.outputs[0].txOutput.address, "bc1qmysp4826gh7tc7nnhx352hd39l0yltv83mty40kgg3xeaepe5qtq4c50qe")
+
+        XCTAssertEqual(psbtWithChange.outputs[1].txOutput.amount, 819)
+        XCTAssertEqual(psbtWithChange.outputs[1].txOutput.address, "bc1qsrufxljkjttj8kven90pta82ah6nqayxfr8p9h")
+
     }
 }
