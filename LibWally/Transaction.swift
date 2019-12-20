@@ -13,12 +13,12 @@ public typealias Satoshi = UInt64
 
 public struct TxOutput {
     let wally_tx_output: wally_tx_output
-    let network: Network
-    var amount: Satoshi {
+    public let network: Network
+    public var amount: Satoshi {
         return self.wally_tx_output.satoshi
     }
-    let scriptPubKey: ScriptPubKey
-    var address: String? {
+    public let scriptPubKey: ScriptPubKey
+    public var address: String? {
         if let address = Address(self.scriptPubKey, self.network) {
             return address.description
         }
