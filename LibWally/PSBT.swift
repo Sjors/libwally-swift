@@ -50,8 +50,7 @@ struct PSBTInput {
             for origin in origins {
                 if hdKey.fingerprint == origin.value.fingerprint {
                     if let childKey = try? hdKey.derive(origin.value.path) {
-                        let childPubKey = PubKey(childKey.pubKey, origin.key.network)!
-                        if childPubKey == origin.key {
+                        if childKey.pubKey == origin.key {
                             result[origin.key] = origin.value
                         }
                     }
