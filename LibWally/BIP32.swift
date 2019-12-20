@@ -244,10 +244,10 @@ public struct HDKey {
         return String(cString: output!)
     }
     
-    public var pubKey: Data {
+    public var pubKey: PubKey {
         var tmp = self.wally_ext_key.pub_key
         let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
-        return Data(pub_key)
+        return PubKey(Data(pub_key), self.network, compressed: true)!
     }
     
     var privKey: Key? {
