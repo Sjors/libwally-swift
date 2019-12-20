@@ -31,7 +31,7 @@ func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyO
     return origins
 }
 
-struct PSBTInput {
+public struct PSBTInput {
     let wally_psbt_input: wally_psbt_input
     let origins: [PubKey: KeyOrigin]?
     
@@ -66,10 +66,10 @@ struct PSBTInput {
     }
 }
 
-struct PSBTOutput {
+public struct PSBTOutput {
     let wally_psbt_output: wally_psbt_output
-    let txOutput: TxOutput
-    let origins: [PubKey: KeyOrigin]?
+    public let txOutput: TxOutput
+    public let origins: [PubKey: KeyOrigin]?
     
     init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
         precondition(index >= 0 && index < tx.num_outputs)
@@ -97,9 +97,9 @@ public struct PSBT : Equatable {
         case invalid
     }
     
-    let network: Network
-    let inputs: [PSBTInput]
-    let outputs: [PSBTOutput]
+    public let network: Network
+    public let inputs: [PSBTInput]
+    public let outputs: [PSBTOutput]
     
     let wally_psbt: wally_psbt
     
