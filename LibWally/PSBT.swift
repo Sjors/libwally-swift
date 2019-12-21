@@ -148,15 +148,16 @@ public struct PSBT : Equatable {
     public var data: Data {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
-        let len = 100000 // TODO: use psbt_get_length once it's public
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
+        var len = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        precondition(wally_psbt_get_length(psbt, len) == WALLY_OK)
+        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len.pointee)
         var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             psbt.deallocate()
             bytes_out.deallocate()
             written.deallocate()
         }
-        precondition(wally_psbt_to_bytes(psbt, bytes_out, len, written) == WALLY_OK)
+        precondition(wally_psbt_to_bytes(psbt, bytes_out, len.pointee, written) == WALLY_OK)
         return Data(bytes: bytes_out, count: written.pointee)
     }
     
