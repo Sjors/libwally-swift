@@ -81,7 +81,136 @@ public struct PSBTOutput {
             self.origins = nil
         }
         let output = tx.outputs![index]
-        self.txOutput = TxOutput(output, network)
+        let scriptPubKey: ScriptPubKey
+        if let scriptPubKeyBytes = self.wally_psbt_output.witness_script {
+            scriptPubKey = ScriptPubKey(Data(bytes: scriptPubKeyBytes, count: self.wally_psbt_output.witness_script_len))
+        } else {
+            scriptPubKey = ScriptPubKey(Data(bytes: output.script, count: output.script_len))
+        }
+        
+        self.txOutput = TxOutput(tx_output: output, scriptPubKey: scriptPubKey, network: network)
+    }
+    
+    static func commonOriginChecks(origin: KeyOrigin, rootPath: ArraySlice<BIP32Derivation>, pubKey: PubKey, signer: HDKey, cosigners: [HDKey]) ->  Bool {
+        // Check that origin ends with 0/* or 1/*
+        let components = origin.path.components
+        if (
+            components.count < 2 ||
+                !(components.reversed()[1] == .normal(0) || components.reversed()[1] == .normal(1)) ||
+            components.reversed()[0].isHardened
+        ) {
+            return false
+        }
+        
+        // Check that origin starts with expected components
+        if (components[0..<(components.count - 2)] != rootPath) {
+            return false
+        }
+        
+        // Find matching HDKey
+        var hdKey: HDKey? = nil
+        if (signer.fingerprint == origin.fingerprint) {
+            hdKey = signer
+        } else {
+            for cosigner in cosigners {
+                if (cosigner.fingerprint == origin.fingerprint) {
+                    hdKey = cosigner
+                }
+            }
+        }
+        
+        guard hdKey != nil else {
+            return false
+        }
+        
+        // Check that origin pubkey is correct
+        guard let childKey = try? hdKey!.derive(origin.path) else {
+            return false
+        }
+        
+        if childKey.pubKey != pubKey {
+            return false
+        }
+        
+        return true
+    }
+    
+    public func isChange(signer: HDKey, inputs:[PSBTInput], cosigners: [HDKey], threshold: UInt) -> Bool {
+        // Transaction must have at least one input
+        if inputs.count < 1 {
+            return false
+        }
+        
+        // All inputs must have origin info
+        for input in inputs {
+            if input.origins == nil {
+                return false
+            }
+        }
+        
+        // All inputs and outputs must share the same key deriviation root
+        let keyPath = inputs[0].origins!.first!.value.path
+        if (keyPath.components.count < 2) {
+            return false
+        }
+        let keyPathRootComponents = keyPath.components[0..<(keyPath.components.count - 2)]
+
+        for input in inputs {
+            // Check that we can sign all inputs (TODO: relax assumption for e.g. coinjoin)
+            if !input.canSign(signer) {
+                return false
+            }
+            guard let origins = input.origins else {
+                return false
+            }
+
+            for origin in origins {
+                if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
+                    return false
+                }
+            }
+        }
+        
+        // Check outputs
+        guard let origins = self.origins else {
+            return false
+        }
+
+        var changeIndex: UInt32? = nil
+        for origin in origins {
+            if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
+                return false
+            }
+            // Check that the output index is reasonable
+            // When combined with the above constraints, change "hijacked" to an extreme index can
+            // be covered by importing keys using Bitcoin Core's maximum range [0,999999].
+            // This needs less than 1 GB of RAM, but is fairly slow.
+            if case let .normal(i) = origin.value.path.components.reversed()[0] {
+                if i > 999999 {
+                    return false
+                }
+                // Change index must be the same for all origins
+                if changeIndex != nil && i != changeIndex {
+                    return false
+                } else {
+                    changeIndex = i
+                }
+            }
+        }
+        
+        // Check scriptPubKey
+        switch self.txOutput.scriptPubKey.type {
+        case .multiSig:
+            
+            
+            let expectedScriptPubKey = ScriptPubKey(multisig: Array(origins.keys), threshold: threshold)
+            if self.txOutput.scriptPubKey != expectedScriptPubKey {
+                return false
+            }
+        default:
+            return false
+        }
+        return true
     }
 }
 

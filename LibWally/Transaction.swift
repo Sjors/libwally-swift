@@ -45,10 +45,10 @@ public struct TxOutput {
         self.wally_tx_output = output!.pointee
     }
     
-    public init (_ tx_output: wally_tx_output, _ network: Network) {
+    public init (tx_output: wally_tx_output, scriptPubKey: ScriptPubKey, network: Network) {
         self.network = network
         self.wally_tx_output = tx_output
-        self.scriptPubKey = ScriptPubKey(Data(bytes: tx_output.script, count: tx_output.script_len))
+        self.scriptPubKey = scriptPubKey
     }
 }
 
