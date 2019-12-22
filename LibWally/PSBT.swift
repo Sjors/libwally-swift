@@ -83,6 +83,83 @@ public struct PSBTOutput {
         let output = tx.outputs![index]
         self.txOutput = TxOutput(output, network)
     }
+    
+    static func commonOriginChecks(origin: KeyOrigin, rootPath: ArraySlice<BIP32Derivation>) ->  Bool {
+        // Check that origin ends with 0/* or 1/*
+        let components = origin.path.components
+        if (
+            components.count < 2 ||
+                !(components.reversed()[1] == .normal(0) || components.reversed()[1] == .normal(1)) ||
+            components.reversed()[0].isHardened
+        ) {
+            return false
+        }
+        
+        // Check that origin starts with expected components
+        if (components[0..<(components.count - 2)] != rootPath) {
+            return false
+        }
+        return true
+    }
+    
+    // Err on the safe side with default assumption that destination is not change
+    public func isChange(signer: HDKey, inputs:[PSBTInput]) -> Bool {
+        // Transaction must have at least one input
+        if inputs.count < 1 {
+            return false
+        }
+        
+        // All inputs must have origin info
+        for input in inputs {
+            if input.origins == nil {
+                return false
+            }
+        }
+        
+        // All inputs and outputs must share the same key deriviation root
+        let keyPath = inputs[0].origins!.first!.value.path
+        if (keyPath.components.count < 2) {
+            return false
+        }
+        let keyPathRootComponents = keyPath.components[0..<(keyPath.components.count - 2)]
+
+        for input in inputs {
+            // Check that we can sign all inputs (TODO: relax assumption for e.g. coinjoin)
+            if !input.canSign(signer) {
+                return false
+            }
+            guard let origins = input.origins else {
+                return false
+            }
+
+            for origin in origins {
+                if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents)) {
+                    return false
+                }
+            }
+        }
+        
+        // Check outputs (todo: refactor checks that are the same for inputs)
+        guard let origins = self.origins else {
+            return false
+        }
+
+        for origin in origins {
+            if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents)) {
+                return false
+            }
+            // Check that the output index is reasonable
+            // When combined with the above constraints, change "hijacked" to an extreme index can
+            // be covered by brute forcing over all indexes.
+            if case let .normal(i) = origin.value.path.components.reversed()[0] {
+                if i > 1000000 {
+                    return false
+                }
+            }
+        }
+        
+        return true
+    }
 }
 
 public struct PSBT : Equatable {

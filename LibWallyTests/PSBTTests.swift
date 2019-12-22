@@ -233,4 +233,13 @@ class PSBTTests: XCTestCase {
         XCTAssertEqual(psbtWithChange.outputs[1].txOutput.address, "bc1qsrufxljkjttj8kven90pta82ah6nqayxfr8p9h")
 
     }
+    
+    func testIsChange() {
+        let us = HDKey(master1)!
+        let cosigner = HDKey(master2)!
+        let psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs))
+    }
 }
+
