@@ -70,6 +70,10 @@ class PSBTTests: XCTestCase {
     
     let multiPSBTWithChangeHex = "020000000001015ff4463f24992fd9079363b10bc228cd4b4eda2f9a1b90bb61884edcff5d41670000000000fdffffff02a00f000000000000220020d9201a9d5a45fcbc7a73b9a3455db12fde4fad878ed64abec8444d9ee439a016330300000000000016001480f8937e5692d723d999995e15f4eaedf5307486040047304402207c7310165106927b0779474deea40200c9abb7763b8efbd744b3e248254e838e0220396c6c0e8095d873fcb5f5167ad3065674937f0e513ce261ada09144d0d4f96d0147304402200e48f2b9848bf8f74e595bec82477d1d02a6361769e12008433809ff1050685f022078eac7901cbbd700af14ca0ac84d348d6f9e7e7f0cde6a6624b89d8c56676f860147522102115b29a5b4c2e648bbafc10046df00e8311710963efd15a87534c670dd0eb0fa21039313c80a98460104a4e9abc86f1f73d1fa982ecb3172269d917415e6aeee267552ae00000000"
     
+    let changeIndex999999 = "cHNidP8BAH0CAAAAAUJTCRglAyBzBJKy8g6IQZOs6mW/TAcZQBAwZ1+0nIM2AAAAAAD9////AgMLAAAAAAAAIgAgCrk8USQ4V1PTbvmbC1d4XF6tE0FHxg4DYjSyZ+v36CboAwAAAAAAABYAFMQKYgtvMZZKBJaRRzu2ymKmITLSIkwJAAABASugDwAAAAAAACIAINkgGp1aRfy8enO5o0VdsS/eT62HjtZKvshETZ7kOaAWAQVHUiEDETn001bzEb3a06Rp/qTGLwiwf+/AXPzyvKqiGMIINXYhA1G/4MxB1s6iMX4VonLVkPjrJOV4kZUAs1iMyPtMR3ddUq4iBgMROfTTVvMRvdrTpGn+pMYvCLB/78Bc/PK8qqIYwgg1dhy9Fr7lMAAAgAAAAIAAAACAAgAAgAEAAAACAAAAIgYDUb/gzEHWzqIxfhWictWQ+Osk5XiRlQCzWIzI+0xHd10cNEIZPjAAAIAAAACAAAAAgAIAAIABAAAAAgAAAAABAUdSIQJVEmEwhGKa0JX96JPOEz0ksJ7/7ogUteBmZsuzy8uRRiEC1V/QblpSYPxOd6UP4ufuL2dIy7LAn3MbVmE7q5+FXj5SriICAlUSYTCEYprQlf3ok84TPSSwnv/uiBS14GZmy7PLy5FGHDRCGT4wAACAAAAAgAAAAIACAACAAQAAAD9CDwAiAgLVX9BuWlJg/E53pQ/i5+4vZ0jLssCfcxtWYTurn4VePhy9Fr7lMAAAgAAAAIAAAACAAgAAgAEAAAA/Qg8AAAA="
+    
+    let changeIndex1000000 = "cHNidP8BAH0CAAAAAUJTCRglAyBzBJKy8g6IQZOs6mW/TAcZQBAwZ1+0nIM2AAAAAAD9////AugDAAAAAAAAFgAUxApiC28xlkoElpFHO7bKYqYhMtIDCwAAAAAAACIAIJdT/Bk+sg3L4UXNnCMQ+76c531xAF4pGWkhztn4evpsIkwJAAABASugDwAAAAAAACIAINkgGp1aRfy8enO5o0VdsS/eT62HjtZKvshETZ7kOaAWAQVHUiEDETn001bzEb3a06Rp/qTGLwiwf+/AXPzyvKqiGMIINXYhA1G/4MxB1s6iMX4VonLVkPjrJOV4kZUAs1iMyPtMR3ddUq4iBgMROfTTVvMRvdrTpGn+pMYvCLB/78Bc/PK8qqIYwgg1dhy9Fr7lMAAAgAAAAIAAAACAAgAAgAEAAAACAAAAIgYDUb/gzEHWzqIxfhWictWQ+Osk5XiRlQCzWIzI+0xHd10cNEIZPjAAAIAAAACAAAAAgAIAAIABAAAAAgAAAAAAAQFHUiEC1/v7nPnBRo1jlhIyjJPwMaBdjZhiYYVxQu52lLXNDeAhA4NzKqUnt/XjzyTC7BzuKiGV96QPVF151rJuX4ZV59vNUq4iAgLX+/uc+cFGjWOWEjKMk/AxoF2NmGJhhXFC7naUtc0N4Bw0Qhk+MAAAgAAAAIAAAACAAgAAgAEAAABAQg8AIgIDg3MqpSe39ePPJMLsHO4qIZX3pA9UXXnWsm5fhlXn280cvRa+5TAAAIAAAACAAAAAgAIAAIABAAAAQEIPAAA="
+    
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -233,4 +237,23 @@ class PSBTTests: XCTestCase {
         XCTAssertEqual(psbtWithChange.outputs[1].txOutput.address, "bc1qsrufxljkjttj8kven90pta82ah6nqayxfr8p9h")
 
     }
+    
+    func testIsChange() {
+        let us = HDKey(master1)!
+        let cosigner = HDKey(master2)!
+        var psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        
+        // Test maximum permitted change index
+        psbt = try! PSBT(changeIndex999999, .mainnet)
+        XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+
+        // Test out of bounds change index
+        psbt = try! PSBT(changeIndex1000000, .mainnet)
+        XCTAssertFalse(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+    }
 }
+
