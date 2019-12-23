@@ -44,11 +44,15 @@ public struct PSBTInput {
         }
     }
     
+    // Can we provide at least one signature, assuming we have the private key?
     public func canSign(_ hdKey: HDKey) -> [PubKey: KeyOrigin]? {
         var result: [PubKey: KeyOrigin] = [:]
         if let origins = self.origins {
             for origin in origins {
-                if hdKey.fingerprint == origin.value.fingerprint {
+                guard let masterKeyFingerprint = hdKey.masterKeyFingerprint else {
+                    break
+                }
+                if masterKeyFingerprint == origin.value.fingerprint {
                     if let childKey = try? hdKey.derive(origin.value.path) {
                         if childKey.pubKey == origin.key {
                             result[origin.key] = origin.value
@@ -91,7 +95,7 @@ public struct PSBTOutput {
         self.txOutput = TxOutput(tx_output: output, scriptPubKey: scriptPubKey, network: network)
     }
     
-    static func commonOriginChecks(origin: KeyOrigin, rootPath: ArraySlice<BIP32Derivation>, pubKey: PubKey, signer: HDKey, cosigners: [HDKey]) ->  Bool {
+    static func commonOriginChecks(origin: KeyOrigin, rootPathLength: Int, pubKey: PubKey, signer: HDKey, cosigners: [HDKey]) ->  Bool {
         // Check that origin ends with 0/* or 1/*
         let components = origin.path.components
         if (
@@ -102,18 +106,19 @@ public struct PSBTOutput {
             return false
         }
         
-        // Check that origin starts with expected components
-        if (components[0..<(components.count - 2)] != rootPath) {
-            return false
-        }
-        
         // Find matching HDKey
         var hdKey: HDKey? = nil
-        if (signer.fingerprint == origin.fingerprint) {
+        guard let signerMasterKeyFingerprint = signer.masterKeyFingerprint else {
+            return false
+        }
+        if (signerMasterKeyFingerprint == origin.fingerprint) {
             hdKey = signer
         } else {
             for cosigner in cosigners {
-                if (cosigner.fingerprint == origin.fingerprint) {
+                guard let cosignerMasterKeyFingerprint = cosigner.masterKeyFingerprint else {
+                    return false
+                }
+                if (cosignerMasterKeyFingerprint == origin.fingerprint) {
                     hdKey = cosigner
                 }
             }
@@ -148,12 +153,12 @@ public struct PSBTOutput {
             }
         }
         
-        // All inputs and outputs must share the same key deriviation root
+        // Skip key deriviation root
         let keyPath = inputs[0].origins!.first!.value.path
         if (keyPath.components.count < 2) {
             return false
         }
-        let keyPathRootComponents = keyPath.components[0..<(keyPath.components.count - 2)]
+        let keyPathRootLength = keyPath.components.count - 2
 
         for input in inputs {
             // Check that we can sign all inputs (TODO: relax assumption for e.g. coinjoin)
@@ -165,7 +170,7 @@ public struct PSBTOutput {
             }
 
             for origin in origins {
-                if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
+                if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPathLength:keyPathRootLength, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
                     return false
                 }
             }
@@ -178,7 +183,7 @@ public struct PSBTOutput {
 
         var changeIndex: UInt32? = nil
         for origin in origins {
-            if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPath:keyPathRootComponents, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
+            if !(PSBTOutput.commonOriginChecks(origin: origin.value, rootPathLength:keyPathRootLength, pubKey: origin.key, signer: signer, cosigners: cosigners)) {
                 return false
             }
             // Check that the output index is reasonable

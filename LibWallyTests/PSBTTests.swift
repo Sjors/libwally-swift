@@ -193,7 +193,7 @@ class PSBTTests: XCTestCase {
             XCTAssertTrue(input.canSign(masterKey))
         }
     }
-    
+
     func testFinalize() {
         var psbt = try! PSBT(signedPSBT, .testnet)
         let expected = try! PSBT(finalizedPSBT, .testnet)
@@ -212,6 +212,14 @@ class PSBTTests: XCTestCase {
     // In the previous example all inputs were part of the same BIP32 master key.
     // In this example we sign with seperate keys, more representative of a real
     // setup with multiple wallets.
+    func testCanSignNeutered() {
+        let us = HDKey("xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi", masterKeyFingerprint:Data("3442193e")!)!
+        let psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        for input in psbt.inputs {
+            XCTAssertTrue(input.canSign(us))
+        }
+    }
+    
     func testSignRealMultisigWithHDKey() {
         let keySigner1 = HDKey(master1)!
         let keySigner2 = HDKey(master2)!
@@ -255,5 +263,22 @@ class PSBTTests: XCTestCase {
         XCTAssertFalse(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
         XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
     }
+    
+    func testIsChangeWithNeuteredCosignerKey() {
+        let us = HDKey(master1)!
+        let cosigner = HDKey("xpub6DwQ4gBCmJZM3TaKogP41tpjuEwnMH2nWEi3PFev37LfsWPvjZrh1GfAG8xvoDYMPWGKG1oBPMCfKpkVbJtUHRaqRdCb6X6o1e9PQTVK88a", masterKeyFingerprint:Data("bd16bee5")!)!
+        let psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+    }
+    
+    func testIsChangeWithNeuteredAllKeys() {
+        let us = HDKey("xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi", masterKeyFingerprint:Data("3442193e")!)!
+        let cosigner = HDKey("xpub6DwQ4gBCmJZM3TaKogP41tpjuEwnMH2nWEi3PFev37LfsWPvjZrh1GfAG8xvoDYMPWGKG1oBPMCfKpkVbJtUHRaqRdCb6X6o1e9PQTVK88a", masterKeyFingerprint:Data("bd16bee5")!)!
+        let psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+        XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
+    }
+
 }
 
