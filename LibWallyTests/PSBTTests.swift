@@ -279,6 +279,11 @@ class PSBTTests: XCTestCase {
         XCTAssertTrue(psbt.outputs[0].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
         XCTAssertFalse(psbt.outputs[1].isChange(signer: us, inputs: psbt.inputs, cosigners: [cosigner], threshold: 2))
     }
+    
+    func testGetTransactionFee() {
+        let psbt = try! PSBT(multiUnsignedPSBTWithChange, .mainnet)
+        XCTAssertEqual(psbt.fee, 181)
+    }
 
 }
 

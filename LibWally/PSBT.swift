@@ -1,6 +1,6 @@
 //
 //  PSBT.swift
-//  PSBT 
+//  PSBT
 //
 //  Created by Sjors Provoost on 16/12/2019.
 //  Copyright © 2019 Sjors Provoost. Distributed under the MIT software
@@ -34,7 +34,7 @@ func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyO
 public struct PSBTInput {
     let wally_psbt_input: wally_psbt_input
     let origins: [PubKey: KeyOrigin]?
-    
+
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
         self.wally_psbt_input = wally_psbt_input
         if (wally_psbt_input.keypaths != nil) {
@@ -43,7 +43,7 @@ public struct PSBTInput {
             self.origins = nil
         }
     }
-    
+
     // Can we provide at least one signature, assuming we have the private key?
     public func canSign(_ hdKey: HDKey) -> [PubKey: KeyOrigin]? {
         var result: [PubKey: KeyOrigin] = [:]
@@ -64,9 +64,20 @@ public struct PSBTInput {
         if result.count == 0 { return nil }
         return result
     }
-    
+
     public func canSign(_ hdKey: HDKey) -> Bool {
         return canSign(hdKey) != nil
+    }
+
+    public var isSegWit: Bool {
+        return self.wally_psbt_input.witness_utxo != nil
+    }
+
+    public var amount: Satoshi? {
+        if let witness_utxo = self.wally_psbt_input.witness_utxo {
+            return witness_utxo.pointee.satoshi
+        }
+        return nil
     }
 }
 
@@ -74,7 +85,7 @@ public struct PSBTOutput {
     let wally_psbt_output: wally_psbt_output
     public let txOutput: TxOutput
     public let origins: [PubKey: KeyOrigin]?
-    
+
     init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
         precondition(index >= 0 && index < tx.num_outputs)
         precondition(tx.num_outputs != 0 )
@@ -91,10 +102,10 @@ public struct PSBTOutput {
         } else {
             scriptPubKey = ScriptPubKey(Data(bytes: output.script, count: output.script_len))
         }
-        
+
         self.txOutput = TxOutput(tx_output: output, scriptPubKey: scriptPubKey, network: network)
     }
-    
+
     static func commonOriginChecks(origin: KeyOrigin, rootPathLength: Int, pubKey: PubKey, signer: HDKey, cosigners: [HDKey]) ->  Bool {
         // Check that origin ends with 0/* or 1/*
         let components = origin.path.components
@@ -105,7 +116,7 @@ public struct PSBTOutput {
         ) {
             return false
         }
-        
+
         // Find matching HDKey
         var hdKey: HDKey? = nil
         guard let signerMasterKeyFingerprint = signer.masterKeyFingerprint else {
@@ -123,36 +134,36 @@ public struct PSBTOutput {
                 }
             }
         }
-        
+
         guard hdKey != nil else {
             return false
         }
-        
+
         // Check that origin pubkey is correct
         guard let childKey = try? hdKey!.derive(origin.path) else {
             return false
         }
-        
+
         if childKey.pubKey != pubKey {
             return false
         }
-        
+
         return true
     }
-    
+
     public func isChange(signer: HDKey, inputs:[PSBTInput], cosigners: [HDKey], threshold: UInt) -> Bool {
         // Transaction must have at least one input
         if inputs.count < 1 {
             return false
         }
-        
+
         // All inputs must have origin info
         for input in inputs {
             if input.origins == nil {
                 return false
             }
         }
-        
+
         // Skip key deriviation root
         let keyPath = inputs[0].origins!.first!.value.path
         if (keyPath.components.count < 2) {
@@ -175,7 +186,7 @@ public struct PSBTOutput {
                 }
             }
         }
-        
+
         // Check outputs
         guard let origins = self.origins else {
             return false
@@ -202,12 +213,12 @@ public struct PSBTOutput {
                 }
             }
         }
-        
+
         // Check scriptPubKey
         switch self.txOutput.scriptPubKey.type {
         case .multiSig:
-            
-            
+
+
             let expectedScriptPubKey = ScriptPubKey(multisig: Array(origins.keys), threshold: threshold)
             if self.txOutput.scriptPubKey != expectedScriptPubKey {
                 return false
@@ -223,20 +234,20 @@ public struct PSBT : Equatable {
     public static func == (lhs: PSBT, rhs: PSBT) -> Bool {
         lhs.network == rhs.network && lhs.data == rhs.data
     }
-    
+
 
     enum ParseError: Error {
         case tooShort
         case invalidBase64
         case invalid
     }
-    
+
     public let network: Network
     public let inputs: [PSBTInput]
     public let outputs: [PSBTOutput]
-    
+
     let wally_psbt: wally_psbt
-    
+
     public init (_ psbt: Data, _ network: Network) throws {
         self.network = network
         var psbt_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: psbt.count)
@@ -266,19 +277,19 @@ public struct PSBT : Equatable {
         }
         self.outputs = outputs
     }
-    
+
     public init (_ psbt: String, _ network: Network) throws {
         guard psbt.count != 0 else {
             throw ParseError.tooShort
         }
-        
+
         guard let psbtData = Data(base64Encoded:psbt) else {
             throw ParseError.invalidBase64
         }
-        
+
         try self.init(psbtData, network)
     }
-    
+
     public var data: Data {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
@@ -294,16 +305,39 @@ public struct PSBT : Equatable {
         precondition(wally_psbt_to_bytes(psbt, bytes_out, len.pointee, written) == WALLY_OK)
         return Data(bytes: bytes_out, count: written.pointee)
     }
-    
+
     public var description: String {
         return data.base64EncodedString()
     }
-    
+
     public var complete: Bool {
         // TODO: add function to libwally-core to check this directly
         return self.transactionFinal != nil
     }
-    
+
+    public var transaction: Transaction {
+        precondition(self.wally_psbt.tx != nil)
+        return Transaction(self.wally_psbt.tx!.pointee)
+    }
+
+    public var fee: Satoshi? {
+        if let valueOut = self.transaction.totalOut {
+            var tally: Satoshi = 0
+            for input in self.inputs {
+                guard input.isSegWit else {
+                    return nil
+                }
+                guard let amount = input.amount else {
+                    return nil
+                }
+                tally += amount
+            }
+            precondition(tally >= valueOut)
+            return tally - valueOut
+        }
+        return nil
+    }
+
     public var transactionFinal: Transaction? {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
@@ -320,7 +354,7 @@ public struct PSBT : Equatable {
         precondition(output != nil)
         return Transaction(output!.pointee)
     }
-    
+
     public mutating func sign(_ privKey: Key) {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
@@ -332,7 +366,7 @@ public struct PSBT : Equatable {
         // TODO: sanity key for network
         precondition(wally_sign_psbt(psbt, key_bytes, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
     }
-    
+
     public mutating func sign(_ hdKey: HDKey) {
         for input in self.inputs {
             if let origins: [PubKey : KeyOrigin] = input.canSign(hdKey) {
@@ -347,7 +381,7 @@ public struct PSBT : Equatable {
             }
         }
     }
-    
+
     public mutating func finalize() -> Bool {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
@@ -359,5 +393,5 @@ public struct PSBT : Equatable {
         }
         return true
     }
-    
+
 }
