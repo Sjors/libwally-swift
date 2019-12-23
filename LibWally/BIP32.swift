@@ -135,14 +135,16 @@ public struct BIP32Path : LosslessStringConvertible, Equatable {
     
 }
 
-public struct HDKey : LosslessStringConvertible {
+public struct HDKey {
     var wally_ext_key: ext_key
+    var masterKeyFingerprint: Data? // TODO: https://github.com/ElementsProject/libwally-core/issues/164
     
-    init(_ key: ext_key) {
+    init(_ key: ext_key, masterKeyFingerprint: Data? = nil) {
         self.wally_ext_key = key
+        self.masterKeyFingerprint = masterKeyFingerprint
     }
 
-    public init?(_ description: String) {
+    public init?(_ description: String, masterKeyFingerprint: Data? = nil) {
         var output: UnsafeMutablePointer<ext_key>?
         defer {
             if let wally_ext_key = output {
@@ -152,7 +154,7 @@ public struct HDKey : LosslessStringConvertible {
         let result = bip32_key_from_base58_alloc(description, &output)
         if (result == WALLY_OK) {
             precondition(output != nil)
-            self.init(output!.pointee)
+            self.init(output!.pointee, masterKeyFingerprint: masterKeyFingerprint)
         } else {
             return nil
         }
@@ -185,6 +187,7 @@ public struct HDKey : LosslessStringConvertible {
             // and the caller should retry with new entropy.
             return nil
         }
+        self.masterKeyFingerprint = self.fingerprint
     }
     
     public var network: Network {
@@ -270,7 +273,6 @@ public struct HDKey : LosslessStringConvertible {
         precondition(bip32_key_get_fingerprint(hdkey, fingerprint_bytes, Int(FINGERPRINT_LEN)) == WALLY_OK)
         return Data(bytes: fingerprint_bytes, count: Int(FINGERPRINT_LEN))
     }
-
     
     public func derive (_ path: BIP32Path) throws -> HDKey {
         if self.isNeutered && path.components.first(where: { $0.isHardened }) != nil {
@@ -290,6 +292,6 @@ public struct HDKey : LosslessStringConvertible {
         
         precondition(bip32_key_from_parent_path_alloc(hdkey, path.rawPath, path.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
         precondition(output != nil)
-        return HDKey(output!.pointee)
+        return HDKey(output!.pointee, masterKeyFingerprint: self.masterKeyFingerprint)
     }
 }
