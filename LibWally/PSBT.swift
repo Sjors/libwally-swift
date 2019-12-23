@@ -301,10 +301,10 @@ public struct PSBT : Equatable {
     
     public var complete: Bool {
         // TODO: add function to libwally-core to check this directly
-        return self.transaction != nil
+        return self.transactionFinal != nil
     }
     
-    public var transaction: Transaction? {
+    public var transactionFinal: Transaction? {
         var psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
         var output: UnsafeMutablePointer<wally_tx>?
