@@ -68,6 +68,17 @@ public struct PSBTInput {
     public func canSign(_ hdKey: HDKey) -> Bool {
         return canSign(hdKey) != nil
     }
+    
+    public var isSegWit: Bool {
+        return self.wally_psbt_input.witness_utxo != nil
+    }
+    
+    public var amount: Satoshi? {
+        if let witness_utxo = self.wally_psbt_input.witness_utxo {
+            return witness_utxo.pointee.satoshi
+        }
+        return nil
+    }
 }
 
 public struct PSBTOutput {
@@ -302,6 +313,29 @@ public struct PSBT : Equatable {
     public var complete: Bool {
         // TODO: add function to libwally-core to check this directly
         return self.transactionFinal != nil
+    }
+    
+    public var transaction: Transaction {
+        precondition(self.wally_psbt.tx != nil)
+        return Transaction(self.wally_psbt.tx!.pointee)
+    }
+    
+    public var fee: Satoshi? {
+        if let valueOut = self.transaction.totalOut {
+            var tally: Satoshi = 0
+            for input in self.inputs {
+                guard input.isSegWit else {
+                    return nil
+                }
+                guard let amount = input.amount else {
+                    return nil
+                }
+                tally += amount
+            }
+            precondition(tally >= valueOut)
+            return tally - valueOut
+        }
+        return nil
     }
     
     public var transactionFinal: Transaction? {
