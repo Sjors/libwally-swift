@@ -87,6 +87,19 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(hdKey.fingerprint.hexString, "b4e3f5ed")
     }
     
+    func testMasterKeyFingerPint() {
+        let hdKey = HDKey(seed)!
+        XCTAssertEqual(hdKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
+
+        let childKey = try! HDKey(seed)!.derive(BIP32Path(0))
+        XCTAssertEqual(childKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
+        
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let key = HDKey(tpub, masterKeyFingerprint:Data("b4e3f5ed")!)!
+        XCTAssertEqual(key.masterKeyFingerprint?.hexString, "b4e3f5ed")
+
+    }
+    
     func testRelativePathFromString() {
         let path = BIP32Path("0'/0")
         XCTAssertNotNil(path)
