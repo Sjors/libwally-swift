@@ -97,7 +97,12 @@ class BIP32Tests: XCTestCase {
         let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
         let key = HDKey(tpub, masterKeyFingerprint:Data("b4e3f5ed")!)!
         XCTAssertEqual(key.masterKeyFingerprint?.hexString, "b4e3f5ed")
-
+    }
+    
+    func testInferFingerprintAtDepthZero() {
+        let masterKeyXpriv = "tprv8ZgxMBicQKsPd9TeAdPADNnSyH9SSUUbTVeFszDE23Ki6TBB5nCefAdHkK8Fm3qMQR6sHwA56zqRmKmxnHk37JkiFzvncDqoKmPWubu7hDF"
+        let key = HDKey(masterKeyXpriv)!
+        XCTAssertEqual(key.masterKeyFingerprint?.hexString, "d90c6a4f")
     }
     
     func testRelativePathFromString() {

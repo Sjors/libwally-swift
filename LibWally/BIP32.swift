@@ -168,6 +168,16 @@ public struct HDKey {
         } else {
             return nil
         }
+        if self.wally_ext_key.depth == 0 {
+            if self.masterKeyFingerprint == nil {
+                self.masterKeyFingerprint = self.fingerprint
+            } else {
+                guard self.masterKeyFingerprint == self.fingerprint else {
+                    return nil
+                }
+            }
+        }
+
     }
 
     public init?(_ seed: BIP39Seed, _ network: Network = .mainnet) {
