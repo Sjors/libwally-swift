@@ -185,4 +185,19 @@ class BIP32Tests: XCTestCase {
 
         XCTAssertThrowsError(try hdKey.derive(hardenedPath))
     }
+
+    func testDeriveWithAbsolutePath() {
+        // Derivation is at depth 4
+        let xpub = "xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi"
+        let hdKey = HDKey(xpub)!
+        
+        let relativePath = BIP32Path("0/0")!
+        let expectedChildKey = try! hdKey.derive(relativePath)
+        
+        // This should ignore the first 4 levels
+        let absolutePath = BIP32Path("m/48h/0h/0h/2h/0/0")!
+        let childKey = try! hdKey.derive(absolutePath)
+        
+        XCTAssertEqual(childKey.xpub, expectedChildKey.xpub)
+    }
 }
