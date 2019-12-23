@@ -18,6 +18,7 @@ public enum BIP32Error: Error {
     case invalidIndex
     case hardenedDerivationWithoutPrivateKey
     case incompatibleNetwork
+    case invalidDepth
 }
 
 public enum BIP32Derivation : Equatable {
@@ -131,6 +132,15 @@ public struct BIP32Path : LosslessStringConvertible, Equatable {
             }
         }
         return pathString
+    }
+    
+    public func chop(_ depth: Int) throws -> BIP32Path {
+        if depth > components.count {
+            throw BIP32Error.invalidDepth
+        }
+        var newComponents = self.components
+        newComponents.removeFirst(Int(depth))
+        return try BIP32Path(newComponents, relative: true)
     }
     
 }
@@ -275,7 +285,13 @@ public struct HDKey {
     }
     
     public func derive (_ path: BIP32Path) throws -> HDKey {
-        if self.isNeutered && path.components.first(where: { $0.isHardened }) != nil {
+        let depth = self.wally_ext_key.depth
+        var tmpPath = path
+        if (!path.relative) {
+            tmpPath = try path.chop(Int(depth))
+        }
+
+        if self.isNeutered && tmpPath.components.first(where: { $0.isHardened }) != nil {
             throw BIP32Error.hardenedDerivationWithoutPrivateKey
         }
         
@@ -290,7 +306,7 @@ public struct HDKey {
             }
         }
         
-        precondition(bip32_key_from_parent_path_alloc(hdkey, path.rawPath, path.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
+        precondition(bip32_key_from_parent_path_alloc(hdkey, tmpPath.rawPath, tmpPath.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
         precondition(output != nil)
         return HDKey(output!.pointee, masterKeyFingerprint: self.masterKeyFingerprint)
     }
