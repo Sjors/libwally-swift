@@ -81,10 +81,14 @@ public struct PSBTInput {
     }
 }
 
-public struct PSBTOutput {
+public struct PSBTOutput : Identifiable {
     let wally_psbt_output: wally_psbt_output
     public let txOutput: TxOutput
     public let origins: [PubKey: KeyOrigin]?
+
+    public var id: String {
+        return self.txOutput.address! + String(self.txOutput.amount)
+    }
 
     init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
         precondition(index >= 0 && index < tx.num_outputs)
