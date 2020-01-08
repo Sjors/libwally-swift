@@ -302,7 +302,7 @@ public struct Transaction {
                     var tmp = privKeys[i].wally_ext_key.pub_key
                     let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
                     let pubKeyData = Data(pub_key)
-                    precondition(pubKey == pubKeyData)
+                    precondition(pubKey.data == pubKeyData)
                     
                     let scriptCode = self.inputs![i].witness!.scriptCode
                     let scriptcode_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptCode.count)

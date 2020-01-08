@@ -1,6 +1,6 @@
 //
 //  DataExtension.swift
-//  DataExtension 
+//  DataExtension
 //
 //  Created by Sjors on 28/05/2019.
 //  Copyright © 2019 Blockchain. Distributed under the MIT software
@@ -26,7 +26,7 @@ public extension Data {
         }
         self = data
     }
-    
+
     init?(base58 strBase58: String) {
         var len = strBase58.count + Int(BASE58_CHECKSUM_LEN) // base58 has more characters than the number of bytes we need
         var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
@@ -44,7 +44,7 @@ public extension Data {
     var hexString: String {
         return self.reduce("", { $0 + String(format: "%02x", $1) })
     }
-    
+
     var base58: String {
         let bytes_len = self.count
         var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)

@@ -1,6 +1,6 @@
 //
 //  DataExtensionTests.swift
-//  DataExtensionTests 
+//  DataExtensionTests
 //
 //  Created by Sjors Provoost on 05/12/2019.
 //  Copyright © 2019 Sjors Provoost. Distributed under the MIT software
@@ -28,13 +28,13 @@ class DataExtensionTests: XCTestCase {
         let data = Data("01234567890abcde")
         XCTAssertEqual(data?.base58, "2FEDkTt23zPwhDwc")
     }
-    
+
     func testFromBase58() {
         let base58 = "2FEDkTt23zPwhDwc"
         let data = Data(base58: base58)
         XCTAssertEqual(data?.hexString, "01234567890abcde")
     }
-    
+
     func testInvalidCharacter() {
         let base58 = "💩"
         XCTAssertNil(Data(base58: base58))

@@ -11,7 +11,7 @@ import XCTest
 
 class TransactionTests: XCTestCase {
     let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
-    let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+    let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -87,7 +87,7 @@ class TransactionInstanceTests: XCTestCase {
     // From: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
     // To: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
     let scriptPubKey1 = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
-    let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+    let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
     var tx1: Transaction? = nil
     var tx2: Transaction? = nil
     var tx3: Transaction? = nil

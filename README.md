@@ -13,7 +13,7 @@ Supports a minimal set of features based on v0.7.6. See also [original docs](htt
   - [x] Parse to scriptPubKey
   - [ ] Generate from scriptPubKey #7 (wishlist)
   - [x] Derive
-  - [ ] WIF
+  - [x] WIF
   - [ ] Detect bech32 typos #4 (wishlist)
 - [x] BIP32 Functions
   - [ ] Derive scriptPubKey #6 (wishlist)
@@ -39,6 +39,7 @@ Derive address from a seed:
 ```swift
 let mnemonic = BIP39Mnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))!
+masterKey.fingerprint.hexString
 let path = BIP32Path("m/44'/0'/0'")!
 let account = try! masterKey.derive(path)
 account.xpub

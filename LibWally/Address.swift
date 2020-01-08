@@ -121,6 +121,96 @@ public struct Address : AddressProtocol {
 
 }
 
+public struct Key {
+    let compressed: Bool
+    let data: Data
+    let network: Network
+    
+    static func prefix (_ network: Network) -> UInt32 {
+        switch network {
+         case .mainnet:
+             return UInt32(WALLY_ADDRESS_VERSION_WIF_MAINNET)
+         case .testnet:
+             return UInt32(WALLY_ADDRESS_VERSION_WIF_TESTNET)
+         }
+    }
+    
+    public init?(_ wif: String, _ network: Network, compressed: Bool = true) {
+        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        defer {
+          bytes_out.deallocate()
+        }
+        // TODO: autodetect network by trying both
+        // TODO: autodetect compression with wally_wif_is_uncompressed
+        let flags = UInt32(compressed ? WALLY_WIF_FLAG_COMPRESSED : WALLY_WIF_FLAG_UNCOMPRESSED)
+        guard wally_wif_to_bytes(wif, Key.prefix(network), flags, bytes_out, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK else {
+            return nil
+        }
+        self.compressed = compressed
+        self.data = Data(bytes: bytes_out, count: Int(EC_PRIVATE_KEY_LEN))
+        self.network = network
+    }
+    
+    public init?(_ data: Data, _ network: Network, compressed: Bool = true) {
+        guard data.count == Int(EC_PRIVATE_KEY_LEN) else {
+            return nil
+        }
+        self.data = data
+        self.network = network
+        self.compressed = compressed
+    }
+    
+    public var wif: String {
+        precondition(data.count == Int(EC_PRIVATE_KEY_LEN))
+        var data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        var output: UnsafeMutablePointer<Int8>?
+        defer {
+            wally_free_string(output)
+        }
+        self.data.copyBytes(to: data, count: Int(EC_PRIVATE_KEY_LEN))
+        let flags = UInt32(compressed ? WALLY_WIF_FLAG_COMPRESSED : WALLY_WIF_FLAG_UNCOMPRESSED)
+        precondition(wally_wif_from_bytes(data, Int(EC_PRIVATE_KEY_LEN), Key.prefix(network), flags, &output) == WALLY_OK)
+        assert(output != nil)
+        return String(cString: output!)
+    }
+    
+    public var pubKey: PubKey {
+        precondition(data.count == Int(EC_PRIVATE_KEY_LEN))
+        var data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_LEN))
+        defer {
+          bytes_out.deallocate()
+        }
+        self.data.copyBytes(to: data, count: Int(EC_PRIVATE_KEY_LEN))
+        precondition(wally_ec_public_key_from_private_key(data, Int(EC_PRIVATE_KEY_LEN), bytes_out, Int(EC_PUBLIC_KEY_LEN)) == WALLY_OK)
+        if (!compressed) {
+            var bytes_out_uncompressed = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN))
+            defer {
+              bytes_out_uncompressed.deallocate()
+            }
+            precondition(wally_ec_public_key_decompress(bytes_out, Int(EC_PUBLIC_KEY_LEN), bytes_out_uncompressed, Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN)) == WALLY_OK)
+            return PubKey(Data(bytes: bytes_out_uncompressed, count: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN)), network, compressed: false)!
+        } else {
+            return PubKey(Data(bytes: bytes_out, count: Int(EC_PUBLIC_KEY_LEN)), network, compressed: true)!
+        }
+    }
+}
+
+public struct PubKey : Equatable, Hashable {
+    let compressed: Bool
+    let data: Data
+    let network: Network
+
+    public init?(_ data: Data, _ network: Network, compressed: Bool = true) {
+        guard data.count == Int(compressed ? EC_PUBLIC_KEY_LEN : EC_PUBLIC_KEY_UNCOMPRESSED_LEN) else {
+            return nil
+        }
+        self.data = data
+        self.network = network
+        self.compressed = compressed
+    }
+}
+
 extension HDKey {
     public func address (_ type: AddressType) -> Address {
         return Address(self, type)

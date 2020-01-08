@@ -9,7 +9,7 @@
 import Foundation
 import CLibWally
 
-public enum Network {
+public enum Network : Equatable {
     case mainnet
     case testnet
 }
@@ -18,6 +18,7 @@ public enum BIP32Error: Error {
     case invalidIndex
     case hardenedDerivationWithoutPrivateKey
     case incompatibleNetwork
+    case invalidDepth
 }
 
 public enum BIP32Derivation : Equatable {
@@ -35,10 +36,22 @@ public enum BIP32Derivation : Equatable {
     }
 }
 
-public struct BIP32Path : LosslessStringConvertible {
+public struct BIP32Path : LosslessStringConvertible, Equatable {
     public let components: [BIP32Derivation]
     let rawPath: [UInt32]
     let relative: Bool
+    
+    public init(_ rawPath: [UInt32], relative: Bool) throws {
+        var components: [BIP32Derivation] = []
+        for index in rawPath {
+            if (index < BIP32_INITIAL_HARDENED_CHILD ) {
+                components.append(BIP32Derivation.normal(index))
+            } else {
+                components.append(BIP32Derivation.hardened(index - BIP32_INITIAL_HARDENED_CHILD))
+            }
+        }
+        try self.init(components, relative:relative)
+    }
     
     public init(_ components: [BIP32Derivation], relative: Bool) throws {
         var rawPath: [UInt32] = []
@@ -47,12 +60,12 @@ public struct BIP32Path : LosslessStringConvertible {
         for component in components {
             switch component {
             case .normal(let index):
-                if index >= UINT32_MAX / 2 {
+                if index >= BIP32_INITIAL_HARDENED_CHILD {
                     throw BIP32Error.invalidIndex
                 }
                 rawPath.append(index)
             case .hardened(let index):
-                if index >= UINT32_MAX / 2 {
+                if index >= BIP32_INITIAL_HARDENED_CHILD {
                     throw BIP32Error.invalidIndex
                 }
                 rawPath.append(BIP32_INITIAL_HARDENED_CHILD + index)
@@ -121,16 +134,27 @@ public struct BIP32Path : LosslessStringConvertible {
         return pathString
     }
     
+    public func chop(_ depth: Int) throws -> BIP32Path {
+        if depth > components.count {
+            throw BIP32Error.invalidDepth
+        }
+        var newComponents = self.components
+        newComponents.removeFirst(Int(depth))
+        return try BIP32Path(newComponents, relative: true)
+    }
+    
 }
 
-public struct HDKey : LosslessStringConvertible {
+public struct HDKey {
     var wally_ext_key: ext_key
+    var masterKeyFingerprint: Data? // TODO: https://github.com/ElementsProject/libwally-core/issues/164
     
-    init(_ key: ext_key) {
+    init(_ key: ext_key, masterKeyFingerprint: Data? = nil) {
         self.wally_ext_key = key
+        self.masterKeyFingerprint = masterKeyFingerprint
     }
 
-    public init?(_ description: String) {
+    public init?(_ description: String, masterKeyFingerprint: Data? = nil) {
         var output: UnsafeMutablePointer<ext_key>?
         defer {
             if let wally_ext_key = output {
@@ -140,10 +164,20 @@ public struct HDKey : LosslessStringConvertible {
         let result = bip32_key_from_base58_alloc(description, &output)
         if (result == WALLY_OK) {
             precondition(output != nil)
-            self.init(output!.pointee)
+            self.init(output!.pointee, masterKeyFingerprint: masterKeyFingerprint)
         } else {
             return nil
         }
+        if self.wally_ext_key.depth == 0 {
+            if self.masterKeyFingerprint == nil {
+                self.masterKeyFingerprint = self.fingerprint
+            } else {
+                guard self.masterKeyFingerprint == self.fingerprint else {
+                    return nil
+                }
+            }
+        }
+
     }
 
     public init?(_ seed: BIP39Seed, _ network: Network = .mainnet) {
@@ -173,6 +207,7 @@ public struct HDKey : LosslessStringConvertible {
             // and the caller should retry with new entropy.
             return nil
         }
+        self.masterKeyFingerprint = self.fingerprint
     }
     
     public var network: Network {
@@ -215,6 +250,16 @@ public struct HDKey : LosslessStringConvertible {
         return Data(pub_key)
     }
     
+    var privKey: Key? {
+        if self.isNeutered {
+           return nil
+        }
+        var tmp = self.wally_ext_key.priv_key
+        // skip prefix byte 0
+        let priv_key = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
+        return Key(Data(priv_key), self.network, compressed: true)
+    }
+    
     public var xpriv: String? {
         if self.isNeutered {
             return nil
@@ -232,9 +277,31 @@ public struct HDKey : LosslessStringConvertible {
         return String(cString: output!)
     }
     
+    public var fingerprint: Data {
+        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        var output: UnsafeMutablePointer<Int8>?
+        defer {
+            hdkey.deallocate()
+        }
+        hdkey.initialize(to: self.wally_ext_key)
+        
+        var fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
+        defer {
+            fingerprint_bytes.deallocate()
+        }
+        
+        precondition(bip32_key_get_fingerprint(hdkey, fingerprint_bytes, Int(FINGERPRINT_LEN)) == WALLY_OK)
+        return Data(bytes: fingerprint_bytes, count: Int(FINGERPRINT_LEN))
+    }
     
     public func derive (_ path: BIP32Path) throws -> HDKey {
-        if self.isNeutered && path.components.first(where: { $0.isHardened }) != nil {
+        let depth = self.wally_ext_key.depth
+        var tmpPath = path
+        if (!path.relative) {
+            tmpPath = try path.chop(Int(depth))
+        }
+
+        if self.isNeutered && tmpPath.components.first(where: { $0.isHardened }) != nil {
             throw BIP32Error.hardenedDerivationWithoutPrivateKey
         }
         
@@ -249,8 +316,8 @@ public struct HDKey : LosslessStringConvertible {
             }
         }
         
-        precondition(bip32_key_from_parent_path_alloc(hdkey, path.rawPath, path.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
+        precondition(bip32_key_from_parent_path_alloc(hdkey, tmpPath.rawPath, tmpPath.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
         precondition(output != nil)
-        return HDKey(output!.pointee)
+        return HDKey(output!.pointee, masterKeyFingerprint: self.masterKeyFingerprint)
     }
 }
