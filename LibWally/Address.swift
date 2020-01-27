@@ -182,9 +182,9 @@ public struct Address : AddressProtocol {
 }
 
 public struct Key {
-    let compressed: Bool
-    let data: Data
-    let network: Network
+    public let compressed: Bool
+    public let data: Data
+    public let network: Network
     
     static func prefix (_ network: Network) -> UInt32 {
         switch network {
@@ -257,9 +257,9 @@ public struct Key {
 }
 
 public struct PubKey : Equatable, Hashable {
-    let compressed: Bool
-    let data: Data
-    let network: Network
+    public let compressed: Bool
+    public let data: Data
+    public let network: Network
 
     public init?(_ data: Data, _ network: Network, compressed: Bool = true) {
         guard data.count == Int(compressed ? EC_PUBLIC_KEY_LEN : EC_PUBLIC_KEY_UNCOMPRESSED_LEN) else {
