@@ -26,7 +26,7 @@ Supports a minimal set of features based on v0.7.7. See also [original docs](htt
   - [x] Parse and serialize (base64 / binary)
   - [x] Check completeness and extract transaction
 - [ ] Transaction Functions
-  - [x] Compose and sign (SegWit) transaction
+  - [x] Compose and sign transaction
   - [x] Calculate fee
 
 Items marked with wishlist are not (yet) available upstream.
