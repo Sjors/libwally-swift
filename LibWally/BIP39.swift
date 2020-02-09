@@ -8,8 +8,9 @@
 //
 
 import Foundation
+import CLibWally
 
-let MAX_WORDS = 24 // Arbitrary, used only to determine array size in bip39_mnemonic_to_bytes
+let MAX_BYTES = 32 // Arbitrary, used only to determine array size in bip39_mnemonic_to_bytes
 
 public var BIP39Words: [String] = {
     // Implementation based on Blockstream Green Development Kit
@@ -28,7 +29,7 @@ public var BIP39Words: [String] = {
 }()
 
 public struct BIP39Entropy : LosslessStringConvertible, Equatable {
-    var data: Data
+    public var data: Data
     
     public init?(_ description: String) {
         if let data = Data(description) {
@@ -38,7 +39,7 @@ public struct BIP39Entropy : LosslessStringConvertible, Equatable {
         }
     }
     
-    init(_ data: Data) {
+    public init(_ data: Data) {
         self.data = data
     }
     
@@ -77,8 +78,8 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
     }
     
     public init?(_ entropy: BIP39Entropy) {
-        precondition(entropy.data.count <= MAX_WORDS)
-        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: MAX_WORDS)
+        precondition(entropy.data.count <= MAX_BYTES)
+        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: MAX_BYTES)
         let bytes_len = entropy.data.count
         
         var output: UnsafeMutablePointer<Int8>?
@@ -108,7 +109,7 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
                 bytes_out.deallocate()
                 written.deallocate()
             }
-            precondition(bip39_mnemonic_to_bytes(nil, mnemonic, bytes_out, MAX_WORDS, written) == WALLY_OK)
+            precondition(bip39_mnemonic_to_bytes(nil, mnemonic, bytes_out, MAX_BYTES, written) == WALLY_OK)
             return BIP39Entropy(Data(bytes: bytes_out, count: written.pointee))
         }
     }
@@ -128,7 +129,7 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
 
     static func isValid(_ words: [String]) -> Bool {
         // Enforce maximum length
-        if (words.count > MAX_WORDS) { return false }
+        if (words.count > MAX_BYTES) { return false }
 
         // Check that each word appears in the BIP39 dictionary:
         if (!Set(words).subtracting(Set(BIP39Words)).isEmpty) {

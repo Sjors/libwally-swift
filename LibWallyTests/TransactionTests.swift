@@ -11,7 +11,7 @@ import XCTest
 
 class TransactionTests: XCTestCase {
     let scriptPubKey = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
-    let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+    let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -31,7 +31,7 @@ class TransactionTests: XCTestCase {
     }
 
     func testOutput() {
-        let output = TxOutput(scriptPubKey, 1000)
+        let output = TxOutput(scriptPubKey, 1000, .mainnet)
         XCTAssertNotNil(output)
         XCTAssertEqual(output.amount, 1000)
         XCTAssertEqual(output.scriptPubKey, scriptPubKey)
@@ -61,7 +61,7 @@ class TransactionTests: XCTestCase {
         let txInput = TxInput(prevTx, vout, amount, scriptSig, nil, scriptPubKey)!
 
         // Output:
-        let txOutput = TxOutput(scriptPubKey, 1000)
+        let txOutput = TxOutput(scriptPubKey, 1000, .mainnet)
 
         // Transaction
         let tx = Transaction([txInput], [txOutput])
@@ -87,7 +87,7 @@ class TransactionInstanceTests: XCTestCase {
     // From: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
     // To: legacy P2PKH address 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
     let scriptPubKey1 = ScriptPubKey("76a914bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe88ac")!
-    let pubKey = PubKey("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!
+    let pubKey = PubKey(Data("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c")!, .mainnet)!
     var tx1: Transaction? = nil
     var tx2: Transaction? = nil
     var tx3: Transaction? = nil
@@ -114,7 +114,7 @@ class TransactionInstanceTests: XCTestCase {
         let txInput3 = TxInput(prevTx, vout, amount3, nil, witness3, scriptPubKey3)!
         
         // Output:
-        let txOutput = TxOutput(scriptPubKey1, 1000)
+        let txOutput = TxOutput(scriptPubKey1, 1000, .mainnet)
         
         // Transaction spending legacy
         tx1 = Transaction([txInput1], [txOutput])

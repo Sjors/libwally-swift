@@ -48,6 +48,20 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(hdKey.xpub, xpub)
     }
     
+    func testTpub() {
+        let tpriv = "tprv8gzC1wn3dmCrBiqDFrqhw9XXgy5t4mzeL5SdWayHBHz1GmWbRKoqDBSwDLfunPAWxMqZ9bdGsdpTiYUfYiWypv4Wfj9g7AYX5K3H9gRYNCA"
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let hdKey = HDKey(tpriv)!
+        
+        XCTAssertEqual(hdKey.xpub, tpub)
+    }
+    
+    func testPubKey() {
+        let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
+        let hdKey = HDKey(xpub)!
+        XCTAssertEqual(hdKey.pubKey.data.hexString, Data("02f632717d78bf73e74aa8461e2e782532abae4eed5110241025afb59ebfd3d2fd")?.hexString)
+    }
+    
     func testParseXpub() {
         let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
         let hdKey = HDKey(xpub)
@@ -56,6 +70,39 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(hdKey!.xpub, xpub)
         XCTAssertNil(hdKey!.xpriv)
 
+    }
+
+    func testParseTpub() {
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let hdKey = HDKey(tpub)
+        XCTAssertNotNil(hdKey)
+        XCTAssertEqual(hdKey!.description, tpub)
+        XCTAssertEqual(hdKey!.xpub, tpub)
+        XCTAssertNil(hdKey!.xpriv)
+        
+    }
+    
+    func testFingerPint() {
+        let hdKey = HDKey(seed)!
+        XCTAssertEqual(hdKey.fingerprint.hexString, "b4e3f5ed")
+    }
+    
+    func testMasterKeyFingerPint() {
+        let hdKey = HDKey(seed)!
+        XCTAssertEqual(hdKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
+
+        let childKey = try! HDKey(seed)!.derive(BIP32Path(0))
+        XCTAssertEqual(childKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
+        
+        let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
+        let key = HDKey(tpub, masterKeyFingerprint:Data("b4e3f5ed")!)!
+        XCTAssertEqual(key.masterKeyFingerprint?.hexString, "b4e3f5ed")
+    }
+    
+    func testInferFingerprintAtDepthZero() {
+        let masterKeyXpriv = "tprv8ZgxMBicQKsPd9TeAdPADNnSyH9SSUUbTVeFszDE23Ki6TBB5nCefAdHkK8Fm3qMQR6sHwA56zqRmKmxnHk37JkiFzvncDqoKmPWubu7hDF"
+        let key = HDKey(masterKeyXpriv)!
+        XCTAssertEqual(key.masterKeyFingerprint?.hexString, "d90c6a4f")
     }
     
     func testRelativePathFromString() {
@@ -142,5 +189,20 @@ class BIP32Tests: XCTestCase {
         let hardenedPath = BIP32Path("m/0'")!
 
         XCTAssertThrowsError(try hdKey.derive(hardenedPath))
+    }
+
+    func testDeriveWithAbsolutePath() {
+        // Derivation is at depth 4
+        let xpub = "xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi"
+        let hdKey = HDKey(xpub)!
+        
+        let relativePath = BIP32Path("0/0")!
+        let expectedChildKey = try! hdKey.derive(relativePath)
+        
+        // This should ignore the first 4 levels
+        let absolutePath = BIP32Path("m/48h/0h/0h/2h/0/0")!
+        let childKey = try! hdKey.derive(absolutePath)
+        
+        XCTAssertEqual(childKey.xpub, expectedChildKey.xpub)
     }
 }
