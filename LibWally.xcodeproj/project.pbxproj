@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -52,7 +52,6 @@
 		FE9CD3BA229C397900345DFA /* LibWallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibWallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE9CD3BF229C397900345DFA /* BIP39Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP39Tests.swift; sourceTree = "<group>"; };
 		FE9CD3C1229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FEB0B872229C72A700459518 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
 		FEC79CE3229E7F3800D86E2E /* BIP32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32.swift; sourceTree = "<group>"; };
 		FEC79CE5229E807500D86E2E /* BIP32Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32Tests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -131,7 +130,6 @@
 			isa = PBXGroup;
 			children = (
 				A20C942422C6BC3900B0D206 /* libwallycore.a */,
-				FEB0B872229C72A700459518 /* libwallycore.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -206,7 +204,7 @@
 				};
 			};
 			buildConfigurationList = FE9CD3AB229C397900345DFA /* Build configuration list for PBXProject "LibWally" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 11.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -406,7 +404,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -422,14 +420,13 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
-					"$(PROJECT_DIR)/libwally-core/src/.libs",
-					"$(PROJECT_DIR)/libwally-core/dist",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = "${SRCROOT}/CLibWally";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -443,7 +440,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -459,14 +456,13 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libwally-core/src/secp256k1/.libs",
-					"$(PROJECT_DIR)/libwally-core/src/.libs",
-					"$(PROJECT_DIR)/libwally-core/dist",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = "${SRCROOT}/CLibWally";
 				SWIFT_VERSION = 5.0;
@@ -478,8 +474,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZ6PH75U7K;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LibWallyTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -488,6 +485,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWallyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -497,8 +496,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZ6PH75U7K;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LibWallyTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -507,6 +507,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWallyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
