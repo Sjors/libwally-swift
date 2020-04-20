@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "# Builds libwallycore.a for simulator and device if necessary&#10;exec &gt; $PROJECT_DIR/pre_action.log 2&gt;&amp;1&#10;cd $PROJECT_DIR&#10;echo &quot;Starting build scheme Pre-actions&quot;&#10;&quot;${PROJECT_DIR}/carthage-build-libwally.sh&quot;&#10;">
+               scriptText = "# Builds libwallycore.a for simulator and device if necessary&#10;exec &gt; $PROJECT_DIR/pre_action.log 2&gt;&amp;1&#10;if [[ $CARTHAGE == &quot;YES&quot; ]] || [[ $BUILD_LIB_WALLY_CORE == &quot;YES&quot; ]]; then&#10;    cd $PROJECT_DIR&#10;    echo &quot;Starting build scheme Pre-actions&quot;&#10;    &quot;${PROJECT_DIR}/carthage-build-libwally.sh&quot;&#10;else&#10;    echo &quot;Build scheme Pre-actions skipped, not Carthage&quot;&#10;fi&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
