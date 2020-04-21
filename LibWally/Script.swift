@@ -77,6 +77,7 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
     }
     
     public init(multisig pubKeys:[PubKey], threshold: UInt, bip67: Bool = true) {
+        precondition(threshold > 0)
         let pubkeys_bytes_len = Int(EC_PUBLIC_KEY_LEN) * pubKeys.count
         let pubkeys_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubkeys_bytes_len)
         var offset = 0
