@@ -86,14 +86,28 @@ See also the included [Playground](/DemoPlayground.playground/Contents.swift) an
 
 ## Install
 
-Via CocoaPods:
+## CocoaPods:
 
+Add to your Podfile:
 ```
-pod 'LibWally', :git => 'https://github.com/blockchain/LibWally-Swift.git', :branch => 'master', :submodules => true
+pod 'LibWally', :git => 'https://github.com/blockchain/LibWally-Swift.git', :tag => 'v0.0.1', :submodules => true
 ```
 
+and then run:
 ```
 pod install --verbose
+```
+
+## Carthage:
+
+Add to your Cartfile:
+```
+github "blockchain/libwally-swift" == 0.0.1
+```
+
+and then run:
+```
+carthage update libwally-swift
 ```
 
 ## Build
