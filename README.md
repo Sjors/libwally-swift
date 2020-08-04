@@ -3,7 +3,7 @@
 Opinionated Swift wrapper around [LibWally](https://github.com/ElementsProject/libwally-core),
 a collection of useful primitives for cryptocurrency wallets.
 
-Supports a minimal set of features based on v0.7.7. See also [original docs](https://wally.readthedocs.io/en/release_0.7.7).
+Supports a minimal set of features based on v0.7.8. See also [original docs](https://wally.readthedocs.io/en/release_0.7.8).
 
 - [ ] Core Functions
   - [x] base58 encode / decode
