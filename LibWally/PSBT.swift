@@ -32,7 +32,7 @@ func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyO
 }
 
 public struct PSBTInput {
-    public let wally_psbt_input: wally_psbt_input
+    public var wally_psbt_input: wally_psbt_input
     public let origins: [PubKey: KeyOrigin]?
 
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
@@ -41,6 +41,9 @@ public struct PSBTInput {
             self.origins = getOrigins(keypaths: wally_psbt_input.keypaths.pointee, network: network)
         } else {
             self.origins = nil
+        }
+        if self.wally_psbt_input.witness_utxo != nil && self.wally_psbt_input.non_witness_utxo != nil {
+            self.wally_psbt_input.non_witness_utxo = nil
         }
     }
 
