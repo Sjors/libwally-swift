@@ -38,7 +38,9 @@ public struct PSBTInput {
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
         var input = wally_psbt_input
         if input.witness_utxo != nil && input.non_witness_utxo != nil {
-            input.witness_utxo = nil
+            input.non_witness_utxo = nil
+            input.redeem_script = nil
+            input.redeem_script_len = 0
         }
         self.wally_psbt_input = input
         if (wally_psbt_input.keypaths != nil) {
