@@ -11,7 +11,7 @@ import CLibWally
 
 public struct KeyOrigin : Equatable {
     let fingerprint: Data
-    let path: BIP32Path
+    public let path: BIP32Path
 }
 
 func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyOrigin] {
@@ -32,8 +32,8 @@ func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyO
 }
 
 public struct PSBTInput {
-    let wally_psbt_input: wally_psbt_input
-    let origins: [PubKey: KeyOrigin]?
+    public let wally_psbt_input: wally_psbt_input
+    public let origins: [PubKey: KeyOrigin]?
 
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
         self.wally_psbt_input = wally_psbt_input
@@ -71,6 +71,10 @@ public struct PSBTInput {
 
     public var isSegWit: Bool {
         return self.wally_psbt_input.witness_utxo != nil
+    }
+    
+    public var hasBothUtxo: Bool {
+        return self.wally_psbt_input.witness_utxo != nil && self.wally_psbt_input.non_witness_utxo != nil
     }
 
     public var amount: Satoshi? {
