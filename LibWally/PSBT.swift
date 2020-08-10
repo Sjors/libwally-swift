@@ -36,14 +36,15 @@ public struct PSBTInput {
     public let origins: [PubKey: KeyOrigin]?
 
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
-        self.wally_psbt_input = wally_psbt_input
+        var input = wally_psbt_input
+        if input.witness_utxo != nil && input.non_witness_utxo != nil {
+            input.non_witness_utxo = nil
+        }
+        self.wally_psbt_input = input
         if (wally_psbt_input.keypaths != nil) {
             self.origins = getOrigins(keypaths: wally_psbt_input.keypaths.pointee, network: network)
         } else {
             self.origins = nil
-        }
-        if self.wally_psbt_input.witness_utxo != nil && self.wally_psbt_input.non_witness_utxo != nil {
-            self.wally_psbt_input.non_witness_utxo = nil
         }
     }
 
