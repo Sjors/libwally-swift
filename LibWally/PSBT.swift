@@ -14,14 +14,14 @@ public struct KeyOrigin : Equatable {
     public let path: BIP32Path
 }
 
-func getOrigins (keypaths: wally_psbt_input, network: Network) -> [PubKey: KeyOrigin] {
+func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyOrigin] {
     var origins: [PubKey: KeyOrigin] = [:]
     for i in 0..<keypaths.num_items {
-        let item: wally_map_item = keypaths.items[i]
-        let pubKey = PubKey(Data(bytes: [item.key], count: Int(EC_PUBLIC_KEY_LEN)), network)!
-        let fingerprint = Data(bytes: [item.fingerprint], count: Int(BIP32_KEY_FINGERPRINT_LEN))
+        let item: wally_keypath_item = keypaths.items[i]
+        let pubKey = PubKey(Data(bytes: [item.pubkey], count: Int(EC_PUBLIC_KEY_LEN)), network)!
+        let fingerprint = Data(bytes: [item.origin.fingerprint], count: Int(FINGERPRINT_LEN))
         var components: [UInt32] = []
-        for j in 0..<item.path_len {
+        for j in 0..<item.origin.path_len {
             let index = item.origin.path[j]
             components.append(index)
         }
