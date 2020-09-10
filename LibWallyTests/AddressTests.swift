@@ -31,7 +31,6 @@ class AddressTests: XCTestCase {
         let address = hdKeyTestnet.address(.payToPubKeyHash)
         XCTAssertEqual(address.description, "mnicNaAVzyGdFvDa9VkMrjgNdnr2wHBWxk")
     }
-
     
     func testDeriveWrappedSegWitAddress() {
         let address = hdKey.address(.payToScriptHashPayToWitnessPubKeyHash)
@@ -42,7 +41,6 @@ class AddressTests: XCTestCase {
         let address = hdKeyTestnet.address(.payToScriptHashPayToWitnessPubKeyHash)
         XCTAssertEqual(address.description, "2N6M3ah9EoggimNz5pnAmQwnpE1Z3ya3V7A")
     }
-    
     
     func testDeriveNativeSegWitAddress() {
         let address = hdKey.address(.payToWitnessPubKeyHash)
@@ -70,6 +68,33 @@ class AddressTests: XCTestCase {
         let address = Address("bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt")
         XCTAssertNotNil(address)
         XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe"))
+    }
+    
+    func testECDHDerivation() {
+        let privKey = Key(Data("9cd3b16e10bd574fed3743d8e0de0b7b4e6c69f3245ab5a168ef010d22bfefa0")!, .mainnet)
+        XCTAssertNotNil(privKey)
+        let pubKey = PubKey(Data("02a18a98316b5f52596e75bfa5ca9fa9912edd0c989b86b73d41bb64c9c6adb992")!, .mainnet)
+        XCTAssertNotNil(pubKey)
+        
+        let derived = privKey!.ecdh(pubKey: pubKey!)
+
+        XCTAssertNotNil(derived)
+        XCTAssertEqual(derived!.hexString, "ef2cf705af8714b35c0855030f358f2bee356ff3579cea2607b2025d80133c3a")
+    }
+    
+    func testECDHDerivationBidirectional() {
+        let privKey1 = Key(Data("9cd3b16e10bd574fed3743d8e0de0b7b4e6c69f3245ab5a168ef010d22bfefa0")!, .mainnet)
+        XCTAssertNotNil(privKey1)
+        let privKey2 = Key(Data("ef2cf705af8714b35c0855030f358f2bee356ff3579cea2607b2025d80133c3a")!, .mainnet)
+        XCTAssertNotNil(privKey2)
+
+        
+        let derived1 = privKey1!.ecdh(pubKey: privKey2!.pubKey)
+        let derived2 = privKey2!.ecdh(pubKey: privKey1!.pubKey)
+
+        XCTAssertNotNil(derived1)
+        XCTAssertNotNil(derived2)
+        XCTAssertEqual(derived1!.hexString, derived2!.hexString)
     }
     
     func testParseWIF() {

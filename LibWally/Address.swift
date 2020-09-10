@@ -254,6 +254,35 @@ public struct Key {
             return PubKey(Data(bytes: bytes_out, count: Int(EC_PUBLIC_KEY_LEN)), network, compressed: true)!
         }
     }
+    
+    public func ecdh(pubKey: PubKey) -> Data? {
+        precondition(pubKey.compressed)
+
+        let output = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
+        let privKeyRaw = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        let pubKeyRaw = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_LEN))
+
+        defer {
+            output.deallocate()
+            privKeyRaw.deallocate()
+            pubKeyRaw.deallocate()
+        }
+        
+        self.data.copyBytes(to: privKeyRaw, count: Int(EC_PRIVATE_KEY_LEN))
+        pubKey.data.copyBytes(to: pubKeyRaw, count: Int(EC_PUBLIC_KEY_LEN))
+        
+        guard wally_ecdh(
+            pubKeyRaw,
+            Int(EC_PUBLIC_KEY_LEN),
+            privKeyRaw,
+            Int(EC_PRIVATE_KEY_LEN),
+            output,
+            Int(SHA256_LEN)) == WALLY_OK else {
+            return nil
+        }
+        
+        return Data(bytes: output, count: Int(SHA256_LEN))
+    }
 }
 
 public struct PubKey : Equatable, Hashable {
