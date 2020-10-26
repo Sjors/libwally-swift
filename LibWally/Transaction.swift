@@ -318,9 +318,7 @@ public struct Transaction {
                     fallthrough
                 case .payToWitnessPubKeyHash(let pubKey):
                     // Check that we're using the right public key:
-                    var tmp = privKeys[i].wally_ext_key.pub_key
-                    let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
-                    let pubKeyData = Data(pub_key)
+                    let pubKeyData = withUnsafeBytes(of: privKeys[i].wally_ext_key.pub_key) { Data($0) }
                     precondition(pubKey.data == pubKeyData)
                     
                     let scriptCode = self.inputs![i].witness!.scriptCode
@@ -348,16 +346,18 @@ public struct Transaction {
             // Sign hash using private key (without 0 prefix)
             precondition(EC_MESSAGE_HASH_LEN == SHA256_LEN)
             
-            var tmp = privKeys[i].wally_ext_key.priv_key
-            let privKey = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
+            var data = withUnsafeBytes(of: privKeys[i].wally_ext_key.priv_key) { Data($0) }
+            // skip prefix byte 0
+            precondition(data.popFirst() != nil)
+            let privKey = [UInt8](data)
+
             // Ensure private key is valid
             precondition(wally_ec_private_key_verify(privKey, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
         
             precondition(wally_ec_sig_from_bytes(privKey, Int(EC_PRIVATE_KEY_LEN), message_bytes, Int(EC_MESSAGE_HASH_LEN), UInt32(EC_FLAG_ECDSA | EC_FLAG_GRIND_R), compact_sig_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
         
             // Check that signature is valid and for the correct public key:
-            var tmpPub = privKeys[i].wally_ext_key.pub_key
-            let pubKey = [UInt8](UnsafeBufferPointer(start: &tmpPub.0, count: Int(EC_PUBLIC_KEY_LEN)))
+            let pubKey = [UInt8](withUnsafeBytes(of: privKeys[i].wally_ext_key.pub_key) { Data($0) })
             precondition(wally_ec_sig_verify(pubKey, Int(EC_PUBLIC_KEY_LEN), message_bytes, Int(EC_MESSAGE_HASH_LEN), UInt32(EC_FLAG_ECDSA), compact_sig_bytes, Int(EC_SIGNATURE_LEN)) == WALLY_OK)
             
             // Convert to low s form:

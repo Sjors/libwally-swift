@@ -245,19 +245,18 @@ public struct HDKey {
     }
     
     public var pubKey: PubKey {
-        var tmp = self.wally_ext_key.pub_key
-        let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
-        return PubKey(Data(pub_key), self.network, compressed: true)!
+        let data = withUnsafeBytes(of: self.wally_ext_key.pub_key) { Data($0) }
+        return PubKey(data, self.network, compressed: true)!
     }
     
     var privKey: Key? {
         if self.isNeutered {
            return nil
         }
-        var tmp = self.wally_ext_key.priv_key
+        var data = withUnsafeBytes(of: self.wally_ext_key.priv_key) { Data($0) }
         // skip prefix byte 0
-        let priv_key = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
-        return Key(Data(priv_key), self.network, compressed: true)
+        precondition(data.popFirst() != nil)
+        return Key(data, self.network, compressed: true)
     }
     
     public var xpriv: String? {
