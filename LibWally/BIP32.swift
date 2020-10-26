@@ -279,7 +279,6 @@ public struct HDKey {
     
     public var fingerprint: Data {
         let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
-        let output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
         }
