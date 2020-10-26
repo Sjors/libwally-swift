@@ -181,7 +181,7 @@ public struct HDKey {
     }
 
     public init?(_ seed: BIP39Seed, _ network: Network = .mainnet) {
-        var bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+        let bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
         var output: UnsafeMutablePointer<ext_key>?
         defer {
             bytes_in.deallocate()
@@ -231,7 +231,7 @@ public struct HDKey {
     }
     
     public var xpub: String {
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         var output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
@@ -264,7 +264,7 @@ public struct HDKey {
         if self.isNeutered {
             return nil
         }
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         var output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
@@ -278,14 +278,14 @@ public struct HDKey {
     }
     
     public var fingerprint: Data {
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
-        var output: UnsafeMutablePointer<Int8>?
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
         }
         hdkey.initialize(to: self.wally_ext_key)
         
-        var fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
+        let fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
         defer {
             fingerprint_bytes.deallocate()
         }
@@ -305,7 +305,7 @@ public struct HDKey {
             throw BIP32Error.hardenedDerivationWithoutPrivateKey
         }
         
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         hdkey.initialize(to: self.wally_ext_key)
         
         var output: UnsafeMutablePointer<ext_key>?

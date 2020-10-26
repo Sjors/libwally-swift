@@ -29,7 +29,7 @@ public struct TxOutput {
         self.network = network
         self.scriptPubKey = scriptPubKey
 
-        var scriptpubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.bytes.count)
+        let scriptpubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptPubKey.bytes.count)
         let scriptpubkey_bytes_len = scriptPubKey.bytes.count
 
         scriptPubKey.bytes.copyBytes(to: scriptpubkey_bytes, count: scriptpubkey_bytes_len)
@@ -125,7 +125,7 @@ public struct Transaction {
     public init? (_ description: String) {
         if let hex = Data(description) {
             if hex.count != SHA256_LEN { // Not a transaction hash
-                var tx_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: hex.count)
+                let tx_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: hex.count)
                 hex.copyBytes(to: tx_bytes, count: hex.count)
                 defer {
                     tx_bytes.deallocate()
@@ -217,7 +217,7 @@ public struct Transaction {
         if (self.wally_tx == nil) {
             return nil
         }
-        var value_out = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
+        let value_out = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
         defer {
             value_out.deallocate()
         }
@@ -256,7 +256,7 @@ public struct Transaction {
             }
         }
         
-        var value_out = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let value_out = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             value_out.deallocate()
         }
@@ -300,7 +300,7 @@ public struct Transaction {
         for (i, _) in self.inputs!.enumerated() {
             let hasWitness = self.inputs![i].witness != nil
             
-            var message_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
+            let message_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(SHA256_LEN))
             defer {
                 message_bytes.deallocate()
             }
@@ -340,7 +340,7 @@ public struct Transaction {
                 precondition(wally_tx_get_btc_signature_hash(self.wally_tx, i, scriptpubkey_bytes, scriptPubKey.count, 0, UInt32(WALLY_SIGHASH_ALL), 0, message_bytes, Int(SHA256_LEN)) == WALLY_OK)
             }
             
-            var compact_sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
+            let compact_sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_LEN))
             defer {
                 compact_sig_bytes.deallocate()
             }
@@ -369,7 +369,7 @@ public struct Transaction {
             
             // Convert normalized signature to DER
             let sig_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_SIGNATURE_DER_MAX_LEN))
-            var sig_bytes_written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+            let sig_bytes_written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
             defer {
                 sig_bytes.deallocate()
                 sig_bytes_written.deallocate()

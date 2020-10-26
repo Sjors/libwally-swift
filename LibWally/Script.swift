@@ -85,8 +85,8 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
             offset += Int(EC_PUBLIC_KEY_LEN)
         }
         let scriptLen = 3 + pubKeys.count * (Int(EC_PUBLIC_KEY_LEN) + 1)
-        var script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptLen)
-        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: scriptLen)
+        let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             script_bytes.deallocate()
             written.deallocate()
@@ -111,8 +111,8 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
         let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
         self.bytes.copyBytes(to: bytes, count: bytes_len)
         let script_bytes_len = 34 // 00 20 HASH256
-        var script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: script_bytes_len)
-        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let script_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: script_bytes_len)
+        let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             script_bytes.deallocate()
             written.deallocate()
@@ -162,7 +162,7 @@ public struct ScriptSig : Equatable {
         case .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
             let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
             pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
-            var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
+            let pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
             defer {
                 pubkey_hash_bytes.deallocate()
             }
@@ -221,7 +221,7 @@ public struct Witness {
         case .payToWitnessPubKeyHash(let pubKey), .payToScriptHashPayToWitnessPubKeyHash(let pubKey):
             let pubkey_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: pubKey.data.count)
             pubKey.data.copyBytes(to: pubkey_bytes, count: pubKey.data.count)
-            var pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
+            let pubkey_hash_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(HASH160_LEN))
             defer {
                 pubkey_hash_bytes.deallocate()
             }
