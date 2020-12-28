@@ -115,7 +115,7 @@ carthage update libwally-swift
 Install dependencies:
 
 ```sh
-brew install gnu-sed
+brew install gnu-sed automake
 ```
 
 Clone the repository, including submodules:
