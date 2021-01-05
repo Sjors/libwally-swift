@@ -283,13 +283,13 @@ public struct HDKey {
         }
         hdkey.initialize(to: self.wally_ext_key)
         
-        let fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
+        let fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP32_KEY_FINGERPRINT_LEN))
         defer {
             fingerprint_bytes.deallocate()
         }
         
-        precondition(bip32_key_get_fingerprint(hdkey, fingerprint_bytes, Int(FINGERPRINT_LEN)) == WALLY_OK)
-        return Data(bytes: fingerprint_bytes, count: Int(FINGERPRINT_LEN))
+        precondition(bip32_key_get_fingerprint(hdkey, fingerprint_bytes, Int(BIP32_KEY_FINGERPRINT_LEN)) == WALLY_OK)
+        return Data(bytes: fingerprint_bytes, count: Int(BIP32_KEY_FINGERPRINT_LEN))
     }
     
     public func derive (_ path: BIP32Path) throws -> HDKey {

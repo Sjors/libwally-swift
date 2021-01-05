@@ -14,16 +14,23 @@ public struct KeyOrigin : Equatable {
     let path: BIP32Path
 }
 
-func getOrigins (keypaths: wally_keypath_map, network: Network) -> [PubKey: KeyOrigin] {
+func getOrigins (keypaths: wally_map, network: Network) -> [PubKey: KeyOrigin] {
     var origins: [PubKey: KeyOrigin] = [:]
     for i in 0..<keypaths.num_items {
-        let item: wally_keypath_item = keypaths.items[i]
-        let pubKey = PubKey(Data(bytes: [item.pubkey], count: Int(EC_PUBLIC_KEY_LEN)), network)!
-        let fingerprint = Data(bytes: [item.origin.fingerprint], count: Int(FINGERPRINT_LEN))
+        // TOOD: simplify after https://github.com/ElementsProject/libwally-core/issues/241
+        let item: wally_map_item = keypaths.items[i]
+        
+        let pubKey = PubKey(Data(bytes: item.key, count: Int(EC_PUBLIC_KEY_LEN)), network)!
+        // The value contains a 4 byte fingerprint followed by the path
+        let fingerprint = Data(bytes: item.value, count: Int(BIP32_KEY_FINGERPRINT_LEN))
+        let keyPath = Data(bytes: item.value + Int(BIP32_KEY_FINGERPRINT_LEN), count: Int(item.value_len) - Int(BIP32_KEY_FINGERPRINT_LEN))
+
         var components: [UInt32] = []
-        for j in 0..<item.origin.path_len {
-            let index = item.origin.path[j]
-            components.append(index)
+        // Each path component is stored as a little endian 32 bit unsigned integer
+        for j in 0..<keyPath.count / 4 {
+            let pathComponentBytes = keyPath.subdata(in: (j * 4)..<((j + 1) * 4))
+            let pathComponent: UInt32 = pathComponentBytes.withUnsafeBytes{ $0.load(as: UInt32.self).littleEndian}
+            components.append(pathComponent)
         }
         let path = try! BIP32Path(components, relative: false)
         origins[pubKey] = KeyOrigin(fingerprint: fingerprint, path: path)
@@ -37,8 +44,8 @@ public struct PSBTInput {
 
     init(_ wally_psbt_input: wally_psbt_input, network: Network) {
         self.wally_psbt_input = wally_psbt_input
-        if (wally_psbt_input.keypaths != nil) {
-            self.origins = getOrigins(keypaths: wally_psbt_input.keypaths.pointee, network: network)
+        if (wally_psbt_input.keypaths.num_items > 0) {
+            self.origins = getOrigins(keypaths: wally_psbt_input.keypaths, network: network)
         } else {
             self.origins = nil
         }
@@ -94,8 +101,8 @@ public struct PSBTOutput : Identifiable {
         precondition(index >= 0 && index < tx.num_outputs)
         precondition(tx.num_outputs != 0 )
         self.wally_psbt_output = wally_psbt_outputs[index]
-        if (wally_psbt_output.keypaths != nil) {
-            self.origins = getOrigins(keypaths: wally_psbt_output.keypaths.pointee, network: network)
+        if (wally_psbt_output.keypaths.num_items > 0) {
+            self.origins = getOrigins(keypaths: wally_psbt_output.keypaths, network: network)
         } else {
             self.origins = nil
         }
@@ -298,7 +305,7 @@ public struct PSBT : Equatable {
         let psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
         psbt.initialize(to: self.wally_psbt)
         let len = UnsafeMutablePointer<Int>.allocate(capacity: 1)
-        precondition(wally_psbt_get_length(psbt, len) == WALLY_OK)
+        precondition(wally_psbt_get_length(psbt, 0, len) == WALLY_OK)
         let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len.pointee)
         let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
@@ -306,7 +313,7 @@ public struct PSBT : Equatable {
             bytes_out.deallocate()
             written.deallocate()
         }
-        precondition(wally_psbt_to_bytes(psbt, bytes_out, len.pointee, written) == WALLY_OK)
+        precondition(wally_psbt_to_bytes(psbt, 0, bytes_out, len.pointee, written) == WALLY_OK)
         return Data(bytes: bytes_out, count: written.pointee)
     }
 
@@ -352,7 +359,7 @@ public struct PSBT : Equatable {
                 wally_tx.deallocate()
             }
         }
-        guard wally_extract_psbt(psbt, &output) == WALLY_OK else {
+        guard wally_psbt_extract(psbt, &output) == WALLY_OK else {
             return nil
         }
         precondition(output != nil)
@@ -368,7 +375,7 @@ public struct PSBT : Equatable {
            psbt.deallocate()
         }
         // TODO: sanity key for network
-        precondition(wally_sign_psbt(psbt, key_bytes, Int(EC_PRIVATE_KEY_LEN)) == WALLY_OK)
+        precondition(wally_psbt_sign(psbt, key_bytes, Int(EC_PRIVATE_KEY_LEN), UInt32(EC_FLAG_GRIND_R)) == WALLY_OK)
     }
 
     public mutating func sign(_ hdKey: HDKey) {
@@ -392,7 +399,7 @@ public struct PSBT : Equatable {
         defer {
             psbt.deallocate()
         }
-        guard wally_finalize_psbt(psbt) == WALLY_OK else {
+        guard wally_psbt_finalize(psbt) == WALLY_OK else {
             return false
         }
         return true
