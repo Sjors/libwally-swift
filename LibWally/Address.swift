@@ -28,8 +28,8 @@ public struct Address : AddressProtocol {
         self.address = description
 
         // base58 and bech32 use more bytes in string form, so description.count should be safe:
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: description.count)
-        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: description.count)
+        let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             bytes_out.deallocate()
             written.deallocate()
@@ -78,7 +78,7 @@ public struct Address : AddressProtocol {
             }
         }()
         
-        var key = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let key = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         key.initialize(to: hdKey.wally_ext_key)
         var output: UnsafeMutablePointer<Int8>?
         defer {
@@ -121,7 +121,7 @@ public struct Address : AddressProtocol {
         switch self.scriptPubKey.type {
         case .payToPubKeyHash, .payToScriptHash:
             let bytes_len = self.scriptPubKey.bytes.count
-            var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
+            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
             var output: UnsafeMutablePointer<Int8>?
             defer {
                 wally_free_string(output)
@@ -139,7 +139,7 @@ public struct Address : AddressProtocol {
               family = "tb"
             }
             let bytes_len = self.scriptPubKey.bytes.count
-            var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
+            let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
             var output: UnsafeMutablePointer<Int8>?
             defer {
                 wally_free_string(output)
@@ -157,7 +157,7 @@ public struct Address : AddressProtocol {
                 family = "tb"
             }
             let witness_program_len = self.scriptPubKey.witnessProgram.count
-            var witness_program = UnsafeMutablePointer<UInt8>.allocate(capacity: witness_program_len)
+            let witness_program = UnsafeMutablePointer<UInt8>.allocate(capacity: witness_program_len)
             var output: UnsafeMutablePointer<Int8>?
             defer {
                 wally_free_string(output)
@@ -196,7 +196,7 @@ public struct Key {
     }
     
     public init?(_ wif: String, _ network: Network, compressed: Bool = true) {
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
         defer {
           bytes_out.deallocate()
         }
@@ -222,7 +222,7 @@ public struct Key {
     
     public var wif: String {
         precondition(data.count == Int(EC_PRIVATE_KEY_LEN))
-        var data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        let data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
         var output: UnsafeMutablePointer<Int8>?
         defer {
             wally_free_string(output)
@@ -236,15 +236,15 @@ public struct Key {
     
     public var pubKey: PubKey {
         precondition(data.count == Int(EC_PRIVATE_KEY_LEN))
-        var data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_LEN))
+        let data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PRIVATE_KEY_LEN))
+        let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_LEN))
         defer {
           bytes_out.deallocate()
         }
         self.data.copyBytes(to: data, count: Int(EC_PRIVATE_KEY_LEN))
         precondition(wally_ec_public_key_from_private_key(data, Int(EC_PRIVATE_KEY_LEN), bytes_out, Int(EC_PUBLIC_KEY_LEN)) == WALLY_OK)
         if (!compressed) {
-            var bytes_out_uncompressed = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN))
+            let bytes_out_uncompressed = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EC_PUBLIC_KEY_UNCOMPRESSED_LEN))
             defer {
               bytes_out_uncompressed.deallocate()
             }

@@ -181,7 +181,7 @@ public struct HDKey {
     }
 
     public init?(_ seed: BIP39Seed, _ network: Network = .mainnet) {
-        var bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+        let bytes_in = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
         var output: UnsafeMutablePointer<ext_key>?
         defer {
             bytes_in.deallocate()
@@ -231,7 +231,7 @@ public struct HDKey {
     }
     
     public var xpub: String {
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         var output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
@@ -245,26 +245,25 @@ public struct HDKey {
     }
     
     public var pubKey: PubKey {
-        var tmp = self.wally_ext_key.pub_key
-        let pub_key = [UInt8](UnsafeBufferPointer(start: &tmp.0, count: Int(EC_PUBLIC_KEY_LEN)))
-        return PubKey(Data(pub_key), self.network, compressed: true)!
+        let data = withUnsafeBytes(of: self.wally_ext_key.pub_key) { Data($0) }
+        return PubKey(data, self.network, compressed: true)!
     }
     
     public var privKey: Key? {
         if self.isNeutered {
            return nil
         }
-        var tmp = self.wally_ext_key.priv_key
+        var data = withUnsafeBytes(of: self.wally_ext_key.priv_key) { Data($0) }
         // skip prefix byte 0
-        let priv_key = [UInt8](UnsafeBufferPointer(start: &tmp.1, count: Int(EC_PRIVATE_KEY_LEN)))
-        return Key(Data(priv_key), self.network, compressed: true)
+        precondition(data.popFirst() != nil)
+        return Key(data, self.network, compressed: true)
     }
     
     public var xpriv: String? {
         if self.isNeutered {
             return nil
         }
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         var output: UnsafeMutablePointer<Int8>?
         defer {
             hdkey.deallocate()
@@ -278,14 +277,13 @@ public struct HDKey {
     }
     
     public var fingerprint: Data {
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
-        var output: UnsafeMutablePointer<Int8>?
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         defer {
             hdkey.deallocate()
         }
         hdkey.initialize(to: self.wally_ext_key)
         
-        var fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
+        let fingerprint_bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(FINGERPRINT_LEN))
         defer {
             fingerprint_bytes.deallocate()
         }
@@ -305,7 +303,7 @@ public struct HDKey {
             throw BIP32Error.hardenedDerivationWithoutPrivateKey
         }
         
-        var hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
+        let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         hdkey.initialize(to: self.wally_ext_key)
         
         var output: UnsafeMutablePointer<ext_key>?

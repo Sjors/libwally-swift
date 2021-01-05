@@ -79,7 +79,7 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
     
     public init?(_ entropy: BIP39Entropy) {
         precondition(entropy.data.count <= MAX_BYTES)
-        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: MAX_BYTES)
+        let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: MAX_BYTES)
         let bytes_len = entropy.data.count
         
         var output: UnsafeMutablePointer<Int8>?
@@ -103,8 +103,8 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
         get {
             let mnemonic = words.joined(separator: " ")
             
-            var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
-            var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+            let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+            let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
             defer {
                 bytes_out.deallocate()
                 written.deallocate()
@@ -117,8 +117,8 @@ public struct BIP39Mnemonic : LosslessStringConvertible, Equatable {
     public func seedHex(_ passphrase: String? = nil) -> BIP39Seed {
         let mnemonic = words.joined(separator: " ")
         
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
-        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP39_SEED_LEN_512))
+        let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             bytes_out.deallocate()
             written.deallocate()

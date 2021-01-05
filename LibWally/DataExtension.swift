@@ -28,9 +28,9 @@ public extension Data {
     }
 
     init?(base58 strBase58: String) {
-        var len = strBase58.count + Int(BASE58_CHECKSUM_LEN) // base58 has more characters than the number of bytes we need
-        var bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
-        var written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let len = strBase58.count + Int(BASE58_CHECKSUM_LEN) // base58 has more characters than the number of bytes we need
+        let bytes_out = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
+        let written = UnsafeMutablePointer<Int>.allocate(capacity: 1)
         defer {
             bytes_out.deallocate()
             written.deallocate()
@@ -47,7 +47,7 @@ public extension Data {
 
     var base58: String {
         let bytes_len = self.count
-        var bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
+        let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: bytes_len)
         self.copyBytes(to: bytes, count: Int(bytes_len))
         var output: UnsafeMutablePointer<Int8>?
         defer {
