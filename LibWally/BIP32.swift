@@ -9,9 +9,10 @@
 import Foundation
 import CLibWally
 
-public enum Network : Equatable {
-    case mainnet
-    case testnet
+public enum Network: Int {
+    case mainnet = 0
+    case testnet = 1
+    case signet = 2
 }
 
 public enum BIP32Error: Error {
