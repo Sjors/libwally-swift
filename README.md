@@ -1,4 +1,4 @@
-# LibWally Swift [![Build Status](https://travis-ci.org/blockchain/libwally-swift.svg?branch=master)](https://travis-ci.org/blockchain/libwally-swift)
+# LibWally Swift [![Build Status](https://travis-ci.com/Sjors/libwally-swift.svg?branch=master)](https://travis-ci.com/Sjors/libwally-swift)
 
 Opinionated Swift wrapper around [LibWally](https://github.com/ElementsProject/libwally-core),
 a collection of useful primitives for cryptocurrency wallets.
@@ -90,7 +90,7 @@ See also the included [Playground](/DemoPlayground.playground/Contents.swift) an
 
 Add to your Podfile:
 ```
-pod 'LibWally', :git => 'https://github.com/blockchain/LibWally-Swift.git', :tag => 'v0.0.1', :submodules => true
+pod 'LibWally', :git => 'https://github.com/Sjors/LibWally-Swift.git', :tag => 'v0.0.3', :submodules => true
 ```
 
 and then run:
@@ -102,7 +102,7 @@ pod install --verbose
 
 Add to your Cartfile:
 ```
-github "blockchain/libwally-swift" == 0.0.1
+github "Sjors/libwally-swift" == 0.0.3
 ```
 
 and then run:
@@ -121,7 +121,7 @@ brew install gnu-sed automake
 Clone the repository, including submodules:
 
 ```sh
-git clone https://github.com/blockchain/libwally-swift.git --recurse-submodules
+git clone https://github.com/Sjors/libwally-swift.git --recurse-submodules
 ```
 
 Build libwally-core:
