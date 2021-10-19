@@ -38,7 +38,7 @@ public enum WitnessType {
 }
 
 public struct ScriptPubKey : LosslessStringConvertible, Equatable {
-    var bytes: Data
+    public var bytes: Data
 
     public var type: ScriptType? {
         let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: self.bytes.count)
