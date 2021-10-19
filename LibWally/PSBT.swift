@@ -94,7 +94,7 @@ public struct PSBTOutput : Identifiable {
     public let origins: [PubKey: KeyOrigin]?
 
     public var id: String {
-        return self.txOutput.address! + String(self.txOutput.amount)
+        return self.txOutput.scriptPubKey.bytes.hexString + String(self.txOutput.amount)
     }
 
     init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
