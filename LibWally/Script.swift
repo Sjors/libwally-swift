@@ -3,8 +3,9 @@
 //  Script
 //
 //  Created by Sjors on 14/06/2019.
-//  Copyright © 2019 Blockchain. Distributed under the MIT software
-//  license, see the accompanying file LICENSE.md
+//  Copyright © 2019 Blockchain.
+//  Copyright © 2021 Sjors Provoost.
+//  Distributed under the MIT software license, see the accompanying file LICENSE.md
 
 import Foundation
 import CLibWally
@@ -17,6 +18,7 @@ public enum ScriptType {
     case payToScriptHash // P2SH (could be wrapped SegWit)
     case payToWitnessPubKeyHash // P2WPKH (native SegWit)
     case payToWitnessScriptHash // P2WS (native SegWit script)
+    case payToTaproot // P2TR (taproot script)
     case multiSig
 }
 
@@ -60,6 +62,8 @@ public struct ScriptPubKey : LosslessStringConvertible, Equatable {
             return .payToWitnessPubKeyHash
         case WALLY_SCRIPT_TYPE_P2WSH:
             return .payToWitnessScriptHash
+        case WALLY_SCRIPT_TYPE_P2TR:
+            return .payToTaproot
         case WALLY_SCRIPT_TYPE_MULTISIG:
             return .multiSig
         default:

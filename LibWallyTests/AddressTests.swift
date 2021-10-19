@@ -2,9 +2,10 @@
 //  AddressTests.swift
 //  AddressTests
 //
-//  Created by Bitcoin Dev on 14/06/2019.
-//  Copyright © 2019 Blockchain. Distributed under the MIT software
-//  license, see the accompanying file LICENSE.md
+//  Created by Sjors Provoost on 14/06/2019.
+//  Copyright © 2019 Blockchain.
+//  Copyright © 2021 Sjors Provoost.
+//  Distributed under the MIT software license, see the accompanying file LICENSE.md
 
 import XCTest
 @testable import LibWally
@@ -69,7 +70,22 @@ class AddressTests: XCTestCase {
         XCTAssertNotNil(address)
         XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("0014bef5a2f9a56a94aab12459f72ad9cf8cf19c7bbe"))
     }
+
+    func testParseTaprootAddress() {
+        let address = Address("bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0")
+        XCTAssertNotNil(address)
+        XCTAssertEqual(address!.scriptPubKey.type, .payToTaproot)
+        XCTAssertEqual(address!.scriptPubKey, ScriptPubKey("512079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"))
+    }
     
+    func testRenderTaprootAddress() {
+        let scriptPubKey = ScriptPubKey("512079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")
+        XCTAssertEqual(scriptPubKey!.type, .payToTaproot)
+        let address = Address(scriptPubKey!, .mainnet)
+        XCTAssertNotNil(address)
+        XCTAssertEqual(address!.description, "bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0")
+    }
+
     func testECDHDerivation() {
         let privKey = Key(Data("9cd3b16e10bd574fed3743d8e0de0b7b4e6c69f3245ab5a168ef010d22bfefa0")!, .mainnet)
         XCTAssertNotNil(privKey)

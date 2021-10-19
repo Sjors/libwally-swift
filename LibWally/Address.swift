@@ -3,8 +3,12 @@
 //  Address 
 //
 //  Created by Sjors on 14/06/2019.
-//  Copyright © 2019 Blockchain. Distributed under the MIT software
-//  license, see the accompanying file LICENSE.md
+//  Copyright © 2019 Blockchain.
+//  Copyright © 2021 Sjors Provoost.
+//  Distributed under the MIT software license, see the accompanying file LICENSE.md
+
+// Temporarily define this until libwally-core adds it (potentially with a different version)
+let WALLY_ADDRESS_TYPE_P2TR: Int32 = 0x08 // P2TR taproot address ("bc1p..)"
 
 import Foundation
 import CLibWally
@@ -13,6 +17,7 @@ public enum AddressType {
     case payToPubKeyHash // P2PKH (legacy)
     case payToScriptHashPayToWitnessPubKeyHash // P2SH-P2WPKH (wrapped SegWit)
     case payToWitnessPubKeyHash // P2WPKH (native SegWit)
+    case payToTaproot // P2TR (Taproot)
 }
 
 public protocol AddressProtocol : LosslessStringConvertible {
@@ -75,6 +80,8 @@ public struct Address : AddressProtocol {
                 return WALLY_ADDRESS_TYPE_P2SH_P2WPKH
             case .payToWitnessPubKeyHash:
                 return WALLY_ADDRESS_TYPE_P2WPKH
+            case .payToTaproot:
+                return WALLY_ADDRESS_TYPE_P2TR
             }
         }()
         
@@ -130,7 +137,7 @@ public struct Address : AddressProtocol {
             precondition(wally_scriptpubkey_to_address(bytes, bytes_len, UInt32(network == .mainnet ? WALLY_NETWORK_BITCOIN_MAINNET : WALLY_NETWORK_BITCOIN_TESTNET), &output) == WALLY_OK)
             precondition(output != nil)
             self.address = String(cString: output!)
-        case .payToWitnessPubKeyHash, .payToWitnessScriptHash:
+        case .payToWitnessPubKeyHash, .payToWitnessScriptHash, .payToTaproot:
             var family: String
             switch network {
             case .mainnet:
