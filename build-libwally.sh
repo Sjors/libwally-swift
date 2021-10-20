@@ -53,7 +53,7 @@ if [ $simulator == 1 ]; then
     export CFLAGS="-O3 -arch x86_64 -arch i386 -fembed-bitcode-marker -mios-simulator-version-min=10.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
     export CXXFLAGS="-O3 -arch x86_64 -arch i386 -fembed-bitcode-marker -mios-simulator-version-min=10.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
     mkdir -p build
-    ./configure --disable-shared --host=x86_64-apple-darwin --enable-static
+    ./configure --disable-shared --host=x86_64-apple-darwin --enable-static --disable-elements
     if [ $clean == 1 ]; then
       set -v # display commands
       make clean
@@ -73,7 +73,7 @@ if [ $device == 1 ]; then
     export CFLAGS="-O3 -arch arm64 -arch arm64e -arch armv7 -arch armv7s -fembed-bitcode -mios-version-min=10.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
     export CXXFLAGS="-O3 -arch arm64 -arch arm64e -arch armv7 -arch armv7s -isysroot -fembed-bitcode -mios-version-min=10.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
     mkdir -p build
-    ./configure --disable-shared --host=aarch64-apple-darwin14 --enable-static
+    ./configure --disable-shared --host=aarch64-apple-darwin14 --enable-static --disable-elements
     if [ $clean == 1 ]; then
       make clean
     fi
