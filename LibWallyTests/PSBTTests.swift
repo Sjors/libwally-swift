@@ -285,5 +285,14 @@ class PSBTTests: XCTestCase {
         XCTAssertEqual(psbt.fee, 181)
     }
 
+    func testSingleSigPSBT() {
+        var psbt = try? PSBT("cHNidP8BAH0CAAAAAaUzN3xZkB2YfVHxZSCjCgexuCQnaG8N80n/cpFVWfDyAAAAAAD9////AhAnAAAAAAAAIgAg49yAFHlKIAYs3rNfW2vA4ZOIOHtW7TrY9YdfftTjBKL3XgEAAAAAABYAFFb1p5mofMojooI4wLWIHhWFZ4E5AAAAAAABAR+ghgEAAAAAABYAFDbuJQf0taOE3ENY73ebWvMzH0C3IgYDbQqzxNNep6EipUEGuAQAYxDlRYw+TKCWlnGeImPa7SkInBWHlwEAAAAAACICAj19pZvok8gSY0WCPsDhP9HXu0pi3Z7MzI9l0W/10xx4CJwVh5foAwAAAA==", .testnet)
+        XCTAssertNotNil(psbt)
+        let key = Key("cNjKJq38o16bji8UZ4yTaZMXpn6sWPhquPDSJSPCAEGuLbHpovfh", .testnet)
+        XCTAssertNotNil(key)
+        psbt!.sign(key!)
+        XCTAssertTrue(psbt!.finalize())
+        XCTAssertTrue(psbt!.complete)
+    }
 }
 
