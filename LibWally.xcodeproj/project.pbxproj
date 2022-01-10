@@ -201,7 +201,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1230;
-				ORGANIZATIONNAME = Blockchain;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					FE9CD3B0229C397900345DFA = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -439,8 +439,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
+				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
-				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -475,8 +476,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
 				);
+				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
-				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWally;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -500,7 +502,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWallyTests;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWallyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -522,7 +524,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blockchain.LibWallyTests;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWallyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
