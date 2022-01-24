@@ -25,6 +25,8 @@
 		FE9CD3C0229C397900345DFA /* BIP39Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9CD3BF229C397900345DFA /* BIP39Tests.swift */; };
 		FEC79CE4229E7F3800D86E2E /* BIP32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC79CE3229E7F3800D86E2E /* BIP32.swift */; };
 		FEC79CE6229E807500D86E2E /* BIP32Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC79CE5229E807500D86E2E /* BIP32Tests.swift */; };
+		A21016BD279EE9D00002330E /* Descriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21016BC279EE9D00002330E /* Descriptor.swift */; };
+		A21016BF279EEFBD0002330E /* DescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21016BE279EEFBD0002330E /* DescriptorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +73,8 @@
 		FE9CD3C1229C397900345DFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FEC79CE3229E7F3800D86E2E /* BIP32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32.swift; sourceTree = "<group>"; };
 		FEC79CE5229E807500D86E2E /* BIP32Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BIP32Tests.swift; sourceTree = "<group>"; };
+		A21016BC279EE9D00002330E /* Descriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Descriptor.swift; sourceTree = "<group>"; };
+		A21016BE279EEFBD0002330E /* DescriptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +137,7 @@
 				FE1A3C0522B395B300EDCB58 /* Address.swift */,
 				FEC79CE3229E7F3800D86E2E /* BIP32.swift */,
 				FE120F54229C3B6900E7720C /* BIP39.swift */,
+				A21016BC279EE9D00002330E /* Descriptor.swift */,
 				A2BCE19323A7D6B200737BEB /* PSBT.swift */,
 				FE8B80A322B3E5630041CC94 /* Script.swift */,
 				A232260022B94A6B00C3B79C /* Transaction.swift */,
@@ -148,6 +153,7 @@
 				FEC79CE5229E807500D86E2E /* BIP32Tests.swift */,
 				FE9CD3BF229C397900345DFA /* BIP39Tests.swift */,
 				FE8B80A122B397090041CC94 /* AddressTests.swift */,
+				A21016BE279EEFBD0002330E /* DescriptorTests.swift */,
 				A2BCE19123A7D28500737BEB /* PSBTTests.swift */,
 				FE8B80A522B3E5760041CC94 /* ScriptTests.swift */,
 				A232260222B94A8400C3B79C /* TransactionTests.swift */,
@@ -281,6 +287,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A21016C1279F03E20002330E /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,6 +307,7 @@
 			files = (
 				FE120F55229C3B6900E7720C /* BIP39.swift in Sources */,
 				A2BCE19423A7D6B200737BEB /* PSBT.swift in Sources */,
+				A21016BD279EE9D00002330E /* Descriptor.swift in Sources */,
 				FE39CDFA229DAAF400DD135E /* DataExtension.swift in Sources */,
 				FE1A3C0622B395B300EDCB58 /* Address.swift in Sources */,
 				FE8B80A422B3E5630041CC94 /* Script.swift in Sources */,
@@ -314,6 +322,7 @@
 			files = (
 				FE8B80A222B397090041CC94 /* AddressTests.swift in Sources */,
 				A23509D72398F33E0045D3A5 /* DataExtensionTests.swift in Sources */,
+				A21016BF279EEFBD0002330E /* DescriptorTests.swift in Sources */,
 				FE8B80A622B3E5760041CC94 /* ScriptTests.swift in Sources */,
 				FEC79CE6229E807500D86E2E /* BIP32Tests.swift in Sources */,
 				A2BCE19223A7D28500737BEB /* PSBTTests.swift in Sources */,
