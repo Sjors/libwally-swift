@@ -59,8 +59,8 @@ if [ $simulator == 1 ]; then
   if [ ! -d "build" ]; then
     echo "Configure and compile for the simulator..."
     set -v
-    export CFLAGS="-O3 -arch x86_64 -arch i386 -fembed-bitcode-marker -mios-simulator-version-min=10.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
-    export CXXFLAGS="-O3 -arch x86_64 -arch i386 -fembed-bitcode-marker -mios-simulator-version-min=10.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
+    export CFLAGS="-O3 -arch arm64 -arch x86_64 -fembed-bitcode-marker -mios-simulator-version-min=11.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
+    export CXXFLAGS="-O3 -arch arm64 -arch x86_64 -fembed-bitcode-marker -mios-simulator-version-min=11.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
     mkdir -p build
 
     ./configure --disable-shared --host=aarch64-apple-darwin --enable-static --disable-elements --enable-standard-secp
@@ -82,8 +82,8 @@ if [ $device == 1 ]; then
   if [ ! -d "build" ] || [ $clean == 1 ]; then
     echo "Configure and cross-compile for the device..."
     set -v
-    export CFLAGS="-O3 -arch arm64 -arch arm64e -arch armv7 -arch armv7s -fembed-bitcode -mios-version-min=10.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
-    export CXXFLAGS="-O3 -arch arm64 -arch arm64e -arch armv7 -arch armv7s -isysroot -fembed-bitcode -mios-version-min=10.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
+    export CFLAGS="-O3 -arch arm64 -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
+    export CXXFLAGS="-O3 -arch arm64 -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
     mkdir -p build
     ./configure --disable-shared --host=aarch64-apple-darwin --enable-static --disable-elements --enable-standard-secp
     if [ $clean == 1 ]; then
