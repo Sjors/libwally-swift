@@ -21,7 +21,7 @@ Pod::Spec.new do |spec|
 
   spec.source_files = "LibWally"
 
-  spec.vendored_libraries = "CLibWally/libwally-core/src/.libs/libwallycore.a"
+  spec.vendored_frameworks = "build/LibwallySwift.xcframework"
 
   spec.pod_target_xcconfig = {
                                'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
