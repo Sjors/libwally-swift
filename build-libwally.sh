@@ -4,6 +4,8 @@ set -e # abort if any command fails
 device=0
 simulator=0
 clean=0
+PROJ_DIRECTORY=`pwd`
+BIN_OUTPUT_DIRECTORY="`pwd`/build"
 
 while getopts "h?dsc" opt; do
     case "$opt" in
@@ -32,6 +34,8 @@ if [ $device == 1 ] && [ $simulator == 1 ]; then
   fi
   echo "Build libwally-core for device and simulator and combine into a single library..."
 fi
+
+rm -rf build
 
 cd CLibWally/libwally-core
 
@@ -62,12 +66,17 @@ if [ $simulator == 1 ]; then
     fi
   fi
   make
-  if [ $device == 1 ]; then
-    cp src/.libs/libwallycore.a build/libwallycore-simulator.a
+  cd $PROJ_DIRECTORY
+  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS Simulator" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim CLANG_ADDRESS_SANITIZER=NO CLANG_ADDRESS_SANITIZER_ALLOW_ERROR_RECOVERY=NO CLANG_ADDRESS_SANITIZER_USE_AFTER_SCOPE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+  if [ $device != 1 ]; then
+    xcodebuild -create-xcframework \
+      -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
+      -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
   fi
 fi
 
 if [ $device == 1 ]; then
+  cd CLibWally/libwally-core
   set +v
   if [ ! -d "build" ] || [ $clean == 1 ]; then
     echo "Configure and cross-compile for the device..."
@@ -82,9 +91,13 @@ if [ $device == 1 ]; then
   fi
   make
   set +v
-  if [ $simulator == 1 ]; then
+  cd $PROJ_DIRECTORY
+  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS ENABLE_BITCODE=NO CLANG_ADDRESS_SANITIZER=NO CLANG_ADDRESS_SANITIZER_ALLOW_ERROR_RECOVERY=NO CLANG_ADDRESS_SANITIZER_USE_AFTER_SCOPE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+  if [ $simulator != 1 ]; then
     set -v
-    cp src/.libs/libwallycore.a build/libwallycore-device.a
+    xcodebuild -create-xcframework \
+      -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
+      -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
   fi
 fi
 
@@ -92,7 +105,11 @@ set +v
 if [ $device == 1 ] && [ $simulator == 1 ]; then
   echo "Combine simulator and device libraries..."
   set -v
-  lipo -create build/libwallycore-device.a build/libwallycore-simulator.a -o src/.libs/libwallycore.a
+
+  xcodebuild -create-xcframework \
+    -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
+    -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
+    -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
 fi
 
 set +v
