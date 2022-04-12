@@ -67,7 +67,7 @@ if [ $simulator == 1 ]; then
   fi
   make
   cd $PROJ_DIRECTORY
-  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS Simulator" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim
+  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS Simulator" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim ONLY_ACTIVE_ARCH=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
   if [ $device != 1 ]; then
     xcodebuild -create-xcframework \
       -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
@@ -105,6 +105,8 @@ set +v
 if [ $device == 1 ] && [ $simulator == 1 ]; then
   echo "Combine simulator and device libraries..."
   set -v
+
+  rm -rf ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
 
   xcodebuild -create-xcframework \
     -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
