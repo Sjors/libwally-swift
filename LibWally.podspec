@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
                                'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally/libwally-core/src/.libs'
                              }
 
-  spec.preserve_paths = 'LibWally/LibWally.modulemap', 'CLibWally'
+  spec.preserve_paths = 'LibWally/LibWally.modulemap', 'CLibWally', "build/LibwallySwift.xcframework"
 
   spec.module_map = 'LibWally/LibWally.modulemap'
 
