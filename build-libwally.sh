@@ -67,7 +67,7 @@ if [ $simulator == 1 ]; then
   fi
   make
   cd $PROJ_DIRECTORY
-  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS Simulator" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim CLANG_ADDRESS_SANITIZER=NO CLANG_ADDRESS_SANITIZER_ALLOW_ERROR_RECOVERY=NO CLANG_ADDRESS_SANITIZER_USE_AFTER_SCOPE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS Simulator" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim
   if [ $device != 1 ]; then
     xcodebuild -create-xcframework \
       -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
@@ -92,7 +92,7 @@ if [ $device == 1 ]; then
   make
   set +v
   cd $PROJ_DIRECTORY
-  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS ENABLE_BITCODE=NO CLANG_ADDRESS_SANITIZER=NO CLANG_ADDRESS_SANITIZER_ALLOW_ERROR_RECOVERY=NO CLANG_ADDRESS_SANITIZER_USE_AFTER_SCOPE=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+  xcodebuild archive -scheme LibWally -destination "generic/platform=iOS" -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
   if [ $simulator != 1 ]; then
     set -v
     xcodebuild -create-xcframework \
