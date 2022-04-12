@@ -24,10 +24,10 @@ Pod::Spec.new do |spec|
   spec.vendored_frameworks = "build/LibwallySwift.xcframework"
 
   spec.pod_target_xcconfig = {
-                               'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
                                'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally',
                                'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally/libwally-core/src/.libs'
                              }
+
   spec.preserve_paths = 'LibWally/LibWally.modulemap', 'CLibWally'
 
   spec.module_map = 'LibWally/LibWally.modulemap'
