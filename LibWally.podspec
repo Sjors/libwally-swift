@@ -6,7 +6,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "LibWally"
-  spec.version      = "0.0.1"
+  spec.version      = "0.0.7"
   spec.summary      = "Swift wrapper for LibWally."
   spec.description  = "Swift wrapper for LibWally, a collection of useful primitives for cryptocurrency wallets."
   spec.homepage     = "https://github.com/Sjors/libwally-swift"
@@ -19,19 +19,10 @@ Pod::Spec.new do |spec|
 
   spec.source       = { :git => "https://github.com/Sjors/libwally-swift.git", :tag => "v#{spec.version}", :submodules => true  }
 
-  spec.source_files = "LibWally"
-
   spec.vendored_frameworks = "build/LibwallySwift.xcframework"
 
-  spec.pod_target_xcconfig = {
-                               'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally',
-                               'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally/libwally-core/src/.libs'
-                             }
-
-  spec.preserve_paths = 'LibWally/LibWally.modulemap', 'CLibWally', "build/LibwallySwift.xcframework"
-
-  spec.module_map = 'LibWally/LibWally.modulemap'
+  spec.preserve_paths = "build/LibwallySwift.xcframework"
 
   spec.prepare_command = './build-libwally.sh -sdc'
-
+  spec.cocoapods_version = '>= 1.10.0'
 end
