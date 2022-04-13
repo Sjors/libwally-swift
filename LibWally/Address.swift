@@ -11,7 +11,7 @@
 let WALLY_ADDRESS_TYPE_P2TR: Int32 = 0x08 // P2TR taproot address ("bc1p..)"
 
 import Foundation
-import CLibWally
+@_implementationOnly import CLibWally
 
 public enum AddressType {
     case payToPubKeyHash // P2PKH (legacy)

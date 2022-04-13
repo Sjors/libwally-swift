@@ -7,7 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
-import CLibWally
+@_implementationOnly import CLibWally
 
 public enum Network : Equatable {
     case mainnet
