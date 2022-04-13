@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A20C942522C6BC3900B0D206 /* libwallycore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A20C942422C6BC3900B0D206 /* libwallycore.a */; };
+		A211847928071F0C00B7C8BD /* libsecp256k1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A211847828071F0C00B7C8BD /* libsecp256k1.a */; };
 		A232260122B94A6B00C3B79C /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260022B94A6B00C3B79C /* Transaction.swift */; };
 		A232260322B94A8400C3B79C /* TransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260222B94A8400C3B79C /* TransactionTests.swift */; };
 		A23509D72398F33E0045D3A5 /* DataExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23509D62398F33E0045D3A5 /* DataExtensionTests.swift */; };
@@ -40,6 +41,7 @@
 		A20557A522C6CDBE007221AA /* LibWally.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LibWally.modulemap; sourceTree = "<group>"; };
 		A20C942422C6BC3900B0D206 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "CLibWally/libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
 		A20C942622C6BDB000B0D206 /* CLibWally */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CLibWally; sourceTree = "<group>"; };
+		A211847828071F0C00B7C8BD /* libsecp256k1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1.a; path = "CLibWally/libwally-core/src/secp256k1/.libs/libsecp256k1.a"; sourceTree = "<group>"; };
 		A232260022B94A6B00C3B79C /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		A232260222B94A8400C3B79C /* TransactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
 		A23509D62398F33E0045D3A5 /* DataExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensionTests.swift; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A211847928071F0C00B7C8BD /* libsecp256k1.a in Frameworks */,
 				A20C942522C6BC3900B0D206 /* libwallycore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,6 +141,7 @@
 		FEB0B466229C6B6C00459518 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A211847828071F0C00B7C8BD /* libsecp256k1.a */,
 				A20C942422C6BC3900B0D206 /* libwallycore.a */,
 			);
 			name = Frameworks;
@@ -438,6 +442,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
+					"$(PROJECT_DIR)/CLibWally/libwally-core/src/secp256k1/.libs",
 				);
 				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
@@ -475,6 +480,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CLibWally/libwally-core/src/.libs",
+					"$(PROJECT_DIR)/CLibWally/libwally-core/src/secp256k1/.libs",
 				);
 				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
