@@ -17,12 +17,12 @@ Pod::Spec.new do |spec|
   spec.platform     = :ios, "10"
   spec.swift_version = '5.0'
 
-  spec.source       = { :git => "https://github.com/Sjors/libwally-swift.git", :tag => "v#{spec.version}", :submodules => true  }
+  spec.source       = { :git => "https://github.com/jurvis/libwally-swift.git", :tag => "v#{spec.version}", :submodules => true  }
 
   spec.vendored_frameworks = "build/LibwallySwift.xcframework"
 
   spec.preserve_paths = "build/LibwallySwift.xcframework"
-
+  spec.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
   spec.prepare_command = './build-libwally.sh -sdc'
   spec.cocoapods_version = '>= 1.10.0'
 end
