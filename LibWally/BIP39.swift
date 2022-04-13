@@ -8,7 +8,7 @@
 //
 
 import Foundation
-import CLibWally
+@_implementationOnly import CLibWally
 
 let MAX_BYTES = 32 // Arbitrary, used only to determine array size in bip39_mnemonic_to_bytes
 
