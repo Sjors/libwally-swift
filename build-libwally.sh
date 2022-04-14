@@ -80,6 +80,7 @@ if [ $simulator == 1 ]; then
   make
   if [ $device == 1 ]; then
     cp src/.libs/libwallycore.a build/libwallycore-simulator.a
+    cp src/secp256k1/.libs/libsecp256k1.a build/libsecp256k1-simulator.a
   fi
 fi
 
@@ -101,6 +102,7 @@ if [ $device == 1 ]; then
   if [ $simulator == 1 ]; then
     set -v
     cp src/.libs/libwallycore.a build/libwallycore-device.a
+    cp src/secp256k1/.libs/libsecp256k1.a build/libsecp256k1-device.a
   fi
 fi
 
@@ -109,6 +111,7 @@ if [ $device == 1 ] && [ $simulator == 1 ]; then
   echo "Combine simulator and device libraries..."
   set -v
   lipo -create build/libwallycore-device.a build/libwallycore-simulator.a -o src/.libs/libwallycore.a
+  lipo -create build/libsecp256k1-device.a build/libsecp256k1-simulator.a -o src/.libs/libsecp256k1.a
 fi
 
 set +v
