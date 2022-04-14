@@ -44,7 +44,7 @@ Derive address from a seed:
 let mnemonic = BIP39Mnemonic("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 let masterKey = HDKey(mnemonic.seedHex("bip39 passphrase"))!
 masterKey.fingerprint.hexString
-let path = BIP32Path("m/44'/0'/0'")!
+let path = "m/44'/0'/0'"
 let account = try! masterKey.derive(path)
 account.xpub
 account.address(.payToWitnessPubKeyHash)
@@ -54,7 +54,7 @@ Derive address from an xpub:
 
 ```swift
 let account = HDKey("xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ")
-let receivePath = BIP32Path("0/0")!
+let receivePath = "0/0"
 key = account.derive(receivePath)
 key.address(.payToPubKeyHash) # => 1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj
 ```
@@ -78,7 +78,7 @@ let input = TxInput(Transaction(txId)!, vout, amount, nil, witness, scriptPubKey
 transaction = Transaction([input], [TxOutput(destinationAddress.scriptPubKey, amount - 110)])
 transaction.feeRate // Satoshi per byte
 let accountPriv = HDKey("xpriv...")
-let privKey = try! accountPriv.derive(BIP32Path("0/0")!)
+let privKey = try! accountPriv.derive("0/0")
 transaction.sign([privKey])
 transaction.description # transaction hex
 ```

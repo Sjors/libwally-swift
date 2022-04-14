@@ -11,7 +11,7 @@ import CLibWally
 
 public struct KeyOrigin : Equatable {
     let fingerprint: Data
-    let path: BIP32Path
+    let path: String
 }
 
 func getOrigins (keypaths: wally_map, network: Network) -> [PubKey: KeyOrigin] {
@@ -19,7 +19,7 @@ func getOrigins (keypaths: wally_map, network: Network) -> [PubKey: KeyOrigin] {
     for i in 0..<keypaths.num_items {
         // TOOD: simplify after https://github.com/ElementsProject/libwally-core/issues/241
         let item: wally_map_item = keypaths.items[i]
-        
+
         let pubKey = PubKey(Data(bytes: item.key, count: Int(EC_PUBLIC_KEY_LEN)), network)!
         // The value contains a 4 byte fingerprint followed by the path
         let fingerprint = Data(bytes: item.value, count: Int(BIP32_KEY_FINGERPRINT_LEN))
@@ -32,7 +32,7 @@ func getOrigins (keypaths: wally_map, network: Network) -> [PubKey: KeyOrigin] {
             let pathComponent: UInt32 = pathComponentBytes.withUnsafeBytes{ $0.load(as: UInt32.self).littleEndian}
             components.append(pathComponent)
         }
-        let path = try! BIP32Path(components, relative: false)
+        let path: String = "m/" + components.map { $0 < BIP32_INITIAL_HARDENED_CHILD ? String($0) : String($0 - BIP32_INITIAL_HARDENED_CHILD) + "'" }.joined(separator: "/")
         origins[pubKey] = KeyOrigin(fingerprint: fingerprint, path: path)
     }
     return origins
@@ -118,15 +118,8 @@ public struct PSBTOutput : Identifiable {
     }
 
     static func commonOriginChecks(origin: KeyOrigin, rootPathLength: Int, pubKey: PubKey, signer: HDKey, cosigners: [HDKey]) ->  Bool {
-        // Check that origin ends with 0/* or 1/*
-        let components = origin.path.components
-        if (
-            components.count < 2 ||
-                !(components.reversed()[1] == .normal(0) || components.reversed()[1] == .normal(1)) ||
-            components.reversed()[0].isHardened
-        ) {
-            return false
-        }
+        // Check that origin ends with /0/* or /1/*
+        if origin.path.range(of: #"\/[01]\/\d+$"#, options: .regularExpression) == nil { return false }
 
         // Find matching HDKey
         var hdKey: HDKey? = nil
@@ -176,11 +169,11 @@ public struct PSBTOutput : Identifiable {
         }
 
         // Skip key deriviation root
-        let keyPath = inputs[0].origins!.first!.value.path
-        if (keyPath.components.count < 2) {
+        let keyPath = inputs[0].origins!.first!.value.path.split(separator: "/")
+        if (keyPath.count < 2) {
             return false
         }
-        let keyPathRootLength = keyPath.components.count - 2
+        let keyPathRootLength = keyPath.count - 2
 
         for input in inputs {
             // Check that we can sign all inputs (TODO: relax assumption for e.g. coinjoin)
@@ -212,16 +205,16 @@ public struct PSBTOutput : Identifiable {
             // When combined with the above constraints, change "hijacked" to an extreme index can
             // be covered by importing keys using Bitcoin Core's maximum range [0,999999].
             // This needs less than 1 GB of RAM, but is fairly slow.
-            if case let .normal(i) = origin.value.path.components.reversed()[0] {
-                if i > 999999 {
-                    return false
-                }
-                // Change index must be the same for all origins
-                if changeIndex != nil && i != changeIndex {
-                    return false
-                } else {
-                    changeIndex = i
-                }
+            let i = UInt32(origin.value.path.split(separator: "/").last!)
+            guard i != nil else { return false }
+            if i! > 999999 {
+                return false
+            }
+            // Change index must be the same for all origins
+            if changeIndex != nil && i != changeIndex! {
+                return false
+            } else {
+                changeIndex = i
             }
         }
 

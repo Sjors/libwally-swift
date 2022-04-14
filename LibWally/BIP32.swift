@@ -15,10 +15,7 @@ public enum Network : Equatable {
 }
 
 public enum BIP32Error: Error {
-    case invalidIndex
-    case hardenedDerivationWithoutPrivateKey
-    case incompatibleNetwork
-    case invalidDepth
+    case derivationFailed
 }
 
 public enum BIP32Derivation : Equatable {
@@ -34,115 +31,6 @@ public enum BIP32Derivation : Equatable {
                 return true
         }
     }
-}
-
-public struct BIP32Path : LosslessStringConvertible, Equatable {
-    public let components: [BIP32Derivation]
-    let rawPath: [UInt32]
-    let relative: Bool
-    
-    public init(_ rawPath: [UInt32], relative: Bool) throws {
-        var components: [BIP32Derivation] = []
-        for index in rawPath {
-            if (index < BIP32_INITIAL_HARDENED_CHILD ) {
-                components.append(BIP32Derivation.normal(index))
-            } else {
-                components.append(BIP32Derivation.hardened(index - BIP32_INITIAL_HARDENED_CHILD))
-            }
-        }
-        try self.init(components, relative:relative)
-    }
-    
-    public init(_ components: [BIP32Derivation], relative: Bool) throws {
-        var rawPath: [UInt32] = []
-        self.relative = relative
-
-        for component in components {
-            switch component {
-            case .normal(let index):
-                if index >= BIP32_INITIAL_HARDENED_CHILD {
-                    throw BIP32Error.invalidIndex
-                }
-                rawPath.append(index)
-            case .hardened(let index):
-                if index >= BIP32_INITIAL_HARDENED_CHILD {
-                    throw BIP32Error.invalidIndex
-                }
-                rawPath.append(BIP32_INITIAL_HARDENED_CHILD + index)
-            }
-        }
-        self.components = components
-        self.rawPath = rawPath
-    }
-    
-    public init(_ component: BIP32Derivation, relative: Bool = true) throws {
-        try self.init([component], relative: relative)
-    }
-    
-    public init(_ index: Int, relative: Bool = true) throws {
-        try self.init([.normal(UInt32(index))], relative: relative)
-    }
-    
-    // LosslessStringConvertible does not permit this initializer to throw
-    public init?(_ description: String) {
-        guard description.count > 0 else {
-            return nil
-        }
-        let relative = description.prefix(2) != "m/"
-        var tmpComponents: [BIP32Derivation] = []
-
-        for component in description.split(separator: "/") {
-            if component == "m" { continue }
-            let index: UInt32? = UInt32(component)
-            if let i = index {
-                tmpComponents.append(.normal(i))
-            } else if component.suffix(1) == "h" || component.suffix(1) == "'" {
-                let indexHardened: UInt32? = UInt32(component.dropLast(1))
-                if let i = indexHardened {
-                    tmpComponents.append(.hardened(i))
-                } else {
-                    return nil
-                }
-            } else {
-                return nil
-            }
-        }
-        
-        guard tmpComponents.count > 0 else {
-            return nil
-        }
-        do {
-            try self.init(tmpComponents, relative: relative)
-        } catch {
-            return nil
-        }
-    }
-    
-    public var description: String {
-        var pathString = self.relative ? "" : "m/"
-        for (index, item) in components.enumerated() {
-            switch item {
-            case .normal(let index):
-                pathString += String(index)
-            case .hardened(let index):
-                pathString += String(index) + "h"
-            }
-            if index < components.endIndex - 1 {
-                pathString += "/"
-            }
-        }
-        return pathString
-    }
-    
-    public func chop(_ depth: Int) throws -> BIP32Path {
-        if depth > components.count {
-            throw BIP32Error.invalidDepth
-        }
-        var newComponents = self.components
-        newComponents.removeFirst(Int(depth))
-        return try BIP32Path(newComponents, relative: true)
-    }
-    
 }
 
 public struct HDKey {
@@ -292,17 +180,7 @@ public struct HDKey {
         return Data(bytes: fingerprint_bytes, count: Int(BIP32_KEY_FINGERPRINT_LEN))
     }
     
-    public func derive (_ path: BIP32Path) throws -> HDKey {
-        let depth = self.wally_ext_key.depth
-        var tmpPath = path
-        if (!path.relative) {
-            tmpPath = try path.chop(Int(depth))
-        }
-
-        if self.isNeutered && tmpPath.components.first(where: { $0.isHardened }) != nil {
-            throw BIP32Error.hardenedDerivationWithoutPrivateKey
-        }
-        
+    public func derive (_ path: String) throws -> HDKey {
         let hdkey = UnsafeMutablePointer<ext_key>.allocate(capacity: 1)
         hdkey.initialize(to: self.wally_ext_key)
         
@@ -314,7 +192,15 @@ public struct HDKey {
             }
         }
         
-        precondition(bip32_key_from_parent_path_alloc(hdkey, tmpPath.rawPath, tmpPath.rawPath.count, UInt32(self.isNeutered ? BIP32_FLAG_KEY_PUBLIC : BIP32_FLAG_KEY_PRIVATE), &output) == WALLY_OK)
+        // Convert absolute path to relative:
+        var tmpPath = path
+        if path.split(separator: "/").first == "m" {
+            tmpPath = path.split(separator: "/").dropFirst(1 + Int(self.wally_ext_key.depth)).joined(separator: "/")
+        }
+        
+        if bip32_key_from_parent_path_str_alloc(hdkey, tmpPath, 0, isNeutered ? UInt32(BIP32_FLAG_KEY_PUBLIC) : UInt32(BIP32_FLAG_KEY_PRIVATE), &output) != WALLY_OK {
+            throw BIP32Error.derivationFailed
+        }
         precondition(output != nil)
         return HDKey(output!.pointee, masterKeyFingerprint: self.masterKeyFingerprint)
     }

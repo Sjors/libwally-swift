@@ -91,7 +91,7 @@ class BIP32Tests: XCTestCase {
         let hdKey = HDKey(seed)!
         XCTAssertEqual(hdKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
 
-        let childKey = try! HDKey(seed)!.derive(BIP32Path(0))
+        let childKey = try! HDKey(seed)!.derive("0")
         XCTAssertEqual(childKey.masterKeyFingerprint?.hexString, "b4e3f5ed")
         
         let tpub = "tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ"
@@ -105,48 +105,11 @@ class BIP32Tests: XCTestCase {
         XCTAssertEqual(key.masterKeyFingerprint?.hexString, "d90c6a4f")
     }
     
-    func testRelativePathFromString() {
-        let path = BIP32Path("0'/0")
-        XCTAssertNotNil(path)
-        XCTAssertEqual(path!.components, [.hardened(0), .normal(0)])
-        XCTAssertEqual(path!.description, "0h/0")
-    }
-    
-    func testAbsolutePathFromString() {
-        let path = BIP32Path("m/0'/0") // 0' and 0h are treated the same
-        XCTAssertNotNil(path)
-        XCTAssertEqual(path!.components, [.hardened(0), .normal(0)])
-        XCTAssertEqual(path!.description, "m/0h/0") // description always uses h instead of '
-    }
-    
-    func testRelativePathFromInt() {
-        var path: BIP32Path
-        XCTAssertNoThrow(try BIP32Path(0))
-        path = try! BIP32Path(0)
-        XCTAssertEqual(path.components, [.normal(0)])
-        XCTAssertEqual(path.description, "0")
-        
-        XCTAssertThrowsError(try BIP32Path(Int(UINT32_MAX))) { error in
-            XCTAssertEqual(error as! BIP32Error, BIP32Error.invalidIndex)
-        }
-    }
-    
-    func testAbsolutePathFromInt() {
-        var path: BIP32Path
-        path = try! BIP32Path(0, relative: false)
-        XCTAssertEqual(path.description, "m/0")
-        
-        XCTAssertThrowsError(try BIP32Path(Int(UINT32_MAX))) { error in
-            XCTAssertEqual(error as! BIP32Error, BIP32Error.invalidIndex)
-        }
-    }
-    
     func testDerive() {
         let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
         let hdKey = HDKey(xpriv)!
         
-        let derivation = try! BIP32Path(0)
-        let childKey = try! hdKey.derive(derivation)
+        let childKey = try! hdKey.derive("0")
 
         XCTAssertNotNil(childKey.xpriv)
         XCTAssertEqual(childKey.xpriv!, "xprv9vEG8CuCbvqnJXhr1ZTHZYJcYqGMZ8dkphAUT2CDZsfqewNpq42oSiFgBXXYwDWAHXVbHew4uBfiHNAahRGJ8kUWwqwTGSXUb4wrbWz9eqo")
@@ -156,8 +119,7 @@ class BIP32Tests: XCTestCase {
         let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
         let hdKey = HDKey(xpriv)!
         
-        let derivation = try! BIP32Path(.hardened(0))
-        let childKey = try! hdKey.derive(derivation)
+        let childKey = try! hdKey.derive("0h")
 
         XCTAssertNotNil(childKey.xpriv)
         XCTAssertEqual(childKey.xpriv!, "xprv9vEG8CuLwbNkVNhb56dXckENNiU1SZEgwEAokv1yLodVwsHMRbAFyUMoMd5uyKEgPDgEPBwNfa42v5HYvCvT1ymQo1LQv9h5LtkBMvQD55b")
@@ -167,9 +129,7 @@ class BIP32Tests: XCTestCase {
         let xpriv = "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF"
         let hdKey = HDKey(xpriv)!
 
-        let path = BIP32Path("m/0'/0")!
-
-        let childKey = try! hdKey.derive(path)
+        let childKey = try! hdKey.derive("m/0'/0")
         
         XCTAssertNotNil(childKey.xpriv)
         XCTAssertEqual(childKey.xpriv!, "xprv9xcgxEx7PAbqP2YSijYjX38Vo6dV4i7g9ApmPRAkofDzQ6Hf4c3nBNRfW4EKSm2uhk4FBbjNFGjhZrATqLVKM2JjhsxSrUsDdJYK4UKhyQt")
@@ -179,16 +139,13 @@ class BIP32Tests: XCTestCase {
         let xpub = "xpub661MyMwAqRbcGB88KaFbLGiYAat55APKhtWg4uYMkXAmfuSTbq2QYsn9sKJCj1YqZPafsboef4h4YbXXhNhPwMbkHTpkf3zLhx7HvFw1NDy"
         let hdKey = HDKey(xpub)!
         
-        let path = BIP32Path("m/0")!
-        let childKey = try! hdKey.derive(path)
+        let childKey = try! hdKey.derive("m/0")
         
         XCTAssertNotNil(childKey.xpub)
         XCTAssertEqual(childKey.xpub, "xpub69DcXiS6SJQ5X1nK7azHvgFM6s6qxbMcBv65FQbq8DCpXjhyNbM3zWaA2p4L7Na2siUqFvyuK9W11J6GjqQhtPeJkeadtSpFcf6XLdKsZLZ")
         XCTAssertNil(childKey.xpriv)
         
-        let hardenedPath = BIP32Path("m/0'")!
-
-        XCTAssertThrowsError(try hdKey.derive(hardenedPath))
+        XCTAssertThrowsError(try hdKey.derive("m/0'"))
     }
 
     func testDeriveWithAbsolutePath() {
@@ -196,12 +153,10 @@ class BIP32Tests: XCTestCase {
         let xpub = "xpub6E64WfdQwBGz85XhbZryr9gUGUPBgoSu5WV6tJWpzAvgAmpVpdPHkT3XYm9R5J6MeWzvLQoz4q845taC9Q28XutbptxAmg7q8QPkjvTL4oi"
         let hdKey = HDKey(xpub)!
         
-        let relativePath = BIP32Path("0/0")!
-        let expectedChildKey = try! hdKey.derive(relativePath)
+        let expectedChildKey = try! hdKey.derive("0/0")
         
         // This should ignore the first 4 levels
-        let absolutePath = BIP32Path("m/48h/0h/0h/2h/0/0")!
-        let childKey = try! hdKey.derive(absolutePath)
+        let childKey = try! hdKey.derive("m/48h/0h/0h/2h/0/0")
         
         XCTAssertEqual(childKey.xpub, expectedChildKey.xpub)
     }

@@ -26,12 +26,12 @@ class PSBTTests: XCTestCase {
     let masterKeyXpriv = "tprv8ZgxMBicQKsPd9TeAdPADNnSyH9SSUUbTVeFszDE23Ki6TBB5nCefAdHkK8Fm3qMQR6sHwA56zqRmKmxnHk37JkiFzvncDqoKmPWubu7hDF"
     
     // Paths
-    let path0 = BIP32Path("m/0'/0'/0'")!
-    let path1 = BIP32Path("m/0'/0'/1'")!
-    let path2 = BIP32Path("m/0'/0'/2'")!
-    let path3 = BIP32Path("m/0'/0'/3'")!
-    let path4 = BIP32Path("m/0'/0'/4'")!
-    let path5 = BIP32Path("m/0'/0'/5'")!
+    let path0 = "m/0'/0'/0'"
+    let path1 = "m/0'/0'/1'"
+    let path2 = "m/0'/0'/2'"
+    let path3 = "m/0'/0'/3'"
+    let path4 = "m/0'/0'/4'"
+    let path5 = "m/0'/0'/5'"
     
     // Private keys (testnet)
     let WIF_0 = "cP53pDbR5WtAD8dYAW9hhTjuvvTVaEiQBdrz9XPrgLBeRFiyCbQr" // m/0'/0'/0'
