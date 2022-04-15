@@ -19,18 +19,16 @@ Pod::Spec.new do |spec|
 
   spec.source       = { :git => "https://github.com/Sjors/libwally-swift.git", :tag => "v#{spec.version}", :submodules => true  }
 
-  spec.source_files = "LibWally"
-
-  spec.vendored_libraries = "CLibWally/libwally-core/src/.libs/libwallycore.a"
+  # Vendored Frameworks only supported >= 1.10.0
+  spec.cocoapods_version = '>= 1.10.0'
+  spec.vendored_frameworks = 'build/LibwallySwift.xcframework'
 
   spec.pod_target_xcconfig = {
                                'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
-                               'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally',
-                               'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/CLibWally/libwally-core/src/.libs'
+                               'SWIFT_INCLUDE_PATHS' => 'build/LibwallySwift.xcframework',
+                               'LIBRARY_SEARCH_PATHS' => 'build/LibwallySwift.xcframework'
                              }
-  spec.preserve_paths = 'LibWally/LibWally.modulemap', 'CLibWally'
-
-  spec.module_map = 'LibWally/LibWally.modulemap'
+  spec.preserve_paths = 'build/LibwallySwift.xcframework'
 
   spec.prepare_command = './build-libwally.sh -sdc'
 
