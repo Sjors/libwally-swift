@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
   spec.license      = { :type => "MIT", :file => "LICENSE.md" }
   spec.authors      = { "Sjors Provoost" => "sjors@sprovoost.nl" }
 
-  spec.platform     = :ios, "10"
+  spec.platform     = :ios, "11"
   spec.swift_version = '5.0'
 
   spec.source       = { :git => "https://github.com/Sjors/libwally-swift.git", :tag => "v#{spec.version}", :submodules => true  }
