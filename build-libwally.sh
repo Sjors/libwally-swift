@@ -1,133 +1,49 @@
 #!/usr/bin/env sh
 set -e # abort if any command fails
 
-device=0
-simulator=0
-clean=0
-PROJ_DIRECTORY=`pwd`
-BIN_OUTPUT_DIRECTORY="`pwd`/build"
-
-while getopts "h?dsc" opt; do
-    case "$opt" in
-    h|\?)
-        show_help
-        exit 0
-        ;;
-    d)  device=1
-        ;;
-    s)  simulator=1
-        ;;
-    c)  clean=1
-        ;;
-    esac
-done
-
-if [ $device == 0 ] && [ $simulator == 0 ]; then
-  echo "Set device (-d) and/or simulator (-s)"
-  exit 1
+if [[ -f "${HOME}/.bash_profile" ]]; then
+  source "${HOME}/.bash_profile"
 fi
 
-if [ $device == 1 ] && [ $simulator == 1 ]; then
-  if [ $clean == 0 ]; then
-    echo "Set clean (-c) when building both targets"
-    exit 1
+export PATH="$PATH:/usr/bin/python3"
+export PYTHONPATH="${PYTHONPATH}:/usr/bin/python3"
+export PYTHON="/usr/bin/python3"
+
+if [[ ${ACTION:-build} = "build" ]]; then
+  if [[ $PLATFORM_NAME = "macosx" ]]; then
+    TARGET_OS="darwin"
+  elif [[ $PLATFORM_NAME = "iphonesimulator" ]]; then
+    TARGET_OS="iphonesimulator"
+  else
+    TARGET_OS="ios"
   fi
-  echo "Build libwally-core for device and simulator and combine into a single library..."
-fi
 
-rm -rf build
+  if [[ $CONFIGURATION = "Debug" ]]; then
+    CONFIGURATION="debug"
+  else
+    CONFIGURATION="release"
+  fi
 
-cd CLibWally/libwally-core
+  ARCHES=()
+  EXECUTABLES=()
+  for ARCH in $ARCHS
+  do
+    ARCHES+=("-arch $ARCH")
 
-# Switch to vanilla libsecp256k1, rather than the more experimental libsecp256k1-zkp.
-# Since libsecp256k1-zkp is rebased on vanilla libsecp256k1, we can simply checkout
-# a common commit.
-pushd src/secp256k1
-  # Latest commit used in Bitcoin Core:
-  # https://github.com/bitcoin/bitcoin/commits/master/src/secp256k1
-  git checkout 8746600eec5e7fcd35dabd480839a3a4bdfee87b || exit 1
-popd
-
-if [ $clean == 1 ]; then
-  rm -rf build
-fi
-
-if [ ! -d "build" ]; then
-  sh ./tools/autogen.sh
-fi
-export CC=`xcrun -find clang`
-export CXX=`xcrun -find clang++`
-
-set +v
-if [ $simulator == 1 ]; then
-  if [ ! -d "build" ]; then
-    echo "Configure and compile for the simulator..."
-    set -v
-    export CFLAGS="-O3 -arch arm64 -arch x86_64 -fembed-bitcode-marker -mios-simulator-version-min=11.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
-    export CXXFLAGS="-O3 -arch arm64 -arch x86_64 -fembed-bitcode-marker -mios-simulator-version-min=11.0 -isysroot `xcrun -sdk iphonesimulator --show-sdk-path`"
-    mkdir -p build
-
-    ./configure --disable-shared --host=aarch64-apple-darwin --enable-static --disable-elements --enable-standard-secp
-
-    if [ $clean == 1 ]; then
-      set -v # display commands
-      make clean
+    TARGET_ARCH=$ARCH
+    if [[ $TARGET_ARCH = "arm64" ]]; then
+      TARGET_ARCH="aarch64"
     fi
-  fi
-  make
 
-  cd $PROJ_DIRECTORY
-  xcodebuild archive -scheme LibWally \
-    -destination "generic/platform=iOS Simulator" \
-    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim \
-    SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-
-  if [ $device != 1 ]; then
-    xcodebuild -create-xcframework \
-      -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
-      -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
-  fi
+    pushd "CLibWally/libwally-core"
+      export CFLAGS="-O3 ${ARCHES[@]} -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk ${PLATFORM_NAME} --show-sdk-path`"
+      export CXXFLAGS="-O3 ${ARCHES[@]} -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk ${PLATFORM_NAME} --show-sdk-path`"
+      ./configure --disable-shared --host="${TARGET_ARCH}-apple-${TARGET_OS}" --enable-static --disable-elements --enable-standard-secp
+      make
+    popd
+  done
+elif [[ $ACTION = "clean" ]]; then
+  pushd "CLibWally/libwally-core"
+    make clean
+  popd
 fi
-
-if [ $device == 1 ]; then
-  cd CLibWally/libwally-core
-  set +v
-  if [ ! -d "build" ] || [ $clean == 1 ]; then
-    echo "Configure and cross-compile for the device..."
-    set -v
-    export CFLAGS="-O3 -arch arm64 -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
-    export CXXFLAGS="-O3 -arch arm64 -fembed-bitcode -mios-version-min=11.0 -isysroot `xcrun -sdk iphoneos --show-sdk-path`"
-    mkdir -p build
-    ./configure --disable-shared --host=aarch64-apple-darwin --enable-static --disable-elements --enable-standard-secp
-    if [ $clean == 1 ]; then
-      make clean
-    fi
-  fi
-  make
-  set +v
-  cd $PROJ_DIRECTORY
-  xcodebuild archive -scheme LibWally \
-    -destination "generic/platform=iOS" \
-    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS \
-    SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-  if [ $simulator != 1 ]; then
-    set -v
-    xcodebuild -create-xcframework \
-      -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
-      -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
-  fi
-fi
-
-set +v
-if [ $device == 1 ] && [ $simulator == 1 ]; then
-  echo "Combine simulator and device libraries..."
-  set -v
-
-  xcodebuild -create-xcframework \
-    -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
-    -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
-    -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
-fi
-
-set +v
-echo "Done"
