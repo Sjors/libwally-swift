@@ -189,7 +189,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE9CD3C5229C397900345DFA /* Build configuration list for PBXNativeTarget "LibWally" */;
 			buildPhases = (
-				75B9EE022810FC3800E31B4D /* ShellScript */,
 				FE9CD3AC229C397900345DFA /* Headers */,
 				FE9CD3AD229C397900345DFA /* Sources */,
 				FE9CD3AE229C397900345DFA /* Frameworks */,
@@ -281,26 +280,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		75B9EE022810FC3800E31B4D /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=$PATH:/opt/homebrew/bin/\n\ncd CLibWally/libwally-core\npushd src/secp256k1\n  # Latest commit used in Bitcoin Core:\n  # https://github.com/bitcoin/bitcoin/commits/master/src/secp256k1\n  git checkout 8746600eec5e7fcd35dabd480839a3a4bdfee87b || exit 1\npopd\n\nsh ./tools/autogen.sh\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FE9CD3AD229C397900345DFA /* Sources */ = {
