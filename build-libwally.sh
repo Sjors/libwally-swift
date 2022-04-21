@@ -79,13 +79,13 @@ if [ $simulator == 1 ]; then
   cd $PROJ_DIRECTORY
   xcodebuild archive -scheme LibWally \
     -destination "generic/platform=iOS Simulator" \
-    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim \
+    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim \
     SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
   if [ $device != 1 ]; then
     xcodebuild -create-xcframework \
-      -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
-      -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
+      -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
+      -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
   fi
 fi
 
@@ -108,13 +108,13 @@ if [ $device == 1 ]; then
   cd $PROJ_DIRECTORY
   xcodebuild archive -scheme LibWally \
     -destination "generic/platform=iOS" \
-    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS \
+    -archivePath ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS \
     SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES
   if [ $simulator != 1 ]; then
     set -v
     xcodebuild -create-xcframework \
-      -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
-      -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
+      -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
+      -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
   fi
 fi
 
@@ -124,9 +124,9 @@ if [ $device == 1 ] && [ $simulator == 1 ]; then
   set -v
 
   xcodebuild -create-xcframework \
-    -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
-    -framework ${BIN_OUTPUT_DIRECTORY}/LibwallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
-    -output ${BIN_OUTPUT_DIRECTORY}/LibwallySwift.xcframework
+    -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-iOS.xcarchive/Products/Library/Frameworks/LibWally.framework \
+    -framework ${BIN_OUTPUT_DIRECTORY}/LibWallySwift-Sim.xcarchive/Products/Library/Frameworks/LibWally.framework \
+    -output ${BIN_OUTPUT_DIRECTORY}/LibWallySwift.xcframework
 fi
 
 set +v

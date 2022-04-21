@@ -21,14 +21,14 @@ Pod::Spec.new do |spec|
 
   # Vendored Frameworks only supported >= 1.10.0
   spec.cocoapods_version = '>= 1.10.0'
-  spec.vendored_frameworks = 'build/LibwallySwift.xcframework'
+  spec.vendored_frameworks = 'build/LibWallySwift.xcframework'
 
   spec.pod_target_xcconfig = {
                                'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
-                               'SWIFT_INCLUDE_PATHS' => 'build/LibwallySwift.xcframework',
-                               'LIBRARY_SEARCH_PATHS' => 'build/LibwallySwift.xcframework'
+                               'SWIFT_INCLUDE_PATHS' => 'build/LibWallySwift.xcframework',
+                               'LIBRARY_SEARCH_PATHS' => 'build/LibWallySwift.xcframework'
                              }
-  spec.preserve_paths = 'build/LibwallySwift.xcframework/*'
+  spec.preserve_paths = 'build/LibWallySwift.xcframework/*'
 
   spec.prepare_command = './build-libwally.sh -sdc'
 
