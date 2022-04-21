@@ -28,8 +28,8 @@ Pod::Spec.new do |spec|
                                'SWIFT_INCLUDE_PATHS' => 'build/LibWallySwift.xcframework',
                                'LIBRARY_SEARCH_PATHS' => 'build/LibWallySwift.xcframework'
                              }
-  spec.preserve_paths = 'build/LibWallySwift.xcframework/*'
+  spec.preserve_paths = 'LibWally/LibWally.modulemap', 'build/LibWallySwift.xcframework/*'
 
   spec.prepare_command = './build-libwally.sh -sdc'
-
+  spec.module_map = 'LibWally/LibWally.modulemap'
 end

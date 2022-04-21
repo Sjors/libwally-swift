@@ -18,7 +18,7 @@ let package = Package(
     ],
     targets: [
         .binaryTarget(
-            name: "LibwallySwift",
+            name: "LibWallySwift",
             url: url,
             checksum: checksum
         )
