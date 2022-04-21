@@ -19,7 +19,8 @@ let package = Package(
             path: "LibWally"
         ),
         .target(
-            name: "LibWallyCore"
+            name: "LibWallyCore",
+            path: "LibWallyCore"
         ),
         .testTarget(
             name: "LibWallyTests",

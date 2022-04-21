@@ -92,6 +92,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		75665EFE28112D0C00231C5D /* LibWallyCore */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = LibWallyCore;
+			sourceTree = "<group>";
+		};
 		FE9CD3A7229C397900345DFA = {
 			isa = PBXGroup;
 			children = (
@@ -99,6 +106,7 @@
 				FE39CDF5229D534100DD135E /* DemoPlayground.playground */,
 				FE9CD3B3229C397900345DFA /* LibWally */,
 				FE9CD3BE229C397900345DFA /* LibWallyTests */,
+				75665EFE28112D0C00231C5D /* LibWallyCore */,
 				FE9CD3B2229C397900345DFA /* Products */,
 				FEB0B466229C6B6C00459518 /* Frameworks */,
 			);
