@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		754D4D182811112400216F1E /* libsecp256k1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 754D4D172811111B00216F1E /* libsecp256k1.a */; };
 		A20C942522C6BC3900B0D206 /* libwallycore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A20C942422C6BC3900B0D206 /* libwallycore.a */; };
-		A211847928071F0C00B7C8BD /* libsecp256k1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A211847828071F0C00B7C8BD /* libsecp256k1.a */; };
 		A232260122B94A6B00C3B79C /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260022B94A6B00C3B79C /* Transaction.swift */; };
 		A232260322B94A8400C3B79C /* TransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A232260222B94A8400C3B79C /* TransactionTests.swift */; };
 		A23509D72398F33E0045D3A5 /* DataExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23509D62398F33E0045D3A5 /* DataExtensionTests.swift */; };
@@ -28,6 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		75B9EE002810F88400E31B4D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE9CD3A8229C397900345DFA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 75B9EDFC2810F83700E31B4D;
+			remoteInfo = LibWallyCore;
+		};
 		FE9CD3BC229C397900345DFA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FE9CD3A8229C397900345DFA /* Project object */;
@@ -38,10 +45,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		754D4D172811111B00216F1E /* libsecp256k1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1.a; path = "CLibWally/libwally-core/src/secp256k1/.libs/libsecp256k1.a"; sourceTree = "<group>"; };
 		A20557A522C6CDBE007221AA /* LibWally.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LibWally.modulemap; sourceTree = "<group>"; };
 		A20C942422C6BC3900B0D206 /* libwallycore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwallycore.a; path = "CLibWally/libwally-core/src/.libs/libwallycore.a"; sourceTree = "<group>"; };
 		A20C942622C6BDB000B0D206 /* CLibWally */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CLibWally; sourceTree = "<group>"; };
-		A211847828071F0C00B7C8BD /* libsecp256k1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1.a; path = "CLibWally/libwally-core/src/.libs/libsecp256k1.a"; sourceTree = "<group>"; };
 		A232260022B94A6B00C3B79C /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		A232260222B94A8400C3B79C /* TransactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
 		A23509D62398F33E0045D3A5 /* DataExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensionTests.swift; sourceTree = "<group>"; };
@@ -69,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A211847928071F0C00B7C8BD /* libsecp256k1.a in Frameworks */,
+				754D4D182811112400216F1E /* libsecp256k1.a in Frameworks */,
 				A20C942522C6BC3900B0D206 /* libwallycore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -141,7 +148,7 @@
 		FEB0B466229C6B6C00459518 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A211847828071F0C00B7C8BD /* libsecp256k1.a */,
+				754D4D172811111B00216F1E /* libsecp256k1.a */,
 				A20C942422C6BC3900B0D206 /* libwallycore.a */,
 			);
 			name = Frameworks;
@@ -160,11 +167,29 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		75B9EDFC2810F83700E31B4D /* LibWallyCore */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/build-libwally.sh\"";
+			buildConfigurationList = 75B9EDFD2810F83700E31B4D /* Build configuration list for PBXLegacyTarget "LibWallyCore" */;
+			buildPhases = (
+			);
+			buildToolPath = /bin/bash;
+			buildWorkingDirectory = .;
+			dependencies = (
+			);
+			name = LibWallyCore;
+			passBuildSettingsInEnvironment = 1;
+			productName = LibWallyCore;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		FE9CD3B0229C397900345DFA /* LibWally */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE9CD3C5229C397900345DFA /* Build configuration list for PBXNativeTarget "LibWally" */;
 			buildPhases = (
+				75B9EE022810FC3800E31B4D /* ShellScript */,
 				FE9CD3AC229C397900345DFA /* Headers */,
 				FE9CD3AD229C397900345DFA /* Sources */,
 				FE9CD3AE229C397900345DFA /* Frameworks */,
@@ -173,6 +198,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				75B9EE012810F88400E31B4D /* PBXTargetDependency */,
 			);
 			name = LibWally;
 			productName = LibWally;
@@ -207,6 +233,9 @@
 				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					75B9EDFC2810F83700E31B4D = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
 					FE9CD3B0229C397900345DFA = {
 						CreatedOnToolsVersion = 10.2.1;
 						LastSwiftMigration = 1020;
@@ -230,6 +259,7 @@
 			projectRoot = "";
 			targets = (
 				FE9CD3B0229C397900345DFA /* LibWally */,
+				75B9EDFC2810F83700E31B4D /* LibWallyCore */,
 				FE9CD3B9229C397900345DFA /* LibWallyTests */,
 			);
 		};
@@ -251,6 +281,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		75B9EE022810FC3800E31B4D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=$PATH:/opt/homebrew/bin/\n\ncd CLibWally/libwally-core\npushd src/secp256k1\n  # Latest commit used in Bitcoin Core:\n  # https://github.com/bitcoin/bitcoin/commits/master/src/secp256k1\n  git checkout 8746600eec5e7fcd35dabd480839a3a4bdfee87b || exit 1\npopd\n\nsh ./tools/autogen.sh\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FE9CD3AD229C397900345DFA /* Sources */ = {
@@ -284,6 +334,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		75B9EE012810F88400E31B4D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 75B9EDFC2810F83700E31B4D /* LibWallyCore */;
+			targetProxy = 75B9EE002810F88400E31B4D /* PBXContainerItemProxy */;
+		};
 		FE9CD3BD229C397900345DFA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FE9CD3B0229C397900345DFA /* LibWally */;
@@ -292,6 +347,35 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		75B9EDFE2810F83700E31B4D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = EZ49532236;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		75B9EDFF2810F83700E31B4D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = EZ49532236;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		FE9CD3C3229C397900345DFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -542,6 +626,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		75B9EDFD2810F83700E31B4D /* Build configuration list for PBXLegacyTarget "LibWallyCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				75B9EDFE2810F83700E31B4D /* Debug */,
+				75B9EDFF2810F83700E31B4D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FE9CD3AB229C397900345DFA /* Build configuration list for PBXProject "LibWally" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
