@@ -15,13 +15,37 @@ pushd src/secp256k1
   git checkout 8746600eec5e7fcd35dabd480839a3a4bdfee87b || exit 1
 popd
 
+BUILD_DIR="$(pwd)/build"
+
+build() {
+  SDK_NAME=$1 # iphonesimulator, iphoneos
+  HOST=$2 # 'aarch64-apple-darwin' or 'x86_64-apple-darwin'
+  EXTRA_CFLAGS=$3 # '-arch arm64 -mios...'
+  CC="$(xcrun --sdk $SDK_NAME -f clang) -isysroot $(xcrun --sdk $SDK_NAME --show-sdk-path)"
+  CC_FOR_BUILD="$(xcrun --sdk macosx -f clang) -isysroot $(xcrun --sdk macosx --show-sdk-path)"
+
+  ./configure --disable-shared --host=$HOST --enable-static --disable-elements --enable-standard-secp \
+    CC="$CC $EXTRA_CFLAGS" \
+    CPP="$CC $EXTRA_CFLAGS -E" \
+    CC_FOR_BUILD="$CC_FOR_BUILD" \
+    CPP_FOR_BUILD="$CC_FOR_BUILD -E" \
+
+  make
+
+  SDK_DIR="${BUILD_DIR}/${SDK_NAME}"
+  mkdir -p "${SDK_DIR}"
+
+  cp src/.libs/libwallycore.a "${SDK_DIR}/libwallycore-$HOST.a"
+  cp src/secp256k1/.libs/libsecp256k1.a "${SDK_DIR}/libsecp256k1-$HOST.a"
+
+  make clean
+}
+
 if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
   sh ./tools/autogen.sh
 
-  cd $PROJECT_DIR
-
   if [[ $PLATFORM_NAME = "macosx" ]]; then
-    TARGET_OS="darwin"
+    TARGET_OS="macos"
   elif [[ $PLATFORM_NAME = "iphonesimulator" ]]; then
     TARGET_OS="ios-simulator"
   else
@@ -35,29 +59,22 @@ if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
   fi
 
   ARCHES=()
-  EXECUTABLES=()
+  LIBWALLYCORE_EXECUTABLES=()
+  LIBSECP256K1_EXECUTABLES=()
   for ARCH in $ARCHS
   do
-    ARCHES+=("-arch $ARCH")
-
     TARGET_ARCH=$ARCH
     if [[ $TARGET_ARCH = "arm64" ]]; then
       TARGET_ARCH="aarch64"
     fi
+
+    build ${PLATFORM_NAME} ${TARGET_ARCH}-apple-darwin "-arch ${ARCH} -m${TARGET_OS}-version-min=7.0 -fembed-bitcode"
+    LIBWALLYCORE_EXECUTABLES+=("${BUILD_DIR}/${PLATFORM_NAME}/libwallycore-${TARGET_ARCH}-apple-darwin.a")
+    LIBSECP256K1_EXECUTABLES+=("${BUILD_DIR}/${PLATFORM_NAME}/libsecp256k1-${TARGET_ARCH}-apple-darwin.a")
   done
 
-  pushd "CLibWally/libwally-core"
-    export CFLAGS="-O3 ${ARCHES[@]} -fembed-bitcode -m${TARGET_OS}-version-min=11.0 -isysroot `xcrun -sdk ${PLATFORM_NAME} --show-sdk-path`"
-    export CXXFLAGS="-O3 ${ARCHES[@]} -fembed-bitcode -m${TARGET_OS}-version-min=11.0 -isysroot `xcrun -sdk ${PLATFORM_NAME} --show-sdk-path`"
-
-    # CPPFLAGS only required for x86 host machines, doing this on arm64 machines will cause a duplicate symbols error.
-    if [[ $NATIVE_ARCH = "x86_64" ]]; then
-      export CPPFLAGS="-O3 ${ARCHES[@]} -fembed-bitcode -m${TARGET_OS}-version-min=11.0 -isysroot `xcrun -sdk ${PLATFORM_NAME} --show-sdk-path`"
-    fi
-
-    ./configure --disable-shared --host="${TARGET_ARCH}-apple-darwin" --enable-static --disable-elements --enable-standard-secp
-    make
-  popd
+  xcrun --sdk $PLATFORM_NAME lipo -create "${LIBWALLYCORE_EXECUTABLES[@]}" -output "${BUILD_DIR}/LibWallyCore"
+  xcrun --sdk $PLATFORM_NAME lipo -create "${LIBSECP256K1_EXECUTABLES[@]}" -output "${BUILD_DIR}/libsecp256k1"
 elif [[ $ACTION = "clean" ]]; then
   make clean
 fi
