@@ -99,17 +99,6 @@ and then run:
 pod install --verbose
 ```
 
-## Carthage:
-
-Add to your Cartfile:
-```
-github "Sjors/libwally-swift" == 0.0.3
-```
-
-and then run:
-```
-carthage update libwally-swift
-```
 
 ## Build
 
