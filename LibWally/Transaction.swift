@@ -7,7 +7,7 @@
 //  license, see the accompanying file LICENSE.md
 
 import Foundation
-import CLibWally
+@_implementationOnly import CLibWally
 
 public typealias Satoshi = UInt64
 
@@ -45,7 +45,7 @@ public struct TxOutput {
         self.wally_tx_output = output!.pointee
     }
     
-    public init (tx_output: wally_tx_output, scriptPubKey: ScriptPubKey, network: Network) {
+    internal init (tx_output: wally_tx_output, scriptPubKey: ScriptPubKey, network: Network) {
         self.network = network
         self.wally_tx_output = tx_output
         self.scriptPubKey = scriptPubKey
