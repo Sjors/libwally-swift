@@ -16,6 +16,7 @@ xcodebuild archive -scheme LibWally \
 # build the ones for device.
 pushd CLibWally/libwally-core
   make clean
+  rm -rf $(pwd)/build
 popd
 
 xcodebuild archive -scheme LibWally \
