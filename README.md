@@ -99,13 +99,12 @@ and then run:
 pod install --verbose
 ```
 
-
 ## Build
 
 Install dependencies:
 
 ```sh
-brew install gnu-sed automake
+brew install gnu-sed automake libtool
 ```
 
 Clone the repository, including submodules:
@@ -114,8 +113,4 @@ Clone the repository, including submodules:
 git clone https://github.com/Sjors/libwally-swift.git --recurse-submodules
 ```
 
-Build libwally-core:
-
-```
-./build-libwally.sh -dsc
-```
+We no longer need to run `build-libwally.sh` manually to build frameworks. To get them, it is highly recommended you open the `LibWally.xcodeproj` and build an archive with the `LibWally` target instead.
