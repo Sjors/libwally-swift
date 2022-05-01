@@ -1,0 +1,22 @@
+name: Build For Testing
+inputs:
+  scheme:
+    description: Scheme
+    required: true
+  destination:
+    description: Destination
+    required: true
+runs:
+  using: composite
+  steps:
+  - shell: bash
+    working-directory: .
+    run: |
+      xcodebuild clean build-for-testing \
+      -allowProvisioningUpdates \
+      -allowProvisioningDeviceRegistration \
+      -scheme '${{ inputs.scheme }}' \
+      -destination '${{ inputs.destination }}' \
+      -resultBundlePath BuildResults.xcresult
+
+      rm -rf AuthKey_${{ inputs.app-store-key-id }}.p8

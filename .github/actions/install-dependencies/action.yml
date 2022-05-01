@@ -1,0 +1,7 @@
+name: Install Dependencies
+runs:
+  using: composite
+  steps:
+  - shell: bash
+    run: |
+      brew install gnu-sed automake gcc autoconf libtool
