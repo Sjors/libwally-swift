@@ -8,7 +8,7 @@
 //  Distributed under the MIT software license, see the accompanying file LICENSE.md
 
 import Foundation
-import CLibWally
+@_implementationOnly import CLibWally
 
 let a = WALLY_SCRIPT_TYPE_OP_RETURN
 
