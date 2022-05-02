@@ -21,7 +21,7 @@ let masterKey = HDKey(seedHex, .mainnet)!
 masterKey.description
 // Wallets are often identified by their master fingerprint
 masterKey.fingerprint.hexString
-let path = BIP32Path("m/44'/0'/0'")!
+let path = "m/44'/0'/0'"
 var account = try! masterKey.derive(path)
 account.xpub
 account.address(.payToWitnessPubKeyHash)
@@ -34,10 +34,10 @@ address?.scriptPubKey.type
 //
 // Destination address. We only need public keys for this, so start by parsing a tpub (xpub for testnet):
 account = HDKey("tpubDDgEAMpHn8tX5Bs19WWJLZBeFzbpE7BYuP3Qo71abZnQ7FmN3idRPg4oPWt2Q6Uf9huGv7AGMTu8M2BaCxAdThQArjLWLDLpxVX2gYfh2YJ")!
-let destinationAddress = try! account.derive(BIP32Path("0/5")!).address(.payToWitnessPubKeyHash)
+let destinationAddress = try! account.derive("0/5").address(.payToWitnessPubKeyHash)
 
 // Legacy input:
-let key1 = try! account.derive(BIP32Path("0/0")!)
+let key1 = try! account.derive("0/0")
 let address1 = key1.address(.payToPubKeyHash)
 let amount: Satoshi = 10000000 // 0.1 BTC
 // This has been funded with 0.1 tBTC in transaction 48bf2039d28b369080400e3d6a16be49d09ffd9edbd794686b30234e2c4dd0b5, output 0
@@ -66,7 +66,7 @@ transaction.feeRate // Satoshi per byte
 // In order to sign it we need the private keys (in the same order as [TxInput]):
 let accountPriv = HDKey("tprv8gzC1wn3dmCrBiqDFrqhw9XXgy5t4mzeL5SdWayHBHz1GmWbRKoqDBSwDLfunPAWxMqZ9bdGsdpTiYUfYiWypv4Wfj9g7AYX5K3H9gRYNCA")!
 account.xpub == accountPriv.xpub
-let privKey1 = try! accountPriv.derive(BIP32Path("0/0")!)
+let privKey1 = try! accountPriv.derive("0/0")
 transaction.sign([privKey1])
 transaction.description
 
@@ -79,7 +79,7 @@ transaction.vbytes // 188
 // When spending native SegWit, construct the input as follows:
 
 // Native SegWit input:
-let key2 = try! account.derive(BIP32Path("0/1")!)
+let key2 = try! account.derive("0/1")
 let address2 = key2.address(.payToWitnessPubKeyHash) // tb1q5h88ajzdl5czjuc57lfjlnwepprlgd9sj2fqkx
 // This has been funded with 0.1 tBTC in transaction 400b52dab0a2bb5ce5fdf5405a965394b43a171828cd65d35ffe1eaa0a79a5c4, output 1
 let txId2 = "400b52dab0a2bb5ce5fdf5405a965394b43a171828cd65d35ffe1eaa0a79a5c4"
@@ -104,7 +104,7 @@ transaction.vbytes // 110
 transaction.fee // Satoshi
 transaction.feeRate // Satoshi per byte
 
-let privKey2 = try! accountPriv.derive(BIP32Path("0/1")!)
+let privKey2 = try! accountPriv.derive("0/1")
 transaction.sign([privKey2])
 transaction.description
 
@@ -112,7 +112,7 @@ transaction.description
 transaction.vbytes // 110
 
 // When spending wrapped SegWit, construct the input as follows:
-let key3 = try! account.derive(BIP32Path("0/2")!)
+let key3 = try! account.derive("0/2")
 let address3 = key3.address(.payToScriptHashPayToWitnessPubKeyHash) // 2N8JzYHt1L2FJkBt37geLatfW6DBXCZW9pr
 // This has been funded with 0.1 tBTC in transaction 5f50a17eb6eab5437b79f357f37a5198a21d9d8dd226b66d8189f3a2fc66dce4, output 0
 let txId3 = "5f50a17eb6eab5437b79f357f37a5198a21d9d8dd226b66d8189f3a2fc66dce4"
@@ -136,7 +136,7 @@ transaction.vbytes // 133
 transaction.fee // Satoshi
 transaction.feeRate // Satoshi per byte
 
-let privKey3 = try! accountPriv.derive(BIP32Path("0/2")!)
+let privKey3 = try! accountPriv.derive("0/2")
 transaction.sign([privKey3])
 transaction.description
 
