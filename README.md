@@ -112,5 +112,3 @@ Clone the repository, including submodules:
 ```sh
 git clone https://github.com/Sjors/libwally-swift.git --recurse-submodules
 ```
-
-We no longer need to run `build-libwally.sh` manually to build frameworks. To get them, it is highly recommended you open the `LibWally.xcodeproj` and build an archive with the `LibWally` target instead.
