@@ -46,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		754D4D172811111B00216F1E /* libsecp256k1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1.a; path = "CLibWally/libwally-core/src/secp256k1/.libs/libsecp256k1.a"; sourceTree = "<group>"; };
+		757DBE97281E181D00AE30F2 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		75F6BECF281F6F650072D4DE /* LibWallyCore */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = LibWallyCore; path = "CLibWally/libwally-core/build/LibWallyCore"; sourceTree = "<group>"; };
 		75F6BED0281F6F650072D4DE /* libsecp256k1 */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1; path = "CLibWally/libwally-core/build/libsecp256k1"; sourceTree = "<group>"; };
 		A20557A522C6CDBE007221AA /* LibWally.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LibWally.modulemap; sourceTree = "<group>"; };
@@ -104,6 +105,7 @@
 		FE9CD3A7229C397900345DFA = {
 			isa = PBXGroup;
 			children = (
+				757DBE97281E181D00AE30F2 /* Package.swift */,
 				A20C942622C6BDB000B0D206 /* CLibWally */,
 				FE39CDF5229D534100DD135E /* DemoPlayground.playground */,
 				FE9CD3B3229C397900345DFA /* LibWally */,
