@@ -524,6 +524,7 @@
 				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_SWIFT_FLAGS = "-Xfrontend  -no-serialize-debugging-options";
 				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -563,6 +564,7 @@
 				);
 				MARKETING_VERSION = 0.0.6;
 				MODULEMAP_FILE = "$(SRCROOT)/LibWally/LibWally.modulemap";
+				OTHER_SWIFT_FLAGS = "-Xfrontend  -no-serialize-debugging-options";
 				PRODUCT_BUNDLE_IDENTIFIER = nl.sprovoost.LibWally;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
