@@ -97,7 +97,7 @@ public struct PSBTOutput : Identifiable {
         return self.txOutput.scriptPubKey.bytes.hexString + String(self.txOutput.amount)
     }
 
-    init(_ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
+    init(_ wally_psbt: wally_psbt, _ wally_psbt_outputs: UnsafeMutablePointer<wally_psbt_output>, tx: wally_tx, index: Int, network: Network) {
         precondition(index >= 0 && index < tx.num_outputs)
         precondition(tx.num_outputs != 0 )
         self.wally_psbt_output = wally_psbt_outputs[index]
@@ -107,11 +107,28 @@ public struct PSBTOutput : Identifiable {
             self.origins = nil
         }
         let output = tx.outputs![index]
-        let scriptPubKey: ScriptPubKey
-        if let scriptPubKeyBytes = self.wally_psbt_output.witness_script {
-            scriptPubKey = ScriptPubKey(Data(bytes: scriptPubKeyBytes, count: self.wally_psbt_output.witness_script_len))
-        } else {
-            scriptPubKey = ScriptPubKey(Data(bytes: output.script, count: output.script_len))
+        // This is overriden with the witness script if found in the PSBT
+        var scriptPubKey = ScriptPubKey(Data(bytes: output.script, count: output.script_len))
+        
+        let witnessScriptLen = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        let witnessScriptWritten = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            witnessScriptLen.deallocate()
+            witnessScriptWritten.deallocate()
+        }
+        // const struct wally_psbt *psbt, size_t index, size_t *written
+        var wally_psbt_tmp = wally_psbt // Copy to allow unsafe access
+        precondition(wally_psbt_get_output_witness_script_len(&wally_psbt_tmp, index, witnessScriptLen) == WALLY_OK)
+
+        if witnessScriptLen.pointee > 0 {
+            let witnessScriptBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: witnessScriptLen.pointee)
+            defer {
+                witnessScriptBytes.deallocate()
+            }
+            precondition(wally_psbt_get_output_witness_script(&wally_psbt_tmp, index, witnessScriptBytes, witnessScriptLen.pointee, witnessScriptWritten) == WALLY_OK)
+
+            precondition(witnessScriptLen.pointee == witnessScriptWritten.pointee)
+            scriptPubKey = ScriptPubKey(Data(bytes: witnessScriptBytes, count: witnessScriptLen.pointee))
         }
 
         self.txOutput = TxOutput(tx_output: output, scriptPubKey: scriptPubKey, network: network)
@@ -263,7 +280,7 @@ public struct PSBT : Equatable {
                 wally_psbt.deallocate()
             }
         }
-        guard wally_psbt_from_bytes(psbt_bytes, psbt_bytes_len, &output) == WALLY_OK else {
+        guard wally_psbt_from_bytes(psbt_bytes, psbt_bytes_len, UInt32(0), &output) == WALLY_OK else {
             // libwally-core returns WALLY_EINVAL regardless of why parsing fails
             throw ParseError.invalid
         }
@@ -277,7 +294,7 @@ public struct PSBT : Equatable {
         self.inputs = inputs
         var outputs: [PSBTOutput] = []
         for i in 0..<self.wally_psbt.outputs_allocation_len {
-            outputs.append(PSBTOutput(self.wally_psbt.outputs, tx: self.wally_psbt.tx!.pointee, index: i, network: network))
+            outputs.append(PSBTOutput(self.wally_psbt, self.wally_psbt.outputs, tx: self.wally_psbt.tx!.pointee, index: i, network: network))
         }
         self.outputs = outputs
     }
