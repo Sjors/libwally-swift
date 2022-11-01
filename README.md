@@ -87,7 +87,9 @@ See also the included [Playground](/DemoPlayground.playground/Contents.swift) an
 
 ## Install
 
-## CocoaPods:
+As part of a project.
+
+### CocoaPods
 
 Add to your Podfile:
 ```
@@ -101,6 +103,8 @@ pod install --verbose
 
 ## Build
 
+For development.
+
 Install dependencies:
 
 ```sh
@@ -112,3 +116,5 @@ Clone the repository, including submodules:
 ```sh
 git clone https://github.com/Sjors/libwally-swift.git --recurse-submodules
 ```
+
+Xcode will build libwally-core for you, which may take a few minutes.
