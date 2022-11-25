@@ -24,6 +24,7 @@ build() {
   CC="$(xcrun --sdk $SDK_NAME -f clang) -isysroot $(xcrun --sdk $SDK_NAME --show-sdk-path)"
   CC_FOR_BUILD="$(xcrun --sdk macosx -f clang) -isysroot $(xcrun --sdk macosx --show-sdk-path)"
 
+  sh ./tools/autogen.sh
   ./configure --disable-shared --host=$HOST --enable-static --disable-elements --enable-standard-secp \
     CC="$CC $EXTRA_CFLAGS" \
     CPP="$CC $EXTRA_CFLAGS -E" \
@@ -42,8 +43,6 @@ build() {
 }
 
 if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
-  sh ./tools/autogen.sh
-
   if [[ $PLATFORM_NAME = "macosx" ]]; then
     TARGET_OS="macos"
   elif [[ $PLATFORM_NAME = "iphonesimulator" ]]; then
@@ -61,6 +60,8 @@ if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
   ARCHES=()
   LIBWALLYCORE_EXECUTABLES=()
   LIBSECP256K1_EXECUTABLES=()
+  NEEDS_LIPO=false
+
   for ARCH in $ARCHS
   do
     TARGET_ARCH=$ARCH
@@ -68,13 +69,29 @@ if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
       TARGET_ARCH="aarch64"
     fi
 
-    build ${PLATFORM_NAME} ${TARGET_ARCH}-apple-darwin "-arch ${ARCH} -m${TARGET_OS}-version-min=7.0 -fembed-bitcode"
-    LIBWALLYCORE_EXECUTABLES+=("${BUILD_DIR}/${PLATFORM_NAME}/libwallycore-${TARGET_ARCH}-apple-darwin.a")
-    LIBSECP256K1_EXECUTABLES+=("${BUILD_DIR}/${PLATFORM_NAME}/libsecp256k1-${TARGET_ARCH}-apple-darwin.a")
+    LIBWALLY_DIR="${BUILD_DIR}/${PLATFORM_NAME}/libwallycore-${TARGET_ARCH}-apple-darwin.a"
+    SECP_DIR="${BUILD_DIR}/${PLATFORM_NAME}/libsecp256k1-${TARGET_ARCH}-apple-darwin.a"
+    
+    # If we haven't built our static library, let's go ahead and build it. Else, we can probably just not try and build at all.
+    if [ ! -f $LIBWALLY_DIR ] || [ ! -f $SECP_DIR ]
+    then
+      echo "DEBUG:: File not found, let's build!"
+      build ${PLATFORM_NAME} ${TARGET_ARCH}-apple-darwin "-arch ${ARCH} -m${TARGET_OS}-version-min=7.0 -fembed-bitcode"
+      
+      # Tracks our list of executables so we know the static libraries we need to lipo later
+      LIBWALLYCORE_EXECUTABLES+=($LIBWALLY_DIR)
+      LIBSECP256K1_EXECUTABLES+=($SECP_DIR)
+      
+      # Something changed, we should lipo later.
+      NEEDS_LIPO=true
+    fi
   done
 
-  xcrun --sdk $PLATFORM_NAME lipo -create "${LIBWALLYCORE_EXECUTABLES[@]}" -output "${BUILD_DIR}/LibWallyCore"
-  xcrun --sdk $PLATFORM_NAME lipo -create "${LIBSECP256K1_EXECUTABLES[@]}" -output "${BUILD_DIR}/libsecp256k1"
+  # If nothing changed, we can just not try lipo at all and skip.
+  if [ "$NEEDS_LIPO" = true ] ; then
+    xcrun --sdk $PLATFORM_NAME lipo -create "${LIBWALLYCORE_EXECUTABLES[@]}" -output "${BUILD_DIR}/LibWallyCore"
+    xcrun --sdk $PLATFORM_NAME lipo -create "${LIBSECP256K1_EXECUTABLES[@]}" -output "${BUILD_DIR}/libsecp256k1"
+  fi
 elif [[ $ACTION = "clean" ]]; then
   make clean
 fi
