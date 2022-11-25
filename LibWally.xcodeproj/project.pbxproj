@@ -28,7 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		75B9EE002810F88400E31B4D /* PBXContainerItemProxy */ = {
+		75683E51293049380014553B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FE9CD3A8229C397900345DFA /* Project object */;
 			proxyType = 1;
@@ -209,7 +209,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				75B9EE012810F88400E31B4D /* PBXTargetDependency */,
+				75683E52293049380014553B /* PBXTargetDependency */,
 			);
 			name = LibWally;
 			productName = LibWally;
@@ -325,10 +325,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		75B9EE012810F88400E31B4D /* PBXTargetDependency */ = {
+		75683E52293049380014553B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 75B9EDFC2810F83700E31B4D /* LibWallyCore */;
-			targetProxy = 75B9EE002810F88400E31B4D /* PBXContainerItemProxy */;
+			targetProxy = 75683E51293049380014553B /* PBXContainerItemProxy */;
 		};
 		FE9CD3BD229C397900345DFA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
