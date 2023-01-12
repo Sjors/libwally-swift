@@ -118,3 +118,6 @@ git clone https://github.com/Sjors/libwally-swift.git --recurse-submodules
 ```
 
 Xcode will build libwally-core for you, which may take a few minutes.
+
+When making changes to libwally-core, keep in mind that cleaning the build folder
+in Xcode [will not trigger a recompile](https://github.com/Sjors/libwally-swift/pull/82#issuecomment-1327837562). You need to call `git clean -dfx` inside `CLibWally/libwally-core`.

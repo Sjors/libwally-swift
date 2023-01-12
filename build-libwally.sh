@@ -10,9 +10,12 @@ cd CLibWally/libwally-core
 # Since libsecp256k1-zkp is rebased on vanilla libsecp256k1, we can simply checkout
 # a common commit.
 pushd src/secp256k1
-  # Latest commit used in Bitcoin Core:
+  # Latest tagged release used in Bitcoin Core:
   # https://github.com/bitcoin/bitcoin/commits/master/src/secp256k1
-  git checkout 8746600eec5e7fcd35dabd480839a3a4bdfee87b || exit 1
+  git remote | grep bitcoin-core || git remote add bitcoin-core https://github.com/bitcoin-core/secp256k1.git
+  git fetch bitcoin-core --tags
+  git checkout v0.2.0 || exit 1
+  git rev-parse HEAD | grep 21ffe4b22a9683cf24ae0763359e401d1284cc7a || exit 1
 popd
 
 BUILD_DIR="$(pwd)/build"
@@ -71,17 +74,17 @@ if [[ ${ACTION:-build} = "build" || $ACTION = "install" ]]; then
 
     LIBWALLY_DIR="${BUILD_DIR}/${PLATFORM_NAME}/libwallycore-${TARGET_ARCH}-apple-darwin.a"
     SECP_DIR="${BUILD_DIR}/${PLATFORM_NAME}/libsecp256k1-${TARGET_ARCH}-apple-darwin.a"
-    
+
     # If we haven't built our static library, let's go ahead and build it. Else, we can probably just not try and build at all.
     if [ ! -f $LIBWALLY_DIR ] || [ ! -f $SECP_DIR ]
     then
       echo "DEBUG:: File not found, let's build!"
       build ${PLATFORM_NAME} ${TARGET_ARCH}-apple-darwin "-arch ${ARCH} -m${TARGET_OS}-version-min=7.0 -fembed-bitcode"
-      
+
       # Tracks our list of executables so we know the static libraries we need to lipo later
       LIBWALLYCORE_EXECUTABLES+=($LIBWALLY_DIR)
       LIBSECP256K1_EXECUTABLES+=($SECP_DIR)
-      
+
       # Something changed, we should lipo later.
       NEEDS_LIPO=true
     fi
