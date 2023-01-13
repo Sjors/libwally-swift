@@ -369,7 +369,7 @@ public struct PSBT : Equatable {
                 wally_tx.deallocate()
             }
         }
-        guard wally_psbt_extract(psbt, &output) == WALLY_OK else {
+        guard wally_psbt_extract(psbt, UInt32(0), &output) == WALLY_OK else {
             return nil
         }
         precondition(output != nil)
