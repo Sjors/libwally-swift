@@ -23,6 +23,7 @@ public struct Descriptor {
     public var network: Network
     public var canonical: String
     public var isRanged: Bool
+    public var miniscript: Bool
     
     // The descriptor is not fully validated.
     public init(_ descriptor: String, _ network: Network) throws {
@@ -37,6 +38,7 @@ public struct Descriptor {
         let feature_flags = UnsafeMutablePointer<UInt32>.allocate(capacity: 1)
         precondition(wally_descriptor_get_features(wally_descriptor, feature_flags) == WALLY_OK)
         self.isRanged = (feature_flags.pointee & UInt32(WALLY_MS_IS_RANGED)) != 0
+        self.miniscript = (feature_flags.pointee & UInt32(WALLY_MS_IS_DESCRIPTOR)) == 0
     
         // Canonicalize the descriptor
         var output: UnsafeMutablePointer<Int8>?
