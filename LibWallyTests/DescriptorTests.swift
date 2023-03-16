@@ -73,4 +73,17 @@ class DescriptorTests: XCTestCase {
         }
     }
     
+    func testWithoutMiniscript() throws {
+        let desc = try! Descriptor("pkh([3442193e/0']xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw/1)#62cpuxwx", .mainnet)
+        
+        XCTAssert(!desc.miniscript)
+    }
+    
+    func testWithMiniscript() throws {
+        let desc = try! Descriptor("wsh(and_v(v:pk([3442193e/0']xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw/1),after(10)))#224tnmsn", .mainnet)
+        
+        XCTAssert(desc.miniscript)
+    }
+    
+    
 }
