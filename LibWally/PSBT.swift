@@ -428,7 +428,7 @@ public struct PSBT : Equatable {
         defer {
             psbt.deallocate()
         }
-        guard wally_psbt_finalize(psbt) == WALLY_OK else {
+        guard wally_psbt_finalize(psbt, UInt32(0)) == WALLY_OK else {
             return false
         }
         return true
