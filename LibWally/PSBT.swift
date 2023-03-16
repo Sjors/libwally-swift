@@ -408,18 +408,35 @@ public struct PSBT : Equatable {
     }
 
     public mutating func sign(_ hdKey: HDKey) {
-        for input in self.inputs {
-            if let origins: [PubKey : KeyOrigin] = input.canSign(hdKey) {
-                for origin in origins {
-                    if let childKey = try? hdKey.derive(origin.value.path) {
-                        if let privKey = childKey.privKey {
-                            precondition(privKey.pubKey == origin.key)
-                            self.sign(privKey)
-                        }
-                    }
-                }
-            }
+        let psbt = UnsafeMutablePointer<wally_psbt>.allocate(capacity: 1)
+        psbt.initialize(to: self.wally_psbt)
+        defer {
+           psbt.deallocate()
         }
+        var ext_key = hdKey.wally_ext_key // Copy for unsafe access
+        
+        // Obtain the BIP 370 PSBT ID, only used for debugging.
+        // Both wally_psbt_sign_bip32 and this function call psbt_build_tx internally
+        let psbtId = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(WALLY_TXHASH_LEN))
+        defer {
+            psbtId.deallocate()
+        }
+        precondition(wally_psbt_get_id(psbt, UInt32(0), psbtId, Int(WALLY_TXHASH_LEN)) == WALLY_OK)
+
+        precondition(wally_psbt_sign_bip32(psbt, &ext_key, UInt32(EC_FLAG_GRIND_R)) == WALLY_OK)
+        
+//        for input in self.inputs {
+//            if let origins: [PubKey : KeyOrigin] = input.canSign(hdKey) {
+//                for origin in origins {
+//                    if let childKey = try? hdKey.derive(origin.value.path) {
+//                        if let privKey = childKey.privKey {
+//                            precondition(privKey.pubKey == origin.key)
+//                            self.sign(privKey)
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     public mutating func finalize() -> Bool {
