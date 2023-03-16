@@ -14,25 +14,44 @@ public struct KeyOrigin : Equatable {
     let path: String
 }
 
+func pathComponent(_ component: UInt32) -> String {
+    return component < BIP32_INITIAL_HARDENED_CHILD ? String(component) : String(component - BIP32_INITIAL_HARDENED_CHILD) + "'"
+}
+
 func getOrigins (keypaths: wally_map, network: Network) -> [PubKey: KeyOrigin] {
     var origins: [PubKey: KeyOrigin] = [:]
+    var keypath_map = keypaths // Copy to allow unsafe access
     for i in 0..<keypaths.num_items {
-        // TOOD: simplify after https://github.com/ElementsProject/libwally-core/issues/241
         let item: wally_map_item = keypaths.items[i]
-
         let pubKey = PubKey(Data(bytes: item.key, count: Int(EC_PUBLIC_KEY_LEN)), network)!
-        // The value contains a 4 byte fingerprint followed by the path
-        let fingerprint = Data(bytes: item.value, count: Int(BIP32_KEY_FINGERPRINT_LEN))
-        let keyPath = Data(bytes: item.value + Int(BIP32_KEY_FINGERPRINT_LEN), count: Int(item.value_len) - Int(BIP32_KEY_FINGERPRINT_LEN))
-
-        var components: [UInt32] = []
-        // Each path component is stored as a little endian 32 bit unsigned integer
-        for j in 0..<keyPath.count / 4 {
-            let pathComponentBytes = keyPath.subdata(in: (j * 4)..<((j + 1) * 4))
-            let pathComponent: UInt32 = pathComponentBytes.withUnsafeBytes{ $0.load(as: UInt32.self).littleEndian}
-            components.append(pathComponent)
+        
+        // Get fingerprint using libwally helper method
+        let fingerprintBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BIP32_KEY_FINGERPRINT_LEN))
+        defer {
+            fingerprintBytes.deallocate()
         }
-        let path: String = "m/" + components.map { $0 < BIP32_INITIAL_HARDENED_CHILD ? String($0) : String($0 - BIP32_INITIAL_HARDENED_CHILD) + "'" }.joined(separator: "/")
+        precondition(wally_map_keypath_get_item_fingerprint(&keypath_map, i, fingerprintBytes, Int(BIP32_KEY_FINGERPRINT_LEN)) == WALLY_OK)
+        let fingerprint = Data(bytes: fingerprintBytes, count: Int(BIP32_KEY_FINGERPRINT_LEN))
+        
+        // Get keypath using libwally helper method
+        let keyPathLen = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            keyPathLen.deallocate()
+        }
+        precondition(wally_map_keypath_get_item_path_len(&keypath_map, i, keyPathLen) == WALLY_OK)
+        let keyPathItemsBytes = UnsafeMutablePointer<UInt32>.allocate(capacity: keyPathLen.pointee)
+        let keyPathWritten = UnsafeMutablePointer<Int>.allocate(capacity: 1)
+        defer {
+            keyPathItemsBytes.deallocate()
+            keyPathWritten.deallocate()
+        }
+        precondition(wally_map_keypath_get_item_path(&keypath_map, i, keyPathItemsBytes, keyPathLen.pointee, keyPathWritten) == WALLY_OK)
+        // TODO: use serialization helper: https://github.com/ElementsProject/libwally-core/issues/377
+        var keyPathItems: [UInt32] = []
+        for index in 0..<keyPathLen.pointee {
+            keyPathItems.append((keyPathItemsBytes + index).pointee)
+        }
+        let path: String = "m/" + keyPathItems.map { pathComponent($0) }.joined(separator: "/")
         origins[pubKey] = KeyOrigin(fingerprint: fingerprint, path: path)
     }
     return origins
